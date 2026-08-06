@@ -1,0 +1,3339 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Land Info — ভূমি পরিমাপ, খতিয়ান, হিস্যা ও উত্তরাধিকার হিসাবের ফ্রি টুল</title>
+  <meta name="description" content="বাংলাদেশের জমি পরিমাপ, খতিয়ান ও হিস্যার হিসাব, মুসলিম ফরায়েজ ও হিন্দু দায়ভাগ উত্তরাধিকার বণ্টন, দলিল রেজিস্ট্রেশন খরচ ও মৌজা ম্যাপ — ১৬টি টুল, সম্পূর্ণ ফ্রি, লগইন ছাড়া।">
+  <meta name="theme-color" content="#4f46e5">
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://ronedata.github.io/map/favicon.ico" type="image/x-icon">
+
+  <!-- বাংলা ফন্ট: Noto Sans Bengali (UI) · Anek Bangla (শিরোনাম) · Tiro Bangla (প্রিন্ট সনদ) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Anek+Bangla:wght@500;600;700;800&family=Tiro+Bangla:ital@0;1&display=swap">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  
+  <!-- Chart.js for Graphical View -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Style System -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/faraiz.css">
+  <link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="copy-toast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#10b981;color:#fff;padding:8px 16px;border-radius:20px;font-size:0.85rem;font-weight:700;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+    কপি করা হয়েছে!
+  </div>
+
+  <!-- Header Navbar -->
+  <header class="app-header">
+    <div class="container">
+      <div class="header-inner">
+        
+        <!-- Logo -->
+        <a href="#" class="brand-logo">
+          <div class="brand-icon">
+            <i class="bi bi-geo-alt-fill"></i>
+          </div>
+          <div class="brand-text">
+            <h1>Land Info</h1>
+            <span>ফ্রি ডিজিটাল ভূমি সার্ভিস</span>
+          </div>
+        </a>
+
+        <!-- Header Right Actions -->
+        <div class="header-actions">
+          <button class="btn-icon" id="dark-toggle-btn" title="ডার্ক মোড টগল">
+            <i class="bi bi-moon-stars-fill dark-toggle-icon"></i>
+          </button>
+
+          <button class="btn-icon d-md-none" id="drawer-toggle" title="মেনু খুলুন">
+            <i class="bi bi-list" style="font-size:1.4rem"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <div class="nav-drawer" id="nav-drawer">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-icon" style="width:36px;height:36px;font-size:1.1rem">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <div class="brand-text">
+          <h1 style="font-size:1.1rem">Land Info</h1>
+        </div>
+      </div>
+      <button class="btn-icon" id="drawer-close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <div style="background:var(--primary-light);padding:14px;border-radius:12px;margin-bottom:16px">
+        <h4 style="font-size:0.95rem;color:var(--primary);margin-bottom:4px">১০০% ফ্রি ডিজিটাল টুলস</h4>
+        <p style="font-size:0.82rem;color:var(--text-muted)">কোনো অ্যাকাউন্ট বা ফি ছাড়াই সকল সুবিধা ব্যবহার করুন।</p>
+      </div>
+
+      <a href="#" class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('mouza-map')">
+        <i class="bi bi-map-fill text-primary"></i>
+        <span>সারাদেশের মৌজা ম্যাপ</span>
+      </a>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('farayeiz')">
+        <i class="bi bi-diagram-3 text-danger"></i>
+        <span>উত্তরাধিকার (মুসলিম)</span>
+      </div>
+      
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('hindu')">
+        <i class="bi bi-diagram-2 text-warning"></i>
+        <span>উত্তরাধিকার (হিন্দু) — দায়ভাগ</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('canvas-measure')">
+        <i class="bi bi-rulers text-success"></i>
+        <span>ক্যানভাস জমি পরিমাপ</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('hissa-calc')">
+        <i class="bi bi-percent text-info"></i>
+        <span>হিস্যা ক্যালকুলেটর</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('khotian-analyzer')">
+        <i class="bi bi-file-earmark-spreadsheet text-warning"></i>
+        <span>খতিয়ান হিস্যা বিশ্লেষণ</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('dolil-fee')">
+        <i class="bi bi-cash-coin text-success"></i>
+        <span>দলিল রেজিস্ট্রেশন খরচ</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('dag-portion')">
+        <i class="bi bi-pin-map text-primary"></i>
+        <span>দাগের মধ্যে অংশ</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('tofasil')">
+        <i class="bi bi-file-earmark-text text-success"></i>
+        <span>তফসিল বন্টন</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('ratio')">
+        <i class="bi bi-pie-chart text-warning"></i>
+        <span>অনুপাত ক্যালকুলেটর</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('land-formula')">
+        <i class="bi bi-book text-info"></i>
+        <span>জমির সকল সূত্র</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('ana-gonda')">
+        <i class="bi bi-calculator text-primary"></i>
+        <span>আনা-গন্ডা কনভার্টার</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('unit-converter')">
+        <i class="bi bi-arrow-repeat text-primary"></i>
+        <span>একক পরিবর্তন</span>
+      </div>
+
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('map-overlay')">
+        <i class="bi bi-layers-half text-secondary"></i>
+        <span>প্যান্টোগ্রাফ (ম্যাপ তুলনা)</span>
+      </div>
+
+      <hr style="border-color:var(--border-color);margin:16px 0">
+
+      <div class="drawer-link" id="dark-toggle-drawer">
+        <i class="bi bi-moon-stars dark-toggle-icon"></i>
+        <span>Dark Mode</span>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <!-- Live Search Box -->
+      <div class="search-box-wrapper">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" id="tool-search-input" class="search-input" placeholder="যেকোনো টুল খুঁজুন (যেমন: ম্যাপ, উত্তরাধিকার, হিস্যা, পরিমাপ, খতিয়ান)...">
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="category-filter">
+        <button class="chip-btn active" data-filter="all">
+          <i class="bi bi-grid-fill"></i> সকল টুলস
+        </button>
+        <button class="chip-btn" data-filter="inheritance">
+          <i class="bi bi-diagram-3"></i> উত্তরাধিকার
+        </button>
+        <button class="chip-btn" data-filter="map">
+          <i class="bi bi-map"></i> ম্যাপ ও ডাউনলোড
+        </button>
+        <button class="chip-btn" data-filter="measure">
+          <i class="bi bi-ruler"></i> পরিমাপ ও জ্যামিতি
+        </button>
+        <button class="chip-btn" data-filter="khotian">
+          <i class="bi bi-file-text"></i> খতিয়ান ও হিস্যা
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools Main Content Grid -->
+  <main class="container">
+    <div class="tools-grid" id="tools-grid">
+
+      <!-- কার্ড ১: উত্তরাধিকার (মুসলিম) — ফরায়েজ -->
+      <div class="tool-card" data-category="inheritance" data-title="উত্তরাধিকার মুসলিম ফারায়েজ ফরায়েজ ওয়ারিশ বন্টন" onclick="AppController.openToolModal('farayeiz')">
+        <span class="tool-badge badge-featured">ফরায়েজ</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#d1fae5;color:#059669">
+            <i class="bi bi-diagram-3-fill"></i>
+          </div>
+          <h3 class="tool-title">উত্তরাধিকার (মুসলিম)</h3>
+          <p class="tool-desc">ইসলামিক ফরায়েজ আইন অনুযায়ী জমি (শতংশ/একর), নগদ টাকা, স্বর্ণ ও রৌপ্যের নিখুঁত ওয়ারিশ বন্টন হিসাব করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- Card: Inheritance (Hindu) — দায়ভাগ -->
+      <div class="tool-card" data-category="inheritance" data-title="উত্তরাধিকার হিন্দু দায়ভাগ inheritance-hindu সম্পত্তি বণ্টন" onclick="AppController.openToolModal('hindu')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
+            <i class="bi bi-diagram-2-fill"></i>
+          </div>
+          <h3 class="tool-title">উত্তরাধিকার (হিন্দু) - দায়ভাগ</h3>
+          <p class="tool-desc">বাংলাদেশে প্রচলিত দায়ভাগ মত ও ১৯৩৭ সালের আইন অনুযায়ী হিন্দু সম্পত্তির উত্তরাধিকার বণ্টন হিসাব করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- Card: দলিল রেজিস্ট্রেশন খরচ -->
+      <div class="tool-card" data-category="khotian" data-title="দলিল রেজিস্ট্রেশন খরচ স্ট্যাম্প শুল্ক উৎসে কর মৌজা রেট জমি রেজিস্ট্রি খরচ" onclick="AppController.openToolModal('dolil-fee')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#dcfce7;color:#16a34a">
+            <i class="bi bi-cash-coin"></i>
+          </div>
+          <h3 class="tool-title">দলিল রেজিস্ট্রেশন খরচ ক্যালকুলেটর</h3>
+          <p class="tool-desc">মৌজা রেট ও জমির পরিমাণ দিয়ে স্ট্যাম্প শুল্ক, রেজিস্ট্রেশন ফি, স্থানীয় সরকার কর ও উৎসে করসহ মোট খরচ বের করুন।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: সারাদেশের মৌজা ম্যাপ -->
+      <div class="tool-card" data-category="map" data-title="মৌজা ম্যাপ ডাউনলোড সারাদেশ CS SA RS BS দিয়ারা মহানগর জরিপ mouza map archive শিট" onclick="AppController.openToolModal('mouza-map')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#1d4ed8">
+            <i class="bi bi-map-fill"></i>
+          </div>
+          <h3 class="tool-title">সারাদেশের মৌজা ম্যাপ</h3>
+          <p class="tool-desc">১ লক্ষ ৯৪ হাজারের বেশি মৌজা ম্যাপ — বিভাগ, জেলা, উপজেলা ও জরিপের ধরন অনুযায়ী খুঁজে সরাসরি নামিয়ে নিন।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- কার্ড: মৌজা ম্যাপে জমি পরিমাপ — কাজ চলমান -->
+      <div class="tool-card" data-category="measure" data-title="মৌজা ম্যাপে জমি পরিমাপ ভাগবণ্টন নকশা থেকে জমি মাপা স্কেল ক্যালিব্রেশন দাগ শতক basics measure" onclick="AppController.openToolModal('map-measure')">
+        <span class="tool-badge badge-wip">কাজ চলছে</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#b45309">
+            <i class="bi bi-rulers"></i>
+          </div>
+          <h3 class="tool-title">মৌজা ম্যাপে জমি পরিমাপ</h3>
+          <p class="tool-desc">নকশার স্কেল ঠিক করে সরাসরি ম্যাপের উপর দাগ এঁকে জমির পরিমাণ বের করুন — প্রতিটি বাহুর মাপসহ।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- কার্ড: গুগল আর্থে মৌজা ম্যাপ (KMZ) — কাজ চলমান -->
+      <div class="tool-card" data-category="map" data-title="গুগল আর্থ KMZ এক্সপোর্ট মৌজা ম্যাপ স্যাটেলাইট ক্যালিব্রেশন google earth kmz overlay নিয়ন্ত্রণ বিন্দু" onclick="AppController.openToolModal('kmz-export')">
+        <span class="tool-badge badge-wip">কাজ চলছে</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#dcfce7;color:#15803d">
+            <i class="bi bi-globe-americas"></i>
+          </div>
+          <h3 class="tool-title">গুগল আর্থে মৌজা ম্যাপ (KMZ)</h3>
+          <p class="tool-desc">মৌজা ম্যাপের ছবিকে স্যাটেলাইট ছবির সাথে মিলিয়ে KMZ ফাইল বানান — Google Earth এ খুললে জমি ঠিক জায়গায় বসবে।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: খতিয়ান বিশ্লেষণ (পর্চার হিসাব) -->
+      <div class="tool-card" data-category="khotian" data-title="খতিয়ান বিশ্লেষণ পর্চার হিসাব পর্চা গণনা দাগভিত্তিক বণ্টন khotian bisleshon porcha hisab তফসিল" onclick="AppController.openToolModal('khotian-porcha')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#e0e7ff;color:#4f46e5">
+            <i class="bi bi-table"></i>
+          </div>
+          <h3 class="tool-title">খতিয়ান বিশ্লেষণ (পর্চার হিসাব)</h3>
+          <p class="tool-desc">পর্চার একাধিক দাগ ও একাধিক মালিকের হিস্যা দিয়ে কে কোন দাগে কত জমি পাবেন তার পূর্ণ তালিকা ও তফসিল তৈরি করুন।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: মৌজা মূল্য তালিকা -->
+      <div class="tool-card" data-category="khotian" data-title="মৌজা মূল্য সম্পত্তির সর্বনিম্ন বাজার মূল্য জমির রেট mouza rate land value সরকারি মূল্য তালিকা সাব-রেজিস্ট্রি" onclick="AppController.openToolModal('mouza-value')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i>
+          </div>
+          <h3 class="tool-title">সম্পত্তির সর্বনিম্ন বাজার মূল্য (মৌজা মূল্য)</h3>
+          <p class="tool-desc">বিভাগ, জেলা ও সাব-রেজিস্ট্রি অফিস বেছে নিয়ে সরকারনির্ধারিত মৌজা রেটের তালিকা সরাসরি দেখুন ও ডাউনলোড করুন।</p>
+          <p class="tool-credit"><i class="bi bi-award"></i>তালিকার সৌজন্যে <b>Land Value</b></p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: দাগ পোরশন -->
+      <div class="tool-card" data-category="khotian" data-title="দাগ পোরশন দাগের মধ্যে অংশ dag portion খতিয়ানের অংশ" onclick="AppController.openToolModal('dag-portion')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#2563eb">
+            <i class="bi bi-pin-map-fill"></i>
+          </div>
+          <h3 class="tool-title">দাগের মধ্যে অত্র খতিয়ানের অংশ</h3>
+          <p class="tool-desc">দাগের মোট জমি ও আবেদিত জমির পরিমাণ দিয়ে আপনার নির্দিষ্ট অংশ বা হিস্যা নিখুঁতভাবে বের করুন।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: তফসিল বন্টন -->
+      <div class="tool-card" data-category="khotian" data-title="তফসিল বন্টন tofasil division নামজারি আবেদন গ্রহীতা" onclick="AppController.openToolModal('tofasil')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#d1fae5;color:#059669">
+            <i class="bi bi-file-earmark-text-fill"></i>
+          </div>
+          <h3 class="tool-title">তফসিল বন্টন ক্যালকুলেটর</h3>
+          <p class="tool-desc">নামজারির আবেদনে একাধিক গ্রহীতার জমির পরিমাণ দিয়ে প্রত্যেকের নির্ণেয় অংশ বের করুন ও বন্টননামা প্রিন্ট করুন।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: অনুপাত ক্যালকুলেটর -->
+      <div class="tool-card" data-category="measure" data-title="অনুপাত ক্যালকুলেটর ratio calculator আনুপাতিক ভাগ সমীকরণ" onclick="AppController.openToolModal('ratio')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
+            <i class="bi bi-pie-chart-fill"></i>
+          </div>
+          <h3 class="tool-title">অনুপাত ক্যালকুলেটর</h3>
+          <p class="tool-desc">যেকোনো গাণিতিক অনুপাত বা আনুপাতিক ভাগ বের করুন। সাথে ইনলাইন সমীকরণ ক্যালকুলেটর।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- Card: জমির সকল সূত্র -->
+      <div class="tool-card" data-category="measure" data-title="জমির সকল সূত্র land formula হিরণের সূত্র ক্ষেত্রফল গড় পদ্ধতির ভুল" onclick="AppController.openToolModal('land-formula')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#e0f2fe;color:#0284c7">
+            <i class="bi bi-book-fill"></i>
+          </div>
+          <h3 class="tool-title">জমির সকল সূত্র</h3>
+          <p class="tool-desc">একক রূপান্তর, হিরণের সূত্র, ট্রাপিজিয়াম, বৃত্ত — সব ক্ষেত্রফলের সূত্র এবং গড় পদ্ধতির ভুল সম্পর্কে সতর্কতা।</p>
+        </div>
+        <div class="tool-footer"><span>দেখুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
+      <!-- কার্ড ৩: হিস্যা ক্যালকুলেটর -->
+      <div class="tool-card" data-category="khotian" data-title="হিস্যা ক্যালকুলেটর হিসা আনা গণ্ডা অংশ" onclick="AppController.openToolModal('hissa-calc')">
+        <div>
+          <div class="tool-icon-wrapper" style="background:#ccfbf1;color:#0d9488">
+            <i class="bi bi-percent"></i>
+          </div>
+          <h3 class="tool-title">হিস্যা ক্যালকুলেটর</h3>
+          <p class="tool-desc">মোট জমির যেকোনো আনা-গন্ডা, শতকরা (%), দশমিক বা ভগ্নাংশ হিস্যা অনুযায়ী তার নির্দিষ্ট পরিমাণ জমি বের করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- কার্ড ৪: ক্যানভাস জমি পরিমাপ -->
+      <div class="tool-card" data-category="measure" data-title="মৌজা ম্যাপে জমি পরিমাপ ক্যানভাস বাহু কর্ণ ক্ষেত্রফল" onclick="AppController.openToolModal('canvas-measure')">
+        <div>
+          <div class="tool-icon-wrapper" style="background:#ede9fe;color:#7c3aed">
+            <i class="bi bi-vector-square"></i>
+          </div>
+          <h3 class="tool-title">ক্যানভাস জমি পরিমাপ</h3>
+          <p class="tool-desc">৪ বাহু ও কর্ণের ইনপুট দিয়ে ক্যানভাসে চিত্র এঁকে সঠিক শতাংশ, কাঠা, বিঘা এবং বর্গফুট অটোমেটিক হিসাব করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- Card 5: Khotian Owner Share Analyzer -->
+      <div class="tool-card" data-category="khotian" data-title="খতিয়ান মালিকানা হিস্যা বিশ্লেষণ" onclick="AppController.openToolModal('khotian-analyzer')">
+        <div>
+          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#2563eb">
+            <i class="bi bi-file-earmark-spreadsheet"></i>
+          </div>
+          <h3 class="tool-title">খতিয়ান হিস্যা বিশ্লেষণ</h3>
+          <p class="tool-desc">খতিয়ানের আনা, গন্ডা, কড়া, ক্রান্তি ও তিল ইনপুট দিয়ে ১ ক্লিকে সকল মালিকের জমির সঠিক পরিমাণ বের করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- Card 6: Ana-Gonda Converter -->
+      <div class="tool-card" data-category="khotian" data-title="আনা-গন্ডা-কড়া-ক্রান্তি-তিল কনভার্টার" onclick="AppController.openToolModal('ana-gonda')">
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fce7f3;color:#db2777">
+            <i class="bi bi-calculator-fill"></i>
+          </div>
+          <h3 class="tool-title">আনা-গন্ডা কনভার্টার</h3>
+          <p class="tool-desc">১৬ আনার খতিয়ানি অংশকে আধুনিক দশমিক, শতাংশ, বর্গফুট ও কাঠায় তাৎক্ষণিক কনভার্ট করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- Card 7: Land Unit Converter -->
+      <div class="tool-card" data-category="measure" data-title="জমি একক পরিমাপ রূপান্তর শতক কাঠা বিঘা একর" onclick="AppController.openToolModal('unit-converter')">
+        <div>
+          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <h3 class="tool-title">জমি একক কনভার্টার</h3>
+          <p class="tool-desc">শতক, কাঠা, বিঘা, একর, বর্গফুট, বর্গগজ এবং অজুতাংশের মধ্যে দ্রুত একক রূপান্তর করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- কার্ড ৮: তুলনামূলক প্যান্টোগ্রাফ — কাজ চলমান -->
+      <div class="tool-card" data-category="map" data-title="তুলনামূলক প্যান্টোগ্রাফ ম্যাপ ওভারলে" onclick="AppController.openToolModal('map-overlay')">
+        <span class="tool-badge badge-wip">কাজ চলছে</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#f3e8ff;color:#9333ea">
+            <i class="bi bi-layers-half"></i>
+          </div>
+          <h3 class="tool-title">তুলনামূলক প্যান্টোগ্রাফ</h3>
+          <p class="tool-desc">দুটি ম্যাপের ছবি একসাথে বসিয়ে অপাসিটি (স্বচ্ছতা) কমিয়ে CS, SA, RS ম্যাপের সীমানা সহজে তুলনা করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+      <!-- কার্ড ৯: প্রিন্ট স্টুডিও — কাজ চলমান -->
+      <div class="tool-card" data-category="measure" data-title="সার্ভে প্রতিবেদন প্রিন্ট স্টুডিও" onclick="AppController.openToolModal('print-studio')">
+        <span class="tool-badge badge-wip">কাজ চলছে</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#e0f2fe;color:#0369a1">
+            <i class="bi bi-printer-fill"></i>
+          </div>
+          <h3 class="tool-title">সার্ভে প্রতিবেদন প্রিন্ট স্টুডিও</h3>
+          <p class="tool-desc">জমির মাপ ও নকশা দিয়ে পেশাদার জরিপ প্রতিবেদন তৈরি করুন এবং সরাসরি প্রিন্ট বা PDF ডাউনলোড করুন।</p>
+        </div>
+        <div class="tool-footer">
+          <span>টুল খুলুন</span>
+          <i class="bi bi-arrow-right"></i>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- APP MODAL CONTAINER -->
+  <div class="app-modal" id="app-modal">
+    <div class="modal-content">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="bi bi-tools text-primary" id="modal-title-icon"></i>
+          <span id="modal-title-text">টুলস ভিউ</span>
+        </div>
+        <button class="btn-icon modal-close" title="বন্ধ করুন" aria-label="বন্ধ করুন">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body" id="modal-dynamic-body">
+
+        <!-- VIEW: মৌজা ম্যাপে জমি পরিমাপ -->
+        <div id="view-map-measure" class="tool-view-content mm-wrap" style="display:none">
+
+          <div class="fz-warn">
+            <i class="bi bi-cone-striped"></i>
+            <span><b>এই টুলের কাজ চলছে।</b> এখন স্কেল ঠিক করে প্লট আঁকা ও জমির
+            পরিমাণ বের করা যায়। <b>ভাগবণ্টন, লাইন, বৃত্ত, টেক্সট ও রপ্তানি</b> পরে যোগ হবে।</span>
+          </div>
+
+          <div class="mm-stage" id="mm-stage">
+            <canvas id="mm-canvas"></canvas>
+
+            <!-- শুরুর কার্ড -->
+            <div class="mm-intro" id="mm-intro">
+              <div class="mm-intro-ic"><i class="bi bi-map"></i></div>
+              <h4>মৌজা ম্যাপ নিন</h4>
+              <p>আর্কাইভ থেকে বেছে নিন, অথবা নিজের ছবি/PDF আপলোড করুন।</p>
+              <div class="mm-intro-btns">
+                <button type="button" class="btn btn-primary" onclick="AppController.mmPick('archive')">
+                  <i class="bi bi-collection"></i> আর্কাইভ থেকে
+                </button>
+                <button type="button" class="btn btn-outline" onclick="AppController.mmPick('file')">
+                  <i class="bi bi-upload"></i> আপলোড
+                </button>
+              </div>
+              <input type="file" id="mm-file" accept="image/jpeg,image/png,application/pdf"
+                     style="display:none" onchange="AppController.mmLoadFile(this)">
+            </div>
+
+            <!-- স্কেলের অবস্থা -->
+            <div class="mm-scale-pill" id="mm-scale-pill" style="display:none"
+                 onclick="AppController.mmScaleDialog(true)">
+              <i class="bi bi-rulers"></i><span id="mm-scale-txt">স্কেল ঠিক করুন</span>
+            </div>
+
+            <!-- এই জুমে এক পিক্সেল কত ফুট — নির্ভুলতার সতর্কবাতি -->
+            <div class="mm-prec" id="mm-prec" style="display:none">
+            </div>
+
+            <!-- বাঁ পাশের নিয়ন্ত্রণ -->
+            <div class="mm-left" id="mm-left" style="display:none">
+              <button type="button" class="mm-cbtn" title="বড়" onclick="AppController.mmZoom(1)"><i class="bi bi-plus-lg"></i></button>
+              <button type="button" class="mm-cbtn" title="ছোট" onclick="AppController.mmZoom(-1)"><i class="bi bi-dash-lg"></i></button>
+              <button type="button" class="mm-cbtn" title="পুরোটা" onclick="AppController.mmFit()"><i class="bi bi-arrows-fullscreen"></i></button>
+              <button type="button" class="mm-cbtn" id="mm-history-undo" title="পূর্বাবস্থায় ফিরুন"
+                      onclick="AppController.mmHistoryUndo()" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
+              <button type="button" class="mm-cbtn" id="mm-history-redo" title="আবার করুন"
+                      onclick="AppController.mmHistoryRedo()" disabled><i class="bi bi-arrow-clockwise"></i></button>
+              <button type="button" class="mm-cbtn danger" title="সব মুছুন" onclick="AppController.mmClear()"><i class="bi bi-trash3"></i></button>
+            </div>
+
+            <!-- ডান পাশের টুলবার -->
+            <div class="mm-tools" id="mm-tools" style="display:none">
+              <button type="button" class="mm-tool" data-tool="map" title="ম্যাপ নিন"
+                      onclick="AppController.mmPick('menu')"><i class="bi bi-image"></i><span>ম্যাপ</span></button>
+              <button type="button" class="mm-tool" data-tool="draw" title="প্লট আঁকুন"
+                      onclick="AppController.mmTool('draw')"><i class="bi bi-pentagon"></i><span>আঁকুন</span></button>
+              <button type="button" class="mm-tool" data-tool="point" title="পয়েন্ট এডিট"
+                      onclick="AppController.mmTool('point')"><i class="bi bi-bounding-box-circles"></i><span>পয়েন্ট</span></button>
+              <button type="button" class="mm-tool active" data-tool="pan" title="সরান"
+                      onclick="AppController.mmTool('pan')"><i class="bi bi-hand-index"></i><span>প্যান</span></button>
+              <button type="button" class="mm-tool" data-tool="select" title="নির্বাচন"
+                      onclick="AppController.mmTool('select')"><i class="bi bi-cursor"></i><span>নির্বাচন</span></button>
+              <button type="button" class="mm-tool" data-tool="divide" title="ভাগবণ্টন"
+                      onclick="AppController.mmDivideMode()"><i class="bi bi-pie-chart"></i><span>ভাগ</span></button>
+            </div>
+
+            <!-- আঁকার সময় নিচের বার -->
+            <div class="mm-draw-bar" id="mm-draw-bar" style="display:none">
+              <span id="mm-draw-hint">ম্যাপে ক্লিক করে পয়েন্ট বসান</span>
+              <button type="button" class="kmz-mini" id="mm-undo" onclick="AppController.mmUndoPoint()">শেষ পয়েন্ট মুছুন</button>
+              <button type="button" class="kmz-mini" onclick="AppController.mmCancelDraft()">বাতিল</button>
+              <button type="button" class="btn btn-primary btn-sm" id="mm-finish"
+                      onclick="AppController.mmFinish()" disabled>
+                <i class="bi bi-check-lg"></i> প্লট সম্পন্ন
+              </button>
+            </div>
+
+            <!-- পয়েন্ট এডিটের বার -->
+            <div class="mm-draw-bar" id="mm-pt-bar" style="display:none">
+              <span id="mm-pt-hint">কোণার বিন্দু ধরে টানুন · বাহুর গায়ে চাপ দিলে নতুন বিন্দু</span>
+              <button type="button" class="kmz-mini danger" id="mm-pt-del"
+                      onclick="AppController.mmDelVertex()" disabled>
+                <i class="bi bi-x-circle"></i> এই বিন্দু মুছুন
+              </button>
+            </div>
+
+            <!-- নিচে-বাঁয়ে তিন টাইল -->
+            <div class="mm-tiles" id="mm-tiles" style="display:none">
+              <div class="mm-tile"><b id="mm-t-cur">০ শতক</b><span>বর্তমান প্লট</span></div>
+              <div class="mm-tile"><b id="mm-t-tot">০ শতক</b><span>মোট এলাকা</span></div>
+              <div class="mm-tile"><b id="mm-t-cnt">০টি</b><span>সম্পন্ন প্লট</span></div>
+            </div>
+          </div>
+
+          <!-- প্লট তালিকা -->
+          <div class="mm-list-wrap" id="mm-list-wrap" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num"><i class="bi bi-list-ul"></i></span>
+              <h3>প্লটের তালিকা</h3>
+              <span class="fz-pill" id="mm-list-pill">০টি</span>
+              <label class="mm-unit-pick" title="বাহুর মাপ কোন এককে দেখাবে">
+                <i class="bi bi-rulers"></i>
+                <select id="mm-label-unit" onchange="AppController.mmLabelUnit(this.value)"></select>
+              </label>
+            </div>
+            <div id="mm-list" class="mm-list">কোনো প্লট নেই</div>
+          </div>
+
+          <div class="mm-history-wrap" id="mm-history-wrap" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num"><i class="bi bi-clock-history"></i></span>
+              <h3>পরিবর্তনের ইতিহাস</h3>
+              <span class="fz-pill" id="mm-history-pill">১টি</span>
+            </div>
+            <div id="mm-history" class="mm-history"></div>
+          </div>
+
+          <!-- ভাগবণ্টন -->
+          <div class="mm-div-wrap" id="mm-div-wrap" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num"><i class="bi bi-pie-chart"></i></span>
+              <h3>জমি ভাগবণ্টন</h3>
+              <span class="fz-pill" id="mm-div-plot">প্লট বাছুন</span>
+            </div>
+
+            <div class="fz-seg" style="margin-bottom:12px">
+              <button type="button" class="fz-seg-btn active" id="mm-dm-prop"
+                      onclick="AppController.mmDivMode('prop')">আনুপাতিক (শরিকের অংশ)</button>
+              <button type="button" class="fz-seg-btn" id="mm-dm-man"
+                      onclick="AppController.mmDivMode('manual')">ম্যানুয়াল (রেখা টেনে)</button>
+            </div>
+
+            <!-- আনুপাতিক -->
+            <div id="mm-div-prop">
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-signpost-split"></i> কাটার রেখা কোন বরাবর যাবে</span></div>
+                <div class="fz-input-wrap fz-select-wrap">
+                  <select id="mm-div-side" onchange="AppController.mmDivPreview()"></select>
+                </div>
+                <p class="kmz-hint" style="margin:6px 0 0">
+                  বাহু বাছলে বন্টনের রেখা <b>সেই বাহুর সমান্তরালে</b> যাবে;
+                  দিক বাছলে ভাগ সেই দিক থেকে শুরু হবে।
+                </p>
+              </div>
+
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-sliders"></i> শরিকের অংশ কীভাবে দেবেন</span></div>
+                <div class="fz-seg fz-seg-sm">
+                  <button type="button" class="fz-seg-btn" id="mm-sm-pct"
+                          onclick="AppController.mmShareMode('pct')">% দিয়ে</button>
+                  <button type="button" class="fz-seg-btn active" id="mm-sm-satak"
+                          onclick="AppController.mmShareMode('satak')">শতক দিয়ে</button>
+                  <button type="button" class="fz-seg-btn" id="mm-sm-equal"
+                          onclick="AppController.mmShareMode('equal')">সমান ভাগে</button>
+                </div>
+              </div>
+
+              <div class="fz-panel-head" style="padding:0;margin:14px 0 8px">
+                <h3 style="font-size:0.95rem">শরিকগণ</h3>
+                <span class="fz-pill" id="mm-share-pill">০ / ০ শতক</span>
+                <button type="button" class="fz-btn-add" onclick="AppController.mmAddShare()">
+                  <i class="bi bi-plus-lg"></i> শরিক যোগ
+                </button>
+              </div>
+              <div id="mm-shares" class="mm-shares"></div>
+
+              <div class="mm-div-actions">
+                <button type="button" class="btn btn-primary" onclick="AppController.mmDoDivide()">
+                  <i class="bi bi-scissors"></i> ভাগ করুন
+                </button>
+                <button type="button" class="btn btn-outline" onclick="AppController.mmClearDivision()">
+                  <i class="bi bi-arrow-counterclockwise"></i> ভাগ মুছুন
+                </button>
+              </div>
+            </div>
+
+            <!-- ম্যানুয়াল -->
+            <div id="mm-div-man" style="display:none">
+              <p class="kmz-hint">
+                প্লটের এক পাশ থেকে অন্য পাশে <b>দুটি ক্লিক</b> করে রেখা টানুন —
+                প্লটটি <b>ক</b> ও <b>খ</b> দুই ভাগে কাটবে।
+              </p>
+              <div class="mm-div-actions">
+                <button type="button" class="btn btn-primary" onclick="AppController.mmStartManualCut()">
+                  <i class="bi bi-pencil"></i> রেখা টানুন
+                </button>
+                <button type="button" class="btn btn-outline" onclick="AppController.mmClearDivision()">
+                  <i class="bi bi-arrow-counterclockwise"></i> ভাগ মুছুন
+                </button>
+              </div>
+            </div>
+
+            <div id="mm-div-result" class="mm-div-result" style="display:none"></div>
+          </div>
+
+          <!-- অগ্রগতি -->
+          <div id="mm-prog" class="kmz-prog" style="display:none">
+            <div class="kmz-prog-bar"><span id="mm-prog-fill"></span></div>
+            <div class="kmz-prog-txt" id="mm-prog-txt">…</div>
+          </div>
+
+          <!-- আর্কাইভ বাছাই -->
+          <div id="mm-arch" class="kmz-arch" style="display:none">
+            <div class="fz-assets kmz-arch-grid">
+              <div class="fz-field"><div class="fz-field-label"><span>বিভাগ</span></div>
+                <div class="fz-input-wrap fz-select-wrap"><select id="mm-div" onchange="AppController.mmArchDiv()"><option>লোড হচ্ছে…</option></select></div></div>
+              <div class="fz-field"><div class="fz-field-label"><span>জেলা</span></div>
+                <div class="fz-input-wrap fz-select-wrap"><select id="mm-dist" onchange="AppController.mmArchDist()" disabled><option>—</option></select></div></div>
+              <div class="fz-field"><div class="fz-field-label"><span>উপজেলা</span></div>
+                <div class="fz-input-wrap fz-select-wrap"><select id="mm-upa" onchange="AppController.mmArchUpa()" disabled><option>—</option></select></div></div>
+              <div class="fz-field"><div class="fz-field-label"><span>জরিপ</span></div>
+                <div class="fz-input-wrap fz-select-wrap"><select id="mm-srv" onchange="AppController.mmArchSrv()" disabled><option>—</option></select></div></div>
+            </div>
+            <div class="fz-field"><div class="fz-field-label"><span><i class="bi bi-search"></i> ফাইল খুঁজুন</span></div>
+              <div class="fz-input-wrap"><input type="text" id="mm-fsearch" placeholder="ম্যাপের নাম" oninput="AppController.mmArchFilter()" disabled></div></div>
+            <div id="mm-arch-list" class="kmz-arch-list">উপরে বিভাগ থেকে জরিপ পর্যন্ত বেছে নিন।</div>
+          </div>
+
+          <!-- স্কেল ডায়ালগ -->
+          <div class="mm-modal" id="mm-scale-modal" style="display:none">
+            <div class="mm-modal-box">
+              <div class="mm-modal-head"><i class="bi bi-rulers"></i> স্কেল সেটিংস</div>
+
+              <div class="mm-method">
+                <h5>পদ্ধতি ১ — মৌজার স্কেল</h5>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>ম্যাপের স্কেল</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mm-mapscale" onchange="AppController.mmFillBarLengths()"></select>
+                  </div>
+                  <p class="kmz-hint" style="margin:6px 0 0">
+                    <b>কোনটা বাছবেন?</b> নকশার গায়ে লেখা থাকে। <b>1″=330′</b> লেখা
+                    থাকলে ১৬″=১ মাইল — গ্রামের সাধারণ মৌজা ম্যাপ। ঢাকা বা জেলা সদরের
+                    <b>সিটি জরিপ / বি‌আর‌এস</b> নকশা সাধারণত <b>৮০″=১ মাইল</b>।
+                  </p>
+                </div>
+
+                <!-- গুনিয়া ও ফুট স্কেলে এক ঘর কত — বাছাই অনুযায়ী বদলায় -->
+                <div class="mm-gunia" id="mm-gunia"></div>
+                <div class="fz-field">
+                  <div class="fz-field-label">
+                    <span>স্ক্যান DPI</span>
+                    <span class="mm-badge" id="mm-dpi-badge" style="display:none"></span>
+                  </div>
+                  <div class="fz-input-wrap fz-select-wrap"><select id="mm-dpi"></select></div>
+                </div>
+                <p class="kmz-hint" id="mm-dpi-note">
+                  PDF হলে DPI নিজে থেকেই বেরিয়ে আসে — বাছার দরকার নেই।
+                </p>
+                <div class="mm-modal-btns">
+                  <button type="button" class="btn btn-outline" onclick="AppController.mmScaleDialog(false)">বাতিল</button>
+                  <button type="button" class="btn btn-primary" id="mm-scale-save"
+                          onclick="AppController.mmApplyMapScale()">সেভ করুন</button>
+                </div>
+              </div>
+
+              <div class="mm-method alt">
+                <h5>পদ্ধতি ২ — ম্যাপ থেকে মাপুন <span>(সর্বোচ্চ নিখুঁত)</span></h5>
+
+                <!-- ধাপ ১ — কোন দূরত্ব -->
+                <div class="mm-step">
+                  <span class="mm-step-n">১</span>
+                  <div class="mm-step-body">
+                    <b>কত দূরত্ব ধরে মাপবেন, বেছে নিন</b>
+                    <div class="fz-input-wrap fz-select-wrap" style="margin-top:7px">
+                      <select id="mm-barlen" onchange="AppController.mmDrawCalibHelp()"></select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ধাপ ২ — ছবিতে দেখানো কোথায় ক্লিক -->
+                <div class="mm-step">
+                  <span class="mm-step-n">২</span>
+                  <div class="mm-step-body">
+                    <b>নকশার স্কেল-দণ্ডে ঠিক এই দুই জায়গায় ক্লিক করুন</b>
+                    <div class="mm-calib-help" id="mm-calib-help"></div>
+                  </div>
+                </div>
+
+                <!-- ধাপ ৩ — শুরু -->
+                <div class="mm-step">
+                  <span class="mm-step-n">৩</span>
+                  <div class="mm-step-body">
+                    <b>বোতামে চাপ দিন</b> — এই বাক্স বন্ধ হবে, নিচে গুনতি দেখাবে
+                    <button type="button" class="btn btn-purple" style="margin-top:8px"
+                            onclick="AppController.mmStartCalibrate()">
+                      <i class="bi bi-pencil"></i> শুরু করুন — নকশায় ২টি ক্লিক
+                    </button>
+                  </div>
+                </div>
+
+                <p class="kmz-hint" style="margin-top:12px">
+                  <b>স্কেল-দণ্ড না থাকলে?</b> যেকোনো <b>চেনা দূরত্ব</b> চলবে —
+                  যেমন যে দাগের মাপ খতিয়ান থেকে জানেন, তার দুই কোণা। তালিকা থেকে
+                  “অন্য দৈর্ঘ্য” বেছে মাপটা লিখে দিন।
+                  <b>আগে জুম করে নিন</b> — দুই বিন্দু পর্দাজুড়ে যত দূরে, মাপ তত নিখুঁত।
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: গুগল আর্থে মৌজা ম্যাপ (KMZ) — ধাপে ধাপে -->
+        <div id="view-kmz-export" class="tool-view-content kmz-wrap" style="display:none">
+
+          <!-- ══ ধাপ ০ — উৎস বাছাই ══ -->
+          <div class="kmz-step" id="kmz-s0">
+            <div class="kmz-hero">
+              <h3><i class="bi bi-geo-alt-fill"></i> গুগল আর্থে মৌজা ম্যাপ</h3>
+              <p>মৌজা নকশাকে স্যাটেলাইট ছবির সাথে মিলিয়ে <b>KMZ ফাইল</b> তৈরি করুন।
+                 কমপক্ষে <b>দুটি</b> নিয়ন্ত্রণ বিন্দু দিয়ে নকশাটি সঠিক জায়গায় বসানো হবে।</p>
+            </div>
+
+            <div class="kmz-choices">
+              <button type="button" class="kmz-choice" onclick="AppController.kmzChoose('archive')">
+                <span class="kmz-choice-ic ic-blue"><i class="bi bi-map"></i></span>
+                <span class="kmz-choice-t">মৌজা ম্যাপ সিলেক্ট করুন</span>
+                <span class="kmz-choice-s">আর্কাইভ থেকে বেছে নিন — ১,৯৪,৩১৭টি নকশা</span>
+              </button>
+              <button type="button" class="kmz-choice" onclick="AppController.kmzChoose('file')">
+                <span class="kmz-choice-ic ic-green"><i class="bi bi-upload"></i></span>
+                <span class="kmz-choice-t">মৌজা ম্যাপ আপলোড করুন</span>
+                <span class="kmz-choice-s">ছবি (JPG/PNG) বা PDF ফাইল দিন</span>
+              </button>
+            </div>
+            <input type="file" id="kmz-file" accept="image/jpeg,image/png,application/pdf"
+                   style="display:none" onchange="AppController.kmzLoadFile(this)">
+
+            <!-- আর্কাইভ বাছাই -->
+            <div id="kmz-pane-arch" class="kmz-arch" style="display:none">
+              <div class="fz-assets kmz-arch-grid">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>বিভাগ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kmz-div" onchange="AppController.kmzArchDiv()"><option>লোড হচ্ছে…</option></select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>জেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kmz-dist" onchange="AppController.kmzArchDist()" disabled><option>—</option></select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>উপজেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kmz-upa" onchange="AppController.kmzArchUpa()" disabled><option>—</option></select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>জরিপ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kmz-srv" onchange="AppController.kmzArchSrv()" disabled><option>—</option></select>
+                  </div>
+                </div>
+              </div>
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-search"></i> ফাইল খুঁজুন</span></div>
+                <div class="fz-input-wrap">
+                  <input type="text" id="kmz-fsearch" placeholder="ম্যাপের নাম লিখুন"
+                         oninput="AppController.kmzArchFilter()" disabled>
+                </div>
+              </div>
+              <div id="kmz-arch-list" class="kmz-arch-list">উপরে বিভাগ থেকে জরিপ পর্যন্ত বেছে নিন।</div>
+            </div>
+
+            <div id="kmz-prog" class="kmz-prog" style="display:none">
+              <div class="kmz-prog-bar"><span id="kmz-prog-fill"></span></div>
+              <div class="kmz-prog-txt" id="kmz-prog-txt">…</div>
+            </div>
+          </div>
+
+          <!-- ══ ধাপ ১ — নকশায় পয়েন্ট ══ -->
+          <div class="kmz-step" id="kmz-s1" style="display:none">
+            <div class="kmz-stage">
+              <div class="kmz-pill" id="kmz-pill1"><span class="dot"></span>নকশায় পয়েন্ট বসান<b>০</b></div>
+              <canvas id="kmz-canvas-img"></canvas>
+              <div class="kmz-ctrls">
+                <button type="button" class="kmz-cbtn" title="বড়" onclick="AppController.kmzImgZoom(1)"><i class="bi bi-plus-lg"></i></button>
+                <button type="button" class="kmz-cbtn" title="ছোট" onclick="AppController.kmzImgZoom(-1)"><i class="bi bi-dash-lg"></i></button>
+                <button type="button" class="kmz-cbtn" title="পুরোটা দেখুন" onclick="AppController.kmzFitImage()"><i class="bi bi-arrows-fullscreen"></i></button>
+                <button type="button" class="kmz-cbtn" title="শেষ পয়েন্ট মুছুন" onclick="AppController.kmzUndo(1)"><i class="bi bi-arrow-counterclockwise"></i></button>
+              </div>
+              <div class="kmz-tip" id="kmz-tip1">জুম করে চেনা জায়গায় ক্লিক করুন — রাস্তার মোড়, পুকুরের কোণা, ব্রিজ</div>
+            </div>
+            <div class="kmz-nav">
+              <button type="button" class="btn btn-outline" onclick="AppController.kmzStep(0)">বাতিল</button>
+              <button type="button" class="btn btn-primary" id="kmz-next1" disabled
+                      onclick="AppController.kmzStep(2)">পরবর্তী ধাপ <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ══ ধাপ ২ — স্যাটেলাইটে একই পয়েন্ট ══ -->
+          <div class="kmz-step" id="kmz-s2" style="display:none">
+            <div class="kmz-stage">
+              <div class="kmz-pill" id="kmz-pill2"><span class="dot"></span>পয়েন্ট ১ বসান<b>০/২</b></div>
+              <canvas id="kmz-canvas-map"></canvas>
+              <div class="kmz-search">
+                <i class="bi bi-search"></i>
+                <input type="text" id="kmz-goto" placeholder="স্থান খুঁজুন বা lat,lng (২৩.৭৮, ৯০.৪১)"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();AppController.kmzGoto()}">
+                <button type="button" class="kmz-cbtn" title="খুঁজুন" id="kmz-go-btn"
+                        onclick="AppController.kmzGoto()"><i class="bi bi-arrow-right-short"></i></button>
+              </div>
+              <div id="kmz-geo-results" class="kmz-geo" style="display:none"></div>
+              <div class="kmz-ctrls">
+                <button type="button" class="kmz-cbtn" title="আমার অবস্থান" id="kmz-loc-btn"
+                        onclick="AppController.kmzMyLocation()"><i class="bi bi-crosshair"></i></button>
+                <button type="button" class="kmz-cbtn" title="বড়" onclick="AppController.kmzZoom(1)"><i class="bi bi-plus-lg"></i></button>
+                <button type="button" class="kmz-cbtn" title="ছোট" onclick="AppController.kmzZoom(-1)"><i class="bi bi-dash-lg"></i></button>
+                <button type="button" class="kmz-cbtn" title="শেষ পয়েন্ট মুছুন" onclick="AppController.kmzUndo(2)"><i class="bi bi-arrow-counterclockwise"></i></button>
+              </div>
+              <div class="kmz-tip" id="kmz-tip2">নকশায় যে ক্রমে বসিয়েছেন, ঠিক সেই ক্রমেই ক্লিক করুন</div>
+            </div>
+            <div class="kmz-nav">
+              <button type="button" class="btn btn-outline" onclick="AppController.kmzStep(1)"><i class="bi bi-arrow-left"></i> পিছনে</button>
+              <button type="button" class="btn btn-primary" id="kmz-next2" disabled
+                      onclick="AppController.kmzStep(3)">পরবর্তী ধাপ <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ══ ধাপ ৩ — ফলাফল ও ডাউনলোড ══ -->
+          <div class="kmz-step" id="kmz-s3" style="display:none">
+            <div class="kmz-done">
+
+              <div id="kmz-result" class="kmz-empty">…</div>
+
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-tag"></i> ম্যাপের নাম (Google Earth এ দেখাবে)</span></div>
+                <div class="fz-input-wrap">
+                  <input type="text" id="kmz-name" placeholder="যেমন: আলোকদিয়া মৌজা — বাগেরহাট">
+                </div>
+              </div>
+
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-layers"></i> নকশার পটভূমি</span></div>
+                <div class="fz-seg">
+                  <button type="button" class="fz-seg-btn active" id="kmz-bg-keep"
+                          onclick="AppController.kmzSetBg(false)">ব্যাকগ্রাউন্ডসহ</button>
+                  <button type="button" class="fz-seg-btn" id="kmz-bg-clear"
+                          onclick="AppController.kmzSetBg(true)">স্বচ্ছ (সাদা বাদ)</button>
+                </div>
+                <p class="kmz-hint">স্বচ্ছ বাছলে সাদা কাগজ সরে গিয়ে কেবল দাগের রেখা থাকবে —
+                  নিচে স্যাটেলাইট ছবি দেখা যাবে।</p>
+              </div>
+
+              <div class="fz-field" id="kmz-th-field" style="display:none">
+                <div class="fz-field-label">
+                  <span><i class="bi bi-sliders"></i> সাদার মাত্রা</span>
+                  <span id="kmz-th-val" class="kmz-op-val">২০৫</span>
+                </div>
+                <input type="range" id="kmz-threshold" min="120" max="255" value="205"
+                       class="kmz-range" oninput="AppController.kmzThreshold(this.value)">
+              </div>
+
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-palette"></i> দাগের রঙ</span></div>
+                <div class="kmz-colors" id="kmz-colors"></div>
+              </div>
+
+              <div class="fz-field">
+                <div class="fz-field-label">
+                  <span><i class="bi bi-droplet-half"></i> স্বচ্ছতা</span>
+                  <span id="kmz-op-val" class="kmz-op-val">৭৮%</span>
+                </div>
+                <input type="range" id="kmz-opacity" min="20" max="100" value="78"
+                       class="kmz-range" oninput="AppController.kmzOpacity(this.value)">
+              </div>
+
+              <div id="kmz-preview-box" class="kmz-preview" style="display:none">
+                <div class="kmz-preview-head">
+                  <span>নকশা যেমন বসবে</span>
+                  <span id="kmz-preview-note"></span>
+                </div>
+                <canvas id="kmz-preview" width="420" height="200"></canvas>
+              </div>
+
+              <p class="kmz-hint">নামানো ফাইলটি <b>Google Earth</b> এ খুললেই নকশাটি স্যাটেলাইট
+                ছবির উপর বসবে। স্যাটেলাইট ছবি © Esri, Maxar, Earthstar Geographics।</p>
+            </div>
+
+            <div class="kmz-nav">
+              <button type="button" class="btn btn-outline" onclick="AppController.kmzStep(2)"><i class="bi bi-arrow-left"></i> পিছনে</button>
+              <button type="button" class="btn btn-primary" id="kmz-dl"
+                      onclick="AppController.kmzDownload()"><i class="bi bi-download"></i> KMZ ডাউনলোড</button>
+            </div>
+          </div>
+
+          <div class="kmz-status" id="kmz-status" style="display:none"></div>
+        </div>
+
+        <!-- VIEW: ফরায়েজ — মুসলিম উত্তরাধিকার -->
+        <div id="view-farayeiz" class="tool-view-content" style="display:none">
+          
+          <!-- Navigation Sub-Tabs -->
+          <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border-color);padding-bottom:10px;flex-wrap:wrap">
+            <button class="btn-primary active" id="subtab-btn-calculator" onclick="AppController.switchInheritanceSubTab('calculator')">ক্যালকুলেটর</button>
+            <button class="btn-secondary" id="subtab-btn-bonton" onclick="AppController.switchInheritanceSubTab('bonton')">বন্টন পদ্ধতি</button>
+            <button class="btn-secondary" id="subtab-btn-bistarito" onclick="AppController.switchInheritanceSubTab('bistarito')">বিস্তারিত</button>
+            <button class="btn-secondary" id="subtab-btn-faq" onclick="AppController.switchInheritanceSubTab('faq')">FAQ</button>
+          </div>
+
+          <!-- SUB-VIEW 1: CALCULATOR — uttoradhikar.gov.bd এর আদলে, মোবাইল ফার্স্ট -->
+          <div id="subtab-view-calculator">
+
+            <!-- ধাপ নির্দেশক -->
+            <div class="fz-stepper" id="fz-stepper">
+              <div class="fz-step active" id="fz-step-1">
+                <span class="fz-step-num">১</span> উত্তরাধিকারী
+              </div>
+              <i class="bi bi-chevron-right fz-step-sep"></i>
+              <div class="fz-step" id="fz-step-2">
+                <span class="fz-step-num">২</span> সম্পদের বিবরণ
+              </div>
+              <i class="bi bi-chevron-right fz-step-sep"></i>
+              <div class="fz-step" id="fz-step-3">
+                <span class="fz-step-num">৩</span> ফলাফল
+              </div>
+            </div>
+
+            <div class="fz-layout">
+
+              <!-- ধাপ ১ — উত্তরাধিকারীর তালিকা -->
+              <div class="fz-panel">
+                <div class="fz-panel-head">
+                  <span class="fz-badge-num">১</span>
+                  <h3>উত্তরাধিকারীর তালিকা (মুসলিম)</h3>
+                  <button class="fz-btn-sub" style="flex:none;padding:6px 11px;min-height:34px;font-size:0.78rem"
+                          onclick="AppController.resetInheritanceForm()" title="সব মুছুন">
+                    <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+                  </button>
+                </div>
+
+                <!-- নির্বাচিতদের সারসংক্ষেপ -->
+                <div class="fz-selected-bar" id="fz-selected-bar">
+                  <span class="fz-selected-empty">এখনো কোনো উত্তরাধিকারী নির্বাচন করা হয়নি</span>
+                </div>
+
+                <div class="fz-panel-body">
+                  <div class="fz-search-wrap">
+                    <i class="bi bi-search"></i>
+                    <input type="text" class="fz-search" id="fz-heir-search"
+                           placeholder="উত্তরাধিকারী খুঁজুন (যেমন: পুত্র, স্ত্রী, চাচা)..."
+                           oninput="AppController.filterHeirs(this.value)">
+                  </div>
+
+                  <!-- সব উত্তরাধিকারী এখানে render হয় -->
+                  <div id="heir-container-wrapper"></div>
+                </div>
+              </div>
+
+              <!-- ধাপ ২ — সম্পদের বিবরণ -->
+              <div class="fz-panel">
+                <div class="fz-panel-head">
+                  <span class="fz-badge-num">২</span>
+                  <h3>সম্পদের বিবরণ</h3>
+                </div>
+
+                <div class="fz-panel-body">
+                  <div class="fz-assets">
+
+                    <div class="fz-asset" style="grid-column:1/-1">
+                      <div class="fz-asset-label">
+                        <span><i class="bi bi-map-fill"></i> জমি</span>
+                        <div class="fz-unit-toggle">
+                          <button class="fz-unit-btn active" id="inh-unit-dec"
+                                  onclick="AppController.setInheritanceUnit('decimal')">শতাংশ</button>
+                          <button class="fz-unit-btn" id="inh-unit-acr"
+                                  onclick="AppController.setInheritanceUnit('acre')">একর</button>
+                        </div>
+                      </div>
+                      <div class="fz-asset-input-wrap">
+                        <input type="text" id="inh-land-input" value="০" placeholder="০" inputmode="decimal">
+                        <span class="fz-unit-suffix" id="inh-land-unit-label">শতাংশ</span>
+                      </div>
+                    </div>
+
+                    <div class="fz-asset">
+                      <div class="fz-asset-label"><span><i class="bi bi-gem"></i> স্বর্ণ</span></div>
+                      <div class="fz-asset-input-wrap">
+                        <input type="text" id="inh-gold-input" value="০" placeholder="০" inputmode="decimal">
+                        <span class="fz-unit-suffix">ভরি</span>
+                      </div>
+                    </div>
+
+                    <div class="fz-asset">
+                      <div class="fz-asset-label"><span><i class="bi bi-circle-half"></i> রৌপ্য</span></div>
+                      <div class="fz-asset-input-wrap">
+                        <input type="text" id="inh-silver-input" value="০" placeholder="০" inputmode="decimal">
+                        <span class="fz-unit-suffix">ভরি</span>
+                      </div>
+                    </div>
+
+                    <div class="fz-asset" style="grid-column:1/-1">
+                      <div class="fz-asset-label"><span><i class="bi bi-cash-stack"></i> নগদ মুদ্রা</span></div>
+                      <div class="fz-asset-input-wrap">
+                        <input type="text" id="inh-cash-input" value="০" placeholder="০" inputmode="decimal">
+                        <span class="fz-unit-suffix">টাকা</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- বণ্টনের আগে বাদ যাবে — দাফন-কাফন · ঋণ · ওসিয়ত -->
+                  <div class="fz-acc" id="inh-deduct-acc" style="margin-top:14px">
+                    <button type="button" class="fz-acc-head"
+                            onclick="AppController.toggleAccordionEl('inh-deduct-acc')">
+                      <span class="fz-acc-pill zero" id="inh-deduct-pill">০</span>
+                      <span class="fz-acc-title">দাফন-কাফন, ঋণ ও ওসিয়ত (থাকলে দিন)</span>
+                      <i class="bi bi-chevron-down fz-acc-chev"></i>
+                    </button>
+                    <div class="fz-acc-body">
+                      <div class="fz-warn" style="margin-bottom:12px">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>শরিয়াহ অনুযায়ী ওয়ারিশদের মাঝে বণ্টনের <b>আগে</b> ক্রমান্বয়ে বাদ যায় —
+                        ১) দাফন-কাফনের খরচ, ২) ঋণ পরিশোধ, ৩) ওসিয়ত।
+                        <b>ওসিয়ত ঋণ শোধের পর অবশিষ্ট সম্পত্তির ১/৩ এর বেশি হতে পারে না</b>
+                        (বেশি লিখলে নিজে থেকেই ১/৩ এ নেমে আসবে)।</span>
+                      </div>
+                      <div id="inh-deduct-rows"></div>
+                    </div>
+                  </div>
+
+                  <div class="fz-actions">
+                    <button class="fz-btn-main" onclick="AppController.calculateDistribution()">
+                      <i class="bi bi-calculator-fill"></i> ফলাফল দেখুন
+                    </button>
+                    <div class="fz-btn-row">
+                      <button class="fz-btn-sub" onclick="AppController.toggleNameInputs()">
+                        <i class="bi bi-person-lines-fill"></i> নামসহ প্রিন্ট
+                      </button>
+                      <button class="fz-btn-sub" onclick="AppController.resetInheritanceForm()">
+                        <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ধাপ ৩ — ফলাফল -->
+            <div class="fz-result" id="result-section" style="display:none">
+              <div class="fz-panel">
+                <div class="fz-panel-head">
+                  <span class="fz-badge-num">৩</span>
+                  <h3>বন্টনের ফলাফল</h3>
+                  <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                          onclick="AppController.initPrint(false)">
+                    <i class="bi bi-printer"></i> সনদ প্রিন্ট
+                  </button>
+                </div>
+
+                <div class="fz-panel-body">
+
+                  <!-- মোট ১০০% না হলে সতর্কবার্তা (LIMIT-1) -->
+                  <div class="fz-warn" id="fz-warn-box" style="display:none">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span id="fz-warn-text"></span>
+                  </div>
+
+                  <!-- দাফন-কাফন / ঋণ / ওসিয়ত বাদ গেলে তার হিসাব -->
+                  <div id="res-deduction-box" style="display:none;margin-bottom:14px"></div>
+
+                  <!-- মৃত ব্যক্তির নাম -->
+                  <div id="deceased-name-row" style="display:none;margin-bottom:14px">
+                    <div class="fz-asset">
+                      <div class="fz-asset-label"><span><i class="bi bi-person-fill"></i> মৃত ব্যক্তির নাম</span></div>
+                      <div class="fz-asset-input-wrap">
+                        <input type="text" id="deceased-name-input" placeholder="উদাহরণ: মরহুম আব্দুল করিম">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- মোবাইল: কার্ড ভিউ -->
+                  <div class="fz-res-cards" id="fz-res-cards"></div>
+
+                  <!-- ডেস্কটপ: টেবিল ভিউ -->
+                  <div class="fz-res-table-wrap">
+                    <table class="custom-table">
+                      <thead id="res-thead"></thead>
+                      <tbody id="res-tbody"></tbody>
+                    </table>
+                  </div>
+
+                  <label class="fz-opt-row" for="chkShowFraction">
+                    <input type="checkbox" id="chkShowFraction" onchange="AppController.renderResultsFromState()">
+                    ভগ্নাংশ ও শতাংশ (%) দেখুন
+                  </label>
+
+                  <label class="fz-opt-row" for="chkSixDigits">
+                    <input type="checkbox" id="chkSixDigits" onchange="AppController.renderResultsFromState()">
+                    জমির ক্ষেত্রে দশমিকের পর ৬ ডিজিট দেখুন
+                  </label>
+
+                  <div class="fz-chart-box">
+                    <h4>গ্রাফিক্যাল ভিউ</h4>
+                    <div style="width:100%;max-width:230px;margin:0 auto">
+                      <canvas id="res-chart"></canvas>
+                    </div>
+                  </div>
+
+                  <div class="fz-steps-box">
+                    <h4><i class="bi bi-list-ol"></i> হিসাবের ধাপ সমূহ</h4>
+                    <ol id="res-steps"></ol>
+                  </div>
+
+                  <div class="fz-warn" style="margin-top:16px;margin-bottom:0">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <span>জটিল হিসাব নিয়ে সন্দেহ বা মতবিরোধ থাকলে অভিজ্ঞ আইনজীবীর মাধ্যমে চূড়ান্ত করুন। এই ফলাফলের আইনগত দায় কর্তৃপক্ষ নেবে না।</span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- মোবাইলে স্টিকি অ্যাকশন বার -->
+            <div class="fz-sticky">
+              <div class="fz-sticky-info">
+                <b id="fz-sticky-count">০</b> জন উত্তরাধিকারী নির্বাচিত
+              </div>
+              <button class="fz-btn-main" onclick="AppController.calculateDistribution()">
+                <i class="bi bi-calculator-fill"></i> ফলাফল
+              </button>
+            </div>
+
+          </div>
+
+          <!-- SUB-VIEW 2: BONTON -->
+          <div id="subtab-view-bonton" style="display:none;line-height:1.7;color:var(--text-main)">
+            <h3 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:12px">উত্তরাধিকার আইন ও ফারায়েজ বন্টন পদ্ধতি</h3>
+            <p><strong>মুসলিম উত্তরাধিকার আইন</strong> বা <strong>ফারায়েজ</strong> হলো ইসলামি শরীয়ত মোতাবেক মৃত ব্যক্তির ত্যাজ্য সম্পত্তি তার জীবিত ওয়ারিশদের মধ্যে সুনির্দিষ্ট অংশে বন্টন করার বিধান। বাংলাদেশে মুসলিম পারিবারিক আইন (১৯৬১) এবং পবিত্র কুরআনের সূরা নিসার নির্দেশনার আলোকে এই সম্পত্তি বন্টন করা হয়। আমাদের এই <strong>উত্তরাধিকার ক্যালকুলেটর</strong> ব্যবহার করে আপনি সহজেই জমির হিস্যা এবং সম্পদের সঠিক ভাগ বের করতে পারবেন।</p>
+
+            <h4 style="font-size:1rem;font-weight:700;margin:16px 0 8px 0">ফারায়েজ এর প্রাথমিক শর্তাবলী:</h4>
+            <ul style="padding-left:20px">
+              <li>১. কাফন ও দাফনের খরচ মেটানো।</li>
+              <li>২. মৃত ব্যক্তির কোনো ঋণ থাকলে তা পরিশোধ করা।</li>
+              <li>৩. কোনো ওসিয়ত করে গেলে তা (সম্পত্তির এক-তৃতীয়াংশের মধ্যে) পূরণ করা।</li>
+            </ul>
+
+            <h4 style="font-size:1rem;font-weight:700;margin:16px 0 8px 0">উত্তরাধিকারীদের শ্রেণীবিভাগ (হানাফি মাযহাব):</h4>
+            <div class="grid-3" style="margin-top:10px">
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--primary)">১. যাবিল ফুরুজ (Sharers)</strong>
+                <p style="font-size:0.85rem;margin-top:4px">যাদের অংশ পবিত্র কুরআনে নির্দিষ্ট করে দেওয়া আছে (যেমন: পিতা, মাতা, স্বামী, স্ত্রী, কন্যা, বোন)।</p>
+              </div>
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--secondary)">২. আসাবা (Residuaries)</strong>
+                <p style="font-size:0.85rem;margin-top:4px">নির্দিষ্ট অংশীদারদের অংশ দেওয়ার পর অবশিষ্ট সম্পত্তির যারা মালিক হন (যেমন: পুত্র, ভাই, চাচা)।</p>
+              </div>
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--accent)">৩. যাবিল আরহাম (Distant Kindred)</strong>
+                <p style="font-size:0.85rem;margin-top:4px">উপরের দুই শ্রেণীর কেউ না থাকলে যারা সম্পত্তি পান (যেমন: বোনের সন্তান, ফুফু, খালা)।</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUB-VIEW 3: বিস্তারিত — পূর্ণ সারণি -->
+          <div id="subtab-view-bistarito" style="display:none;line-height:1.7">
+            <h3 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:12px">উত্তরাধিকার বন্টনের বিস্তারিত নিয়মাবলী (যাবিল ফুরুজ ও আসাবা)</h3>
+            <p style="margin-bottom:16px">পবিত্র কুরআন শরীফে ১২ জন নির্দিষ্ট অংশীদারের (যাবিল ফুরুজ) অংশ নির্ধারণ করে দেওয়া আছে। এদের মধ্যে ৪ জন পুরুষ এবং ৮ জন নারী। নিচে তাদের নির্ধারিত অংশের বিস্তারিত টেবিল দেওয়া হলো:</p>
+
+            <!-- Male Sharers Table (4 Males) -->
+            <h4 style="font-size:1.05rem;font-weight:700;color:var(--primary);margin:16px 0 8px 0">পুরুষ অংশীদারগণ (৪ জন)</h4>
+            <div style="overflow-x:auto;margin-bottom:20px">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width:25%">অংশীদার</th>
+                    <th style="width:25%">নির্ধারিত অংশ</th>
+                    <th style="width:50%">প্রাপ্তির শর্তসমূহ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan="2"><strong>১. স্বামী</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৪ অংশ</td>
+                    <td>মৃত স্ত্রীর যদি কোনো সন্তান বা পুত্রের সন্তান জীবিত থাকে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/২ অংশ</td>
+                    <td>মৃত স্ত্রীর যদি কোনো সন্তান বা পুত্রের সন্তান না থাকে।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="3"><strong>২. পিতা</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>মৃত ব্যক্তির পুত্র বা পুত্রের পুত্র থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৬ + অবশিষ্ট (আসাবা)</td>
+                    <td>মৃত ব্যক্তির শুধুমাত্র কন্যা বা পুত্রের কন্যা থাকলে (পুত্র না থাকলে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">সম্পূর্ণ অবশিষ্ট (আসাবা)</td>
+                    <td>মৃত ব্যক্তির কোনো সন্তান বা অধস্তন বংশধর না থাকলে।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="3"><strong>৩. দাদা</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>সন্তান বা পুত্রের সন্তান থাকলে (তবে পিতা জীবিত থাকলে দাদা বঞ্চিত হবেন)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৬ + অবশিষ্ট (আসাবা)</td>
+                    <td>শুধুমাত্র কন্যা বা পুত্রের কন্যা থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">সম্পূর্ণ অবশিষ্ট (আসাবা)</td>
+                    <td>কোনো সন্তান না থাকলে। (পিতা থাকলে দাদা সর্বদা বঞ্চিত হন)।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="2"><strong>৪. বৈপিত্রেয় ভাই</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>শুধুমাত্র একজন ভাই থাকলে (সন্তান বা পিতা/দাদা না থাকলে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৩ অংশ</td>
+                    <td>একাধিক ভাই/বোন থাকলে তারা সমহারে বন্টন করে নিবে।</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Female Sharers Table (8 Females) -->
+            <h4 style="font-size:1.05rem;font-weight:700;color:var(--primary);margin:24px 0 8px 0">নারী অংশীদারগণ (৮ জন)</h4>
+            <div style="overflow-x:auto;margin-bottom:20px">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th style="width:25%">অংশীদার</th>
+                    <th style="width:25%">নির্ধারিত অংশ</th>
+                    <th style="width:50%">প্রাপ্তির শর্তসমূহ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan="2"><strong>১. স্ত্রী</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৮ অংশ</td>
+                    <td>মৃত স্বামীর সন্তান বা পুত্রের সন্তান থাকলে। (একাধিক স্ত্রী থাকলে সমহারে বন্টন)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৪ অংশ</td>
+                    <td>মৃত স্বামীর কোনো সন্তান বা অধস্তন বংশধর না থাকলে।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="3"><strong>২. কন্যা</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/২ অংশ</td>
+                    <td>শুধুমাত্র একজন কন্যা থাকলে এবং কোনো পুত্র না থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">২/৩ অংশ</td>
+                    <td>একাধিক কন্যা থাকলে এবং কোনো পুত্র না থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">আসাবা (২:১)</td>
+                    <td>পুত্র জীবিত থাকলে কন্যারা পুত্রের অর্ধেক (২:১) হারে অংশ পাবে।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="3"><strong>৩. মাতা</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>মৃত ব্যক্তির সন্তান থাকলে অথবা দুই বা ততোধিক ভাই-বোন থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৩ অংশ</td>
+                    <td>সন্তান না থাকলে এবং ভাই-বোন ১ জনের বেশি না থাকলে।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৩ (উমারিয়্যাত)</td>
+                    <td>স্বামী/স্ত্রী এবং পিতা থাকলে স্বামী/স্ত্রীর অংশ দেওয়ার পর বাকি সম্পত্তির ১/৩ অংশ।</td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>৪. দাদী / নানী</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>মাতা জীবিত না থাকলে দাদী বা নানী এই অংশ পাবেন।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="3"><strong>৫. আপন বোন</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/২ অংশ</td>
+                    <td>একজন বোন থাকলে (সন্তান, পিতা বা আপন ভাই না থাকলে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">২/৩ অংশ</td>
+                    <td>একাধিক বোন থাকলে (উপরোক্ত শর্তে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">আসাবা</td>
+                    <td>আপন ভাই থাকলে (২:১ অনুপাতে) অথবা কন্যা থাকলে অবশিষ্টভোগী হিসেবে।</td>
+                  </tr>
+
+                  <tr>
+                    <td rowspan="4"><strong>৬. বৈমাত্রেয় বোন</strong></td>
+                    <td style="color:var(--primary);font-weight:700">১/২ অংশ</td>
+                    <td>একজন থাকলে (আপন ভাই-বোন, সন্তান বা পিতা না থাকলে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">২/৩ অংশ</td>
+                    <td>একাধিক থাকলে (উপরোক্ত শর্তে)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">১/৬ অংশ</td>
+                    <td>একজন আপন বোন থাকলে (২/৩ অংশ পূরণ করার জন্য)।</td>
+                  </tr>
+                  <tr>
+                    <td style="color:var(--primary);font-weight:700">আসাবা</td>
+                    <td>বৈমাত্রেয় ভাই থাকলে (২:১ অনুপাতে) অথবা কন্যা থাকলে অবশিষ্টভোগী হিসেবে।</td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>৭. পুত্রের কন্যা</strong></td>
+                    <td colspan="2">কন্যার মতোই ১/২ বা ২/৩ পায়। তবে একজন আপন কন্যা থাকলে সে ১/৬ অংশ পায়। পুত্রের পুত্র থাকলে আসাবা হিসেবে অংশ নেয়।</td>
+                  </tr>
+
+                  <tr>
+                    <td><strong>৮. বৈপিত্রেয় বোন</strong></td>
+                    <td colspan="2">বৈপিত্রেয় ভাইয়ের মতোই (১ জন হলে ১/৬, একাধিক হলে ১/৩ সমহারে)।</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Asaba Section (4 Categories) -->
+            <h4 style="font-size:1.05rem;font-weight:700;color:var(--primary);margin:24px 0 8px 0">আসাবা (অবশিষ্টভোগী) এর নিয়মাবলী</h4>
+            <p style="margin-bottom:12px">যাবিল ফুরুজদের নির্দিষ্ট অংশ দেওয়ার পর সম্পত্তির যে অংশটুকু অবশিষ্ট থাকে, তা আসাবাগণ লাভ করেন। আসাবাদের প্রধান ৪টি শ্রেণী রয়েছে (ক্রমানুসারে অগ্রাধিকারপ্রাপ্ত):</p>
+
+            <div class="grid-2" style="margin-bottom:16px">
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--primary)">শ্রেণী ১: মৃত ব্যক্তির অধস্তন পুরুষ</strong>
+                <ul style="padding-left:20px;font-size:0.88rem;margin-top:6px">
+                  <li>পুত্র</li>
+                  <li>কন্যা (পুত্রের সাথে)</li>
+                  <li>পুত্রের পুত্র, পুত্রের কন্যা ইত্যাদি।</li>
+                </ul>
+              </div>
+
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--primary)">শ্রেণী ২: মৃত ব্যক্তির ঊর্ধ্বতন পুরুষ</strong>
+                <ul style="padding-left:20px;font-size:0.88rem;margin-top:6px">
+                  <li>পিতা</li>
+                  <li>দাদা (পিতার পিতা)</li>
+                </ul>
+              </div>
+
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--primary)">শ্রেণী ৩: পিতার অধস্তন পুরুষ</strong>
+                <ul style="padding-left:20px;font-size:0.88rem;margin-top:6px">
+                  <li>আপন ভাই, আপন বোন</li>
+                  <li>সৎ ভাই/বোন (বৈমাত্রেয়)</li>
+                  <li>ভাইয়ের পুত্র, সৎ ভাইয়ের পুত্র ইত্যাদি।</li>
+                </ul>
+              </div>
+
+              <div style="background:var(--bg-input);padding:14px;border-radius:8px">
+                <strong style="color:var(--primary)">শ্রেণী ৪: দাদার অধস্তন পুরুষ</strong>
+                <ul style="padding-left:20px;font-size:0.88rem;margin-top:6px">
+                  <li>আপন চাচা</li>
+                  <li>সৎ চাচা (বৈমাত্রেয়)</li>
+                  <li>চাচাতো ভাই এবং তাদের পুরুষ বংশধর।</li>
+                </ul>
+              </div>
+            </div>
+
+            <p style="font-size:0.88rem;background:var(--primary-light);color:var(--primary);padding:12px;border-radius:8px;border-left:4px solid var(--primary)">
+              <strong>বি.দ্র.</strong> শ্রেণী ১ এর কেউ থাকলে শ্রেণী ২, ৩ ও ৪ এর সবাই আসাবা হিসেবে বঞ্চিত হবে। একইভাবে শ্রেণী ২ থাকলে শ্রেণী ৩ ও ৪ বঞ্চিত হবে। একই শ্রেণীতে পুরুষ ও নারী একত্রে থাকলে <strong>২:১ অনুপাতে</strong> সম্পত্তি বন্টন হবে।
+            </p>
+          </div>
+
+          <!-- SUB-VIEW 4: FAQ -->
+          <div id="subtab-view-faq" style="display:none;line-height:1.7">
+            <h3 style="font-size:1.2rem;font-weight:700;color:var(--primary);margin-bottom:12px">উত্তরাধিকার বন্টনের বাস্তব উদাহরণ ও সচরাচর জিজ্ঞাসা (FAQ)</h3>
+            
+            <div style="margin-bottom:14px;background:var(--bg-input);padding:14px;border-radius:8px">
+              <strong>১. ওয়ারিশ যদি আপন ভাই, বোন এবং কন্যা হয়, তবে বন্টন কেমন হবে?</strong>
+              <p style="font-size:0.88rem;margin-top:4px">সমাধান: কন্যা তার নির্ধারিত অংশ পাবে এবং ভাই-বোন অবশিষ্টভোগী (আসাবা) হিসেবে সম্পত্তি পাবে। (কন্যা: ১/২ অংশ, আপন ভাই: ১/৩ অংশ, আপন বোন: ১/৬ অংশ)।</p>
+            </div>
+
+            <div style="margin-bottom:14px;background:var(--bg-input);padding:14px;border-radius:8px">
+              <strong>২. ওয়ারিশ যদি পুত্র, কন্যা এবং বোন হয়, তবে বন্টন কেমন হবে?</strong>
+              <p style="font-size:0.88rem;margin-top:4px">সমাধান: পুত্রের উপস্থিতির কারণে বোন সম্পূর্ণ বঞ্চিত হবে (হাজব)। পুত্র ও কন্যা ২:১ অনুপাতে পাবে (পুত্র: ২/৩ অংশ, কন্যা: ১/৩ অংশ)।</p>
+            </div>
+
+            <div style="margin-bottom:14px;background:var(--bg-input);padding:14px;border-radius:8px">
+              <strong>৩. ওয়ারিশ যদি পিতা, দাদা, মাতা, দাদী, কন্যা ও পুত্রের কন্যা হয়?</strong>
+              <p style="font-size:0.88rem;margin-top:4px">সমাধান: পিতা থাকলে দাদা বঞ্চিত এবং মাতা থাকলে দাদী বঞ্চিত হবেন। (কন্যা: ১/২, পুত্রের কন্যা: ১/৬, মাতা: ১/৬, পিতা: ১/৬ + অবশিষ্ট)।</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: হিন্দু উত্তরাধিকার (দায়ভাগ) -->
+        <div id="view-hindu" class="tool-view-content" style="display:none">
+
+          <!-- ধাপ নির্দেশক -->
+          <div class="fz-stepper">
+            <div class="fz-step active" id="hd-step-1"><span class="fz-step-num">১</span> উত্তরাধিকারী</div>
+            <i class="bi bi-chevron-right fz-step-sep"></i>
+            <div class="fz-step" id="hd-step-2"><span class="fz-step-num">২</span> সম্পদের বিবরণ</div>
+            <i class="bi bi-chevron-right fz-step-sep"></i>
+            <div class="fz-step" id="hd-step-3"><span class="fz-step-num">৩</span> ফলাফল</div>
+          </div>
+
+          <div class="fz-warn" style="margin-bottom:16px">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>বাংলাদেশে হিন্দু উত্তরাধিকার <b>দায়ভাগ</b> মত অনুযায়ী চলে। ভারতের
+            Hindu Succession Act, ১৯৫৬ এখানে প্রযোজ্য নয়। এই হিসাব
+            <b>পুরুষের নিঃউইল (উইল ছাড়া) সম্পত্তির</b> জন্য।</span>
+          </div>
+
+          <div class="fz-layout">
+
+            <!-- ধাপ ১ — উত্তরাধিকারী -->
+            <div class="fz-panel">
+              <div class="fz-panel-head">
+                <span class="fz-badge-num">১</span>
+                <h3>উত্তরাধিকারীর তালিকা (হিন্দু)</h3>
+                <button class="fz-btn-sub" style="flex:none;padding:6px 11px;min-height:34px;font-size:0.78rem"
+                        onclick="AppController.resetHinduForm()">
+                  <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+                </button>
+              </div>
+
+              <div class="fz-selected-bar" id="hd-selected-bar">
+                <span class="fz-selected-empty">এখনো কোনো উত্তরাধিকারী নির্বাচন করা হয়নি</span>
+              </div>
+
+              <div class="fz-panel-body">
+                <div class="fz-search-wrap">
+                  <i class="bi bi-search"></i>
+                  <input type="text" class="fz-search" id="hd-heir-search"
+                         placeholder="উত্তরাধিকারী খুঁজুন (যেমন: পুত্র, বিধবা, কন্যা)..."
+                         oninput="AppController.filterHinduHeirs(this.value)">
+                </div>
+                <div id="hd-heir-wrapper"></div>
+              </div>
+            </div>
+
+            <!-- ধাপ ২ — সম্পদ -->
+            <div class="fz-panel">
+              <div class="fz-panel-head">
+                <span class="fz-badge-num">২</span>
+                <h3>সম্পদের বিবরণ</h3>
+              </div>
+              <div class="fz-panel-body">
+                <div class="fz-assets">
+                  <div class="fz-field" style="grid-column:1/-1">
+                    <div class="fz-field-label">
+                      <span><i class="bi bi-map-fill"></i> জমি</span>
+                      <div class="fz-unit-toggle">
+                        <button class="fz-unit-btn active" id="hd-unit-dec"
+                                onclick="AppController.setHinduUnit('decimal')">শতাংশ</button>
+                        <button class="fz-unit-btn" id="hd-unit-acr"
+                                onclick="AppController.setHinduUnit('acre')">একর</button>
+                      </div>
+                    </div>
+                    <div class="fz-input-wrap">
+                      <input type="text" id="hd-land-input" value="১০০" placeholder="০" inputmode="decimal">
+                      <span class="fz-unit-suffix" id="hd-land-unit-label">শতাংশ</span>
+                    </div>
+                  </div>
+
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-gem"></i> স্বর্ণ</span></div>
+                    <div class="fz-input-wrap">
+                      <input type="text" id="hd-gold-input" value="০" placeholder="০" inputmode="decimal">
+                      <span class="fz-unit-suffix">ভরি</span>
+                    </div>
+                  </div>
+
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-circle-half"></i> রৌপ্য</span></div>
+                    <div class="fz-input-wrap">
+                      <input type="text" id="hd-silver-input" value="০" placeholder="০" inputmode="decimal">
+                      <span class="fz-unit-suffix">ভরি</span>
+                    </div>
+                  </div>
+
+                  <div class="fz-field" style="grid-column:1/-1">
+                    <div class="fz-field-label"><span><i class="bi bi-cash-stack"></i> নগদ মুদ্রা</span></div>
+                    <div class="fz-input-wrap">
+                      <input type="text" id="hd-cash-input" value="০" placeholder="০" inputmode="decimal">
+                      <span class="fz-unit-suffix">টাকা</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fz-actions">
+                  <button class="fz-btn-main" onclick="AppController.calculateHindu()">
+                    <i class="bi bi-calculator-fill"></i> ফলাফল দেখুন
+                  </button>
+                  <div class="fz-btn-row">
+                    <button class="fz-btn-sub" onclick="AppController.printHindu()">
+                      <i class="bi bi-printer"></i> সনদ প্রিন্ট
+                    </button>
+                    <button class="fz-btn-sub" onclick="AppController.resetHinduForm()">
+                      <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ধাপ ৩ — ফলাফল -->
+          <div class="fz-result" id="hd-result-section" style="display:none">
+            <div class="fz-panel">
+              <div class="fz-panel-head">
+                <span class="fz-badge-num">৩</span>
+                <h3>বন্টনের ফলাফল</h3>
+                <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                        onclick="AppController.printHindu()">
+                  <i class="bi bi-printer"></i> সনদ প্রিন্ট
+                </button>
+              </div>
+
+              <div class="fz-panel-body">
+
+                <!-- সীমিত স্বত্বের সতর্কবার্তা -->
+                <div class="fz-warn" id="hd-limited-warn" style="display:none">
+                  <i class="bi bi-exclamation-triangle-fill"></i>
+                  <span id="hd-limited-text"></span>
+                </div>
+
+                <div class="fz-res-cards" id="hd-res-cards"></div>
+
+                <div class="fz-res-table-wrap">
+                  <table class="custom-table">
+                    <thead id="hd-res-thead"></thead>
+                    <tbody id="hd-res-tbody"></tbody>
+                  </table>
+                </div>
+
+                <label class="fz-opt-row" for="hd-chk-fraction">
+                  <input type="checkbox" id="hd-chk-fraction" onchange="AppController.renderHinduResults()">
+                  ভগ্নাংশ ও শতাংশ (%) দেখুন
+                </label>
+
+                <div class="fz-chart-box">
+                  <h4>গ্রাফিক্যাল ভিউ</h4>
+                  <div style="width:100%;max-width:230px;margin:0 auto">
+                    <canvas id="hd-res-chart"></canvas>
+                  </div>
+                </div>
+
+                <div class="fz-steps-box">
+                  <h4><i class="bi bi-list-ol"></i> হিসাবের ধাপ সমূহ</h4>
+                  <ol id="hd-res-steps"></ol>
+                </div>
+
+                <div class="fz-warn" style="margin-top:16px;margin-bottom:0">
+                  <i class="bi bi-shield-exclamation"></i>
+                  <span>হিন্দু উত্তরাধিকার আইন বাংলাদেশে অসংহিতাবদ্ধ ও ব্যাখ্যাসাপেক্ষ।
+                  জটিল ক্ষেত্রে অভিজ্ঞ আইনজীবীর মাধ্যমে চূড়ান্ত করুন। এই ফলাফলের
+                  আইনগত দায় কর্তৃপক্ষ নেবে না।</span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-sticky">
+            <div class="fz-sticky-info">
+              <b id="hd-sticky-count">০</b> জন উত্তরাধিকারী নির্বাচিত
+            </div>
+            <button class="fz-btn-main" onclick="AppController.calculateHindu()">
+              <i class="bi bi-calculator-fill"></i> ফলাফল
+            </button>
+          </div>
+
+        </div>
+
+        <!-- VIEW: Hissa Calculator -->
+        <div id="view-hissa-calc" class="tool-view-content" style="display:none">
+
+          <!-- ধাপ ১ — মোট জমি -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>মোট জমির পরিমাণ</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-map-fill"></i> পরিমাণ</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="hc-total-land" value="100" inputmode="decimal" oninput="AppController.runHissaCalc()">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-rulers"></i> একক</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="hc-total-unit" onchange="AppController.runHissaCalc()">
+                      <option value="satak">শতক / ডেসিমেল</option>
+                      <option value="katha">কাঠা</option>
+                      <option value="bigha">বিঘা</option>
+                      <option value="acre">একর</option>
+                      <option value="sqft">বর্গফুট</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ২ — হিস্যার ধরন -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>হিস্যার ধরন ও পরিমাণ</h3>
+            </div>
+            <div class="fz-panel-body">
+
+              <div class="fz-seg" style="margin-bottom:14px">
+                <button type="button" class="fz-seg-btn active" data-hc="decimal" onclick="AppController.setHissaType('decimal')">দশমিক</button>
+                <button type="button" class="fz-seg-btn" data-hc="anagonda" onclick="AppController.setHissaType('anagonda')">আনা-গন্ডা</button>
+                <button type="button" class="fz-seg-btn" data-hc="percent" onclick="AppController.setHissaType('percent')">শতকরা (%)</button>
+                <button type="button" class="fz-seg-btn" data-hc="fraction" onclick="AppController.setHissaType('fraction')">ভগ্নাংশ</button>
+              </div>
+              <input type="hidden" id="hc-hissa-type" value="decimal">
+
+              <!-- আনা-গন্ডা -->
+              <div id="hc-panel-anagonda" class="fz-ag-grid" style="display:none">
+                <div class="fz-dead-field">
+                  <label>আনা (০–১৬)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('hc-ana',-1,0,16)">&minus;</button>
+                    <input type="number" id="hc-ana" value="4" min="0" max="16" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                    <button type="button" onclick="AppController.stepField('hc-ana',1,0,16)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>গন্ডা (০–২০)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('hc-gonda',-1,0,20)">&minus;</button>
+                    <input type="number" id="hc-gonda" value="0" min="0" max="20" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                    <button type="button" onclick="AppController.stepField('hc-gonda',1,0,20)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>কড়া (০–৪)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('hc-kora',-1,0,4)">&minus;</button>
+                    <input type="number" id="hc-kora" value="0" min="0" max="4" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                    <button type="button" onclick="AppController.stepField('hc-kora',1,0,4)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>ক্রান্তি (০–৩)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('hc-kranti',-1,0,3)">&minus;</button>
+                    <input type="number" id="hc-kranti" value="0" min="0" max="3" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                    <button type="button" onclick="AppController.stepField('hc-kranti',1,0,3)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>তিল (০–২০)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('hc-til',-1,0,20)">&minus;</button>
+                    <input type="number" id="hc-til" value="0" min="0" max="20" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                    <button type="button" onclick="AppController.stepField('hc-til',1,0,20)">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- শতকরা -->
+              <div id="hc-panel-percent" class="fz-field" style="display:none">
+                <div class="fz-field-label"><span><i class="bi bi-percent"></i> শতকরা হিস্যা</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" id="hc-percent" value="25" inputmode="decimal" oninput="AppController.runHissaCalc()">
+                  <span class="fz-unit-suffix">%</span>
+                </div>
+              </div>
+
+              <!-- দশমিক -->
+              <div id="hc-panel-decimal" class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-dot"></i> দশমিক হিস্যা (০.০০ – ১.০০)</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" step="0.001" id="hc-decimal" value="0.25" inputmode="decimal" oninput="AppController.runHissaCalc()">
+                </div>
+              </div>
+
+              <!-- ভগ্নাংশ -->
+              <div id="hc-panel-fraction" class="fz-assets" style="display:none">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>লব (উপরের সংখ্যা)</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="hc-num" value="1" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span>হর (নিচের সংখ্যা)</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="hc-den" value="4" inputmode="numeric" oninput="AppController.runHissaCalc()">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ধাপ ৩ — ফলাফল -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>প্রাপ্ত হিস্যা জমির পরিমাণ</h3>
+            </div>
+            <div class="fz-panel-body">
+
+              <div class="fz-hero">
+                <span class="l">প্রাপ্ত অংশ</span>
+                <span class="v" id="hc-res-percent">২৫.০০০%</span>
+                <div class="sub" id="hc-res-anagonda">৪ আনা ০ গন্ডা ০ কড়া ০ ক্রান্তি ০ তিল</div>
+              </div>
+
+              <div class="fz-katha-note"></div>
+              <div class="fz-stats">
+                <div class="fz-stat"><span class="v" id="hc-res-decimal">০.২৫০০</span><span class="l">অংশ (দশমিক)</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-fraction">১/৪</span><span class="l">ভগ্নাংশ</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-satak">২৫.০০</span><span class="l">শতক</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-katha">১৫.১৫</span><span class="l">কাঠা</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-bigha">০.৭৫</span><span class="l">বিঘা</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-sqft">১০৮৯০</span><span class="l">বর্গফুট</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-sqyard">১২১০</span><span class="l">বর্গগজ</span></div>
+                <div class="fz-stat"><span class="v" id="hc-res-ajutangsha">২৫০০০</span><span class="l">অযুতাংশ</span></div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 1: ক্যানভাস জমি পরিমাপ -->
+        <div id="view-canvas-measure" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>জমির বাহু সংখ্যা</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-warn" style="margin-bottom:12px">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>জমির যতগুলো কোণা, ততগুলো বাহু। <b>৩ থেকে ১২</b> বাহু পর্যন্ত মাপা যায়।
+                আকৃতি নির্দিষ্ট করতে বাহুর পাশাপাশি <b>কর্ণের মাপও</b> লাগে —
+                <b>N বাহুর জন্য (N−৩)টি কর্ণ</b>।</span>
+              </div>
+
+              <div class="fz-dead-field" style="max-width:240px">
+                <label>বাহুর সংখ্যা</label>
+                <div class="fz-mini-counter">
+                  <button type="button" onclick="AppController.changeSideCount(-1)">&minus;</button>
+                  <input type="number" id="cm-side-count" value="4" min="3" max="12"
+                         inputmode="numeric" onchange="AppController.rebuildSideInputs()">
+                  <button type="button" onclick="AppController.changeSideCount(1)">+</button>
+                </div>
+              </div>
+
+              <div class="fz-seg" style="margin-top:12px">
+                <button type="button" class="fz-seg-btn" onclick="AppController.setSideCount(3)">ত্রিভুজ (৩)</button>
+                <button type="button" class="fz-seg-btn active" onclick="AppController.setSideCount(4)">চতুর্ভুজ (৪)</button>
+                <button type="button" class="fz-seg-btn" onclick="AppController.setSideCount(5)">পঞ্চভুজ (৫)</button>
+                <button type="button" class="fz-seg-btn" onclick="AppController.setSideCount(6)">ষড়ভুজ (৬)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>বাহুর মাপ (ফুট)</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-ag-grid" id="cm-sides"></div>
+            </div>
+          </div>
+
+          <div class="fz-panel" id="cm-diag-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>কর্ণের মাপ (ফুট)</h3>
+            </div>
+            <div class="fz-panel-body">
+              <p style="font-size:0.84rem;color:var(--text-muted);line-height:1.7;margin-bottom:10px">
+                <b>কোণা ১</b> থেকে অন্য কোণাগুলোর সোজা দূরত্ব মাপুন। এতে জমিটি
+                ত্রিভুজে ভাগ হয়ে যায় এবং ক্ষেত্রফল <b>নির্ভুল</b> হয়।
+              </p>
+              <div class="fz-ag-grid" id="cm-diags"></div>
+
+              <label class="fz-opt-row" for="cm-avg" id="cm-avg-row" style="margin-top:12px">
+                <input type="checkbox" id="cm-avg" onchange="AppController.updateCanvasFromInputs()">
+                কর্ণ মাপা নেই — গড় পদ্ধতিতে আনুমানিক হিসাব করুন
+              </label>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৪</span>
+              <h3>জমির আকৃতি</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-warn" id="cm-error" style="display:none">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span id="cm-error-text"></span>
+              </div>
+
+              <div class="canvas-wrapper">
+                <canvas id="land-canvas"></canvas>
+              </div>
+              <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;text-align:center">
+                মাউস বা আঙুল দিয়ে কোণার বিন্দু টেনে আকৃতি বদলাতে পারবেন।
+                <br>কমলা ড্যাশ রেখাগুলো কর্ণ — এগুলোই জমিকে ত্রিভুজে ভাগ করে।
+              </p>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৫</span>
+              <h3>ক্ষেত্রফল ফলাফল</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.openToolModal('print-studio')">
+                <i class="bi bi-printer"></i> প্রিন্ট রিপোর্ট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-katha-note"></div>
+              <div class="fz-stats">
+                <div class="fz-stat"><span class="v" id="res-canvas-satak">০.০০</span><span class="l">শতক</span></div>
+                <div class="fz-stat"><span class="v" id="res-canvas-katha">০.০০</span><span class="l">কাঠা</span></div>
+                <div class="fz-stat"><span class="v" id="res-canvas-sqft">০.০০</span><span class="l">বর্গফুট</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 2: Ana-Gonda Converter -->
+        <div id="view-ana-gonda" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>দাগের মোট জমি</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-map-fill"></i> মোট জমি</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" id="ag-total-land" value="100" inputmode="decimal" oninput="AppController.runAnaGondaCalc()">
+                  <span class="fz-unit-suffix">শতক</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>আনা-গন্ডা হিস্যা</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-ag-grid">
+                <div class="fz-dead-field">
+                  <label>আনা (০–১৬)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('ag-ana',-1,0,16)">&minus;</button>
+                    <input type="number" id="ag-ana" value="4" min="0" max="16" inputmode="numeric" oninput="AppController.runAnaGondaCalc()">
+                    <button type="button" onclick="AppController.stepField('ag-ana',1,0,16)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>গন্ডা (০–২০)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('ag-gonda',-1,0,20)">&minus;</button>
+                    <input type="number" id="ag-gonda" value="10" min="0" max="20" inputmode="numeric" oninput="AppController.runAnaGondaCalc()">
+                    <button type="button" onclick="AppController.stepField('ag-gonda',1,0,20)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>কড়া (০–৪)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('ag-kora',-1,0,4)">&minus;</button>
+                    <input type="number" id="ag-kora" value="2" min="0" max="4" inputmode="numeric" oninput="AppController.runAnaGondaCalc()">
+                    <button type="button" onclick="AppController.stepField('ag-kora',1,0,4)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>ক্রান্তি (০–৩)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('ag-kranti',-1,0,3)">&minus;</button>
+                    <input type="number" id="ag-kranti" value="1" min="0" max="3" inputmode="numeric" oninput="AppController.runAnaGondaCalc()">
+                    <button type="button" onclick="AppController.stepField('ag-kranti',1,0,3)">+</button>
+                  </div>
+                </div>
+                <div class="fz-dead-field">
+                  <label>তিল (০–২০)</label>
+                  <div class="fz-mini-counter">
+                    <button type="button" onclick="AppController.stepField('ag-til',-1,0,20)">&minus;</button>
+                    <input type="number" id="ag-til" value="0" min="0" max="20" inputmode="numeric" oninput="AppController.runAnaGondaCalc()">
+                    <button type="button" onclick="AppController.stepField('ag-til',1,0,20)">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>কনভার্সন ফলাফল</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-hero">
+                <span class="l">মোট অংশ</span>
+                <span class="v" id="ag-res-frac">০.০০%</span>
+              </div>
+              <div class="fz-katha-note"></div>
+              <div class="fz-stats">
+                <div class="fz-stat"><span class="v" id="ag-res-decimal">০.০০০০</span><span class="l">অংশ (দশমিক)</span></div>
+                <div class="fz-stat"><span class="v" id="ag-res-fraction">০</span><span class="l">ভগ্নাংশ</span></div>
+                <div class="fz-stat"><span class="v" id="ag-res-satak">০.০০</span><span class="l">প্রাপ্ত শতক</span></div>
+                <div class="fz-stat"><span class="v" id="ag-res-katha">০.০০</span><span class="l">প্রাপ্ত কাঠা</span></div>
+                <div class="fz-stat"><span class="v" id="ag-res-sqft">০.০০</span><span class="l">বর্গফুট</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 3: Khotian Owner Analyzer -->
+        <div id="view-khotian-analyzer" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>খতিয়ানের মোট জমি</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-file-earmark-text"></i> মোট জমি</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" id="khotian-total-land" value="100" inputmode="decimal" oninput="AppController.runKhotianCalc()">
+                  <span class="fz-unit-suffix">শতক</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>মালিকদের হিস্যা তালিকা</h3>
+              <button class="fz-btn-add" id="khotian-add-row-btn">
+                <i class="bi bi-plus-lg"></i> মালিক যোগ
+              </button>
+            </div>
+            <div class="fz-panel-body">
+
+              <!-- হিস্যার ধরন — হিস্যা ক্যালকুলেটরের মতোই ৪ রকম -->
+              <div style="margin-bottom:6px;font-size:0.86rem;font-weight:600">হিস্যার ধরন</div>
+              <div class="fz-seg" id="khotian-type-seg" style="margin-bottom:14px">
+                <button type="button" class="fz-seg-btn active" data-kht="decimal"
+                        onclick="AppController.setKhotianType('decimal')">দশমিক</button>
+                <button type="button" class="fz-seg-btn" data-kht="anagonda"
+                        onclick="AppController.setKhotianType('anagonda')">আনা-গন্ডা</button>
+                <button type="button" class="fz-seg-btn" data-kht="percent"
+                        onclick="AppController.setKhotianType('percent')">শতকরা (%)</button>
+                <button type="button" class="fz-seg-btn" data-kht="fraction"
+                        onclick="AppController.setKhotianType('fraction')">ভগ্নাংশ</button>
+              </div>
+
+              <!-- প্রতিটি মালিক একটি কার্ড — মোবাইল ও ডেস্কটপ দুটোতেই -->
+              <div class="fz-rows" id="khotian-rows-tbody"></div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>মালিকানা হিসাব বিবরণী</h3>
+              <span class="fz-pill ok" id="khotian-sum-badge">১৬ আনা (১০০%)</span>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.printKhotian()">
+                <i class="bi bi-printer"></i> প্রিন্ট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+
+              <!-- মোবাইল: কার্ড -->
+              <div class="fz-katha-note"></div>
+
+              <!-- কোন কলাম দেখাবে — টিক দিলে ঐ কলাম টেবিলে যোগ হবে -->
+              <div class="fz-col-toggles">
+                <span class="fz-col-title"><i class="bi bi-layout-three-columns"></i> কলাম দেখান</span>
+                <label><input type="checkbox" id="kh-col-ana" checked onchange="AppController.runKhotianCalc()"> হিস্যা (আনা-গন্ডা)</label>
+                <label><input type="checkbox" id="kh-col-frac" checked onchange="AppController.runKhotianCalc()"> ভগ্নাংশ</label>
+                <label><input type="checkbox" id="kh-col-pct" checked onchange="AppController.runKhotianCalc()"> অংশ (%)</label>
+                <label><input type="checkbox" id="kh-col-katha" checked onchange="AppController.runKhotianCalc()"> জমি (কাঠা)</label>
+                <label><input type="checkbox" id="kh-col-sqft" checked onchange="AppController.runKhotianCalc()"> বর্গফুট</label>
+              </div>
+
+              <div class="fz-res-cards" id="khotian-res-cards"></div>
+
+              <!-- ডেস্কটপ: টেবিল -->
+              <div class="fz-res-table-wrap">
+                <table class="custom-table">
+                  <thead id="khotian-res-thead"></thead>
+                  <tbody id="khotian-res-tbody"></tbody>
+                  <tfoot id="khotian-res-tfoot"></tfoot>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW 5: Unit Converter -->
+        <div id="view-unit-converter" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>যে পরিমাণ রূপান্তর করবেন</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-123"></i> পরিমাণ</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="uc-input-val" value="10" inputmode="decimal" oninput="AppController.runUnitConverter()">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-rulers"></i> একক</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="uc-input-unit" onchange="AppController.runUnitConverter()">
+                      <option value="satak">শতক / ডেসিমেল</option>
+                      <option value="katha">কাঠা</option>
+                      <option value="bigha">বিঘা</option>
+                      <option value="acre">একর</option>
+                      <option value="sqft">বর্গফুট</option>
+                      <option value="ajutangsha">অযুতাংশ</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- কাঠার মাপ — অঞ্চলভেদে আলাদা -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>কাঠার মাপ নির্বাচন</h3>
+            </div>
+            <div class="fz-panel-body">
+
+              <div class="fz-warn" style="margin-bottom:12px">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>বাংলাদেশে <b>কাঠার মাপ অঞ্চলভেদে আলাদা</b>। শতক, একর ও বর্গফুট
+                সব জায়গায় একই, কিন্তু কাঠা ও বিঘা এলাকাভেদে বদলায়।
+                <b>২০ কাঠা = ১ বিঘা</b> — কাঠার মান যাই হোক না কেন।</span>
+              </div>
+
+              <div class="fz-seg" id="uc-katha-seg">
+                <button type="button" class="fz-seg-btn active" data-katha="standard"
+                        onclick="AppController.setKathaMode('standard')">
+                  স্ট্যান্ডার্ড<br><small style="font-weight:600;opacity:.8">১.৬৫ শতক</small>
+                </button>
+                <button type="button" class="fz-seg-btn" data-katha="wide"
+                        onclick="AppController.setKathaMode('wide')">
+                  চওড়া কাঠা<br><small style="font-weight:600;opacity:.8">২.৬০ শতক</small>
+                </button>
+                <button type="button" class="fz-seg-btn" data-katha="custom"
+                        onclick="AppController.setKathaMode('custom')">
+                  কাস্টম<br><small style="font-weight:600;opacity:.8">নিজে লিখুন</small>
+                </button>
+              </div>
+
+              <div class="fz-field" id="uc-katha-custom-wrap" style="display:none;margin-top:12px">
+                <div class="fz-field-label"><span><i class="bi bi-pencil"></i> ১ কাঠা = কত শতক?</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" step="0.0001" id="uc-katha-custom" value="1.65" inputmode="decimal"
+                         oninput="AppController.setKathaMode('custom')">
+                  <span class="fz-unit-suffix">শতক</span>
+                </div>
+              </div>
+
+              <div class="fz-stats" style="margin-top:12px">
+                <div class="fz-stat"><span class="v" id="uc-basis-katha-satak">১.৬৫</span><span class="l">১ কাঠা = কত শতক</span></div>
+                <div class="fz-stat"><span class="v" id="uc-basis-katha-sqft">৭২০</span><span class="l">১ কাঠা = কত বর্গফুট</span></div>
+                <div class="fz-stat"><span class="v" id="uc-basis-bigha-satak">৩৩.০৬</span><span class="l">১ বিঘা = কত শতক</span></div>
+                <div class="fz-stat"><span class="v" id="uc-basis-bigha-sqft">১৪৪০০</span><span class="l">১ বিঘা = কত বর্গফুট</span></div>
+              </div>
+
+              <p class="fz-cert-note" style="text-align:left;margin-top:10px">
+                এই সেটিং সব টুলে প্রযোজ্য হবে (হিস্যা, খতিয়ান, জমি পরিমাপ) এবং
+                আপনার ব্রাউজারে সংরক্ষিত থাকবে।
+              </p>
+
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>অন্যান্য এককে রূপান্তর</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-stats">
+                <div class="fz-stat"><span class="v" id="uc-res-satak">০.০০</span><span class="l">শতক / ডেসিমেল</span></div>
+                <div class="fz-stat"><span class="v" id="uc-res-katha">০.০০</span><span class="l">কাঠা</span></div>
+                <div class="fz-stat"><span class="v" id="uc-res-bigha">০.০০</span><span class="l">বিঘা</span></div>
+                <div class="fz-stat"><span class="v" id="uc-res-acre">০.০০</span><span class="l">একর</span></div>
+                <div class="fz-stat"><span class="v" id="uc-res-sqft">০.০০</span><span class="l">বর্গফুট</span></div>
+                <div class="fz-stat"><span class="v" id="uc-res-ajutangsha">০.০০</span><span class="l">অযুতাংশ</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: দাগ পোরশন -->
+        <!-- VIEW: দলিল রেজিস্ট্রেশন খরচ -->
+        <!-- VIEW: দলিল রেজিস্ট্রেশন খরচ -->
+        <div id="view-dolil-fee" class="tool-view-content" style="display:none">
+
+          <div class="fz-warn" style="margin-bottom:16px">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>হার-সূত্র: <b>নিবন্ধন অধিদপ্তর</b> — "দলিল রেজিস্ট্রেশন সংক্রান্ত ফিস,
+            স্ট্যাম্প শুল্ক ও করাদির হার", প্রকাশ <b>১৬ সেপ্টেম্বর ২০২৫</b> (সারণি ০১–০৫ সহ)।
+            সরকার হার বদলাতে পারে —
+            <a href="https://rd.gov.bd/pages/static-pages/6922dc81933eb65569e10b8b" target="_blank"
+               rel="noopener" style="color:var(--primary);font-weight:700;text-decoration:underline">অফিসিয়াল
+            তালিকা দেখে নিন</a>।</span>
+          </div>
+
+          <!-- ধাপ ১ — দলিল -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>দলিলের তথ্য</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 11px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.resetDolilFee()">
+                <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-field" style="margin-bottom:12px">
+                <div class="fz-field-label"><span><i class="bi bi-file-earmark-text"></i> দলিলের ধরন</span></div>
+                <div class="fz-input-wrap fz-select-wrap">
+                  <select id="df-deed" onchange="AppController.runDolilFee()"></select>
+                </div>
+              </div>
+              <p class="fz-cert-note" id="df-deed-note" style="text-align:left;margin:-6px 0 12px"></p>
+
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-translate"></i> দলিলের ভাষা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-lang" onchange="AppController.runDolilFee()">
+                      <option value="bn">বাংলা</option>
+                      <option value="en">English (এন-ফি দ্বিগুণ)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-building"></i> জেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-district" onchange="AppController.runDolilFee()"></select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-file-text"></i> দলিলের পৃষ্ঠা</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-pages" value="10" min="1" inputmode="numeric"
+                           oninput="AppController.runDolilFee()">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-files"></i> নকলের পৃষ্ঠা</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-copies" value="0" min="0" inputmode="numeric"
+                           oninput="AppController.runDolilFee()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- নকল দলিলের জন্য -->
+              <label class="fz-opt-row" for="df-orig-stamp" id="df-orig-row" style="display:none">
+                <input type="checkbox" id="df-orig-stamp" onchange="AppController.runDolilFee()">
+                মূল দলিলের স্ট্যাম্প শুল্ক ১,০০০ টাকা বা তদনিম্ন
+              </label>
+
+              <!-- ইজারার জন্য -->
+              <div id="df-lease-wrap" style="display:none;margin-top:12px">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-calendar-range"></i> ইজারার মেয়াদ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-lease-term" onchange="AppController.runDolilFee()"></select>
+                  </div>
+                </div>
+                <label class="fz-opt-row" for="df-lease-10" style="margin-top:8px">
+                  <input type="checkbox" id="df-lease-10" onchange="AppController.runDolilFee()">
+                  ইজারার মেয়াদ ১০ বছরের বেশি (অতিরিক্ত ৪% কর)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ২ — জমি -->
+          <div class="fz-panel" id="df-land-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>জমির পরিমাণ ও মূল্য</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-map"></i> জমির পরিমাণ</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-land-qty" value="10" inputmode="decimal"
+                           oninput="AppController.runDolilFee()">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-rulers"></i> পরিমাপের একক</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-land-unit" onchange="AppController.runDolilFee()"></select>
+                  </div>
+                </div>
+
+                <div class="fz-field" style="grid-column:1/-1">
+                  <div class="fz-field-label">
+                    <span><i class="bi bi-cash-stack"></i> <span id="df-value-label">জমির মূল্য</span></span>
+                    <button class="fz-unit-btn active" onclick="AppController.calcFromMouzaRate()"
+                            title="মৌজা রেট × পরিমাণ থেকে হিসাব করুন">
+                      <i class="bi bi-calculator"></i> রেট থেকে
+                    </button>
+                  </div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-value" value="5000000" inputmode="decimal"
+                           oninput="AppController.runDolilFee()">
+                    <span class="fz-unit-suffix">টাকা</span>
+                  </div>
+                </div>
+
+                <div class="fz-field" style="grid-column:1/-1">
+                  <div class="fz-field-label"><span><i class="bi bi-tag"></i> মৌজা রেট (প্রতি শতক)</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-mouza-rate" value="0" inputmode="decimal" placeholder="০">
+                    <span class="fz-unit-suffix">টাকা</span>
+                  </div>
+                </div>
+
+                <!-- ঋণ (বন্ধকী) -->
+                <div class="fz-field" id="df-loan-wrap" style="display:none;grid-column:1/-1">
+                  <div class="fz-field-label"><span><i class="bi bi-bank"></i> মঞ্জুরিকৃত ঋণের পরিমাণ</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-loan" value="0" inputmode="decimal"
+                           oninput="AppController.runDolilFee()">
+                    <span class="fz-unit-suffix">টাকা</span>
+                  </div>
+                </div>
+
+                <!-- পণমূল্য (POA) -->
+                <div class="fz-field" id="df-consid-wrap" style="display:none;grid-column:1/-1">
+                  <div class="fz-field-label"><span><i class="bi bi-cash"></i> পণমূল্য</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="df-consid" value="0" inputmode="decimal"
+                           oninput="AppController.runDolilFee()">
+                    <span class="fz-unit-suffix">টাকা</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৩ — এলাকা ও কর -->
+          <div class="fz-panel" id="df-area-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>এলাকা ও করের হার</h3>
+            </div>
+            <div class="fz-panel-body">
+
+              <div class="fz-field" style="margin-bottom:12px">
+                <div class="fz-field-label"><span><i class="bi bi-buildings"></i> স্থানীয় সরকার / কর্তৃপক্ষ</span></div>
+                <div class="fz-input-wrap fz-select-wrap">
+                  <select id="df-localtax" onchange="AppController.runDolilFee()"></select>
+                </div>
+              </div>
+
+              <div id="df-src125-wrap">
+                <div class="fz-field" style="margin-bottom:12px">
+                  <div class="fz-field-label"><span><i class="bi bi-geo-alt"></i> জমির অবস্থান (সারণি ০১/০২)</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-land-area" onchange="AppController.runDolilFee()"></select>
+                  </div>
+                </div>
+
+                <div class="fz-field" style="margin-bottom:12px">
+                  <div class="fz-field-label"><span><i class="bi bi-diagram-3"></i> এলাকার শ্রেণি</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="df-land-class" onchange="AppController.runDolilFee()"></select>
+                  </div>
+                </div>
+
+                <p class="fz-cert-note" style="text-align:left;margin-bottom:12px">
+                  উৎসে কর = <b>দলিল মূল্যের নির্দিষ্ট %</b> অথবা <b>শতকপ্রতি নির্দিষ্ট টাকা</b> —
+                  যেটি বেশি। এলাকা ও শ্রেণিভেদে হার আলাদা।
+                </p>
+              </div>
+
+              <label class="fz-opt-row" for="df-dev">
+                <input type="checkbox" id="df-dev" onchange="AppController.runDolilFee()">
+                বিক্রেতা/হস্তান্তরকারী <b>ডেভেলপার বা রিয়েল এস্টেট প্রতিষ্ঠান</b>
+                (ধারা ১২৬ ও VAT প্রযোজ্য)
+              </label>
+
+              <div class="fz-field" id="df-vat-wrap" style="display:none;margin-top:10px">
+                <div class="fz-field-label"><span><i class="bi bi-receipt"></i> VAT এর ধরন</span></div>
+                <div class="fz-input-wrap fz-select-wrap">
+                  <select id="df-vatkind" onchange="AppController.runDolilFee()">
+                    <option value="plot">প্লট / জমি — ২%</option>
+                    <option value="flat_upto">ভবন/ফ্ল্যাট ১–১৬০০ বর্গফুট — ২%</option>
+                    <option value="flat_above">ভবন/ফ্ল্যাট ১৬০০ বর্গফুটের ঊর্ধ্বে — ৪.৫%</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৪ — স্থাপনা -->
+          <div class="fz-panel" id="df-building-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৪</span>
+              <h3>স্থাপনা / ভবন / ফ্ল্যাট</h3>
+            </div>
+            <div class="fz-panel-body">
+              <label class="fz-opt-row" for="df-has-building">
+                <input type="checkbox" id="df-has-building" onchange="AppController.runDolilFee()">
+                জমির উপর স্থাপনা / ভবন / ফ্ল্যাট আছে
+              </label>
+
+              <div id="df-building-fields" style="display:none;margin-top:12px">
+                <div class="fz-assets">
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-house"></i> স্থাপনার পরিমাপ</span></div>
+                    <div class="fz-input-wrap">
+                      <input type="number" id="df-building-sqft" value="1200" inputmode="decimal"
+                             oninput="AppController.runDolilFee()">
+                      <span class="fz-unit-suffix">বর্গফুট</span>
+                    </div>
+                  </div>
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-cash-stack"></i> স্থাপনার মূল্য</span></div>
+                    <div class="fz-input-wrap">
+                      <input type="number" id="df-building-value" value="0" inputmode="decimal"
+                             oninput="AppController.runDolilFee()">
+                      <span class="fz-unit-suffix">টাকা</span>
+                    </div>
+                  </div>
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-shop"></i> স্থাপনার ধরন</span></div>
+                    <div class="fz-input-wrap fz-select-wrap">
+                      <select id="df-building-kind" onchange="AppController.runDolilFee()">
+                        <option value="res">আবাসিক</option>
+                        <option value="com">বাণিজ্যিক</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="fz-field">
+                    <div class="fz-field-label"><span><i class="bi bi-geo"></i> স্থাপনার শ্রেণি (সারণি ০৩)</span></div>
+                    <div class="fz-input-wrap fz-select-wrap">
+                      <select id="df-building-125" onchange="AppController.runDolilFee()"></select>
+                    </div>
+                  </div>
+                  <div class="fz-field" id="df-b126-wrap" style="grid-column:1/-1;display:none">
+                    <div class="fz-field-label"><span><i class="bi bi-geo-alt"></i> ভবনের অবস্থান (সারণি ০৪ — ডেভেলপার)</span></div>
+                    <div class="fz-input-wrap fz-select-wrap">
+                      <select id="df-building-126" onchange="AppController.runDolilFee()"></select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৫ — খরচের বিবরণী -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৫</span>
+              <h3>খরচের বিবরণী</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.printDolilFee()">
+                <i class="bi bi-printer"></i> প্রিন্ট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+
+              <div class="fz-warn" id="df-warn" style="display:none">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span id="df-warn-text"></span>
+              </div>
+
+              <div class="fz-hero">
+                <span class="l">সর্বমোট রেজিস্ট্রেশন খরচ</span>
+                <span class="v" id="df-total">০ টাকা</span>
+                <div class="sub" id="df-overhead">দলিল মূল্যের ০%</div>
+              </div>
+
+              <div class="fz-res-cards" id="df-cards"></div>
+
+              <div class="fz-res-table-wrap">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th style="width:7%">ক্রমিক</th>
+                      <th style="text-align:left">খরচের খাত</th>
+                      <th style="text-align:left">হিসাবের ভিত্তি</th>
+                      <th style="text-align:right">টাকা</th>
+                    </tr>
+                  </thead>
+                  <tbody id="df-tbody"></tbody>
+                  <tfoot id="df-tfoot"></tfoot>
+                </table>
+              </div>
+
+              <div class="fz-warn" style="margin-top:16px;margin-bottom:0">
+                <i class="bi bi-shield-exclamation"></i>
+                <span>এটি একটি <b>আনুমানিক</b> হিসাব। প্রকৃত খরচ দলিলের ধরন, এলাকা,
+                পৃষ্ঠা সংখ্যা ও স্থানীয় নিয়মভেদে কমবেশি হতে পারে। টাকা জমা দেওয়ার আগে
+                <b>সাব-রেজিস্ট্রি অফিসে</b> যাচাই করে নিন।</span>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div id="view-dag-portion" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>দাগ ও আবেদিত জমি</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-warn" style="margin-bottom:12px">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>সূত্র: <b>অংশ = আবেদিত জমির পরিমাণ ÷ দাগের মোট জমির পরিমাণ</b>।
+                নামজারি বা দলিলে "দাগের মধ্যে অত্র খতিয়ানের অংশ" লিখতে এই হিসাব লাগে।</span>
+              </div>
+
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-bounding-box"></i> দাগের মোট জমি</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="dp-total" value="100" inputmode="decimal" oninput="AppController.runDagPortion()">
+                    <span class="fz-unit-suffix">শতক</span>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-pin-map"></i> আবেদিত জমি</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="dp-applied" value="25" inputmode="decimal" oninput="AppController.runDagPortion()">
+                    <span class="fz-unit-suffix">শতক</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>প্রাপ্ত অংশ বা হিস্যা</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-warn" id="dp-warn" style="display:none">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span id="dp-warn-text"></span>
+              </div>
+
+              <div class="fz-hero">
+                <span class="l">অংশ (দশমিক)</span>
+                <span class="v" id="dp-res-decimal">০.২৫০০০০</span>
+              </div>
+
+              <div class="fz-stats">
+                <div class="fz-stat"><span class="v" id="dp-res-fraction">১/৪</span><span class="l">ভগ্নাংশ</span></div>
+                <div class="fz-stat"><span class="v" id="dp-res-percent">২৫.০০০%</span><span class="l">অংশ (%)</span></div>
+                <div class="fz-stat" style="grid-column:1/-1"><span class="v" id="dp-res-ana" style="font-size:0.98rem">৪ আনা</span><span class="l">আনা-গণ্ডা হিস্যা</span></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: তফসিল বন্টন -->
+        <div id="view-tofasil" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>মোট জমি ও টার্গেট অংশ</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-warn" style="margin-bottom:12px">
+                <i class="bi bi-info-circle-fill"></i>
+                <span>সূত্র: <b>নির্ণেয় অংশ = (গ্রহীতার জমি ÷ মোট জমি) × টার্গেট অংশ</b>।
+                নামজারির আবেদনে একাধিক গ্রহীতা থাকলে প্রত্যেকের অংশ বসাতে এটি লাগে।
+                এটি <b>খতিয়ান বিশ্লেষণের উল্টো</b> — সেখানে হিস্যা দিয়ে জমি বের হয়, এখানে জমি দিয়ে হিস্যা।</span>
+              </div>
+
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-bounding-box"></i> মোট জমি</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" id="tf-total" value="0" inputmode="decimal" oninput="AppController.runTofasil()">
+                    <span class="fz-unit-suffix">শতক</span>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-percent"></i> টার্গেট অংশ</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="number" step="0.0001" id="tf-target" value="1" inputmode="decimal" oninput="AppController.runTofasil()">
+                  </div>
+                </div>
+              </div>
+              <p class="fz-cert-note" style="text-align:left;margin-top:8px">
+                মোট জমি <b>০</b> রাখলে গ্রহীতাদের জমির যোগফলই মোট ধরা হবে।
+                টার্গেট অংশ সাধারণত <b>১</b> — খতিয়ানে আংশিক অংশ বসলে সেই মান দিন।
+              </p>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>গ্রহীতাদের তালিকা</h3>
+              <button class="fz-btn-add" id="tf-add-btn">
+                <i class="bi bi-plus-lg"></i> গ্রহীতা যোগ
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-rows" id="tf-rows"></div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>বন্টননামা</h3>
+              <span class="fz-pill ok" id="tf-sum-badge">মোট ১.০০০০০০</span>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.printTofasil()">
+                <i class="bi bi-printer"></i> প্রিন্ট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-katha-note"></div>
+
+              <div class="fz-col-toggles">
+                <span class="fz-col-title"><i class="bi bi-layout-three-columns"></i> কলাম দেখান</span>
+                <label><input type="checkbox" id="tf-col-ana" checked onchange="AppController.runTofasil()"> আনা-গন্ডা</label>
+                <label><input type="checkbox" id="tf-col-frac" checked onchange="AppController.runTofasil()"> ভগ্নাংশ</label>
+                <label><input type="checkbox" id="tf-col-pct" checked onchange="AppController.runTofasil()"> অংশ (%)</label>
+                <label><input type="checkbox" id="tf-col-katha" onchange="AppController.runTofasil()"> জমি (কাঠা)</label>
+              </div>
+
+              <div class="fz-res-cards" id="tf-res-cards"></div>
+
+              <div class="fz-res-table-wrap">
+                <table class="custom-table">
+                  <thead id="tf-res-thead"></thead>
+                  <tbody id="tf-res-tbody"></tbody>
+                  <tfoot id="tf-res-tfoot"></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: অনুপাত ক্যালকুলেটর -->
+        <div id="view-ratio" class="tool-view-content" style="display:none">
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>পরিমাণগুলো ও চাহিত মোট</h3>
+              <button class="fz-btn-add" id="rt-add-btn">
+                <i class="bi bi-plus-lg"></i> আরও যোগ
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-rows" id="rt-rows"></div>
+
+              <div class="fz-field" style="margin-top:14px">
+                <div class="fz-field-label"><span><i class="bi bi-bullseye"></i> চাহিত মোট (Target)</span></div>
+                <div class="fz-input-wrap">
+                  <input type="number" id="rt-target" value="0" inputmode="decimal" oninput="AppController.runRatio()">
+                </div>
+              </div>
+              <p class="fz-cert-note" style="text-align:left;margin-top:8px">
+                <b>০</b> রাখলে উপরের যোগফলই চাহিত মোট ধরা হবে (তখন কেবল অনুপাত দেখাবে)।
+              </p>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>আনুপাতিক ভাগ</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-hero">
+                <span class="l">সরল অনুপাত</span>
+                <span class="v" id="rt-simple">২ : ১ : ১</span>
+                <div class="sub"><span id="rt-sum-line">প্রদত্ত মোট ০ · চাহিত মোট ০</span></div>
+              </div>
+
+              <div class="fz-res-cards" id="rt-res-cards"></div>
+              <div class="fz-res-table-wrap">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th style="width:8%">ক্রমিক</th>
+                      <th>প্রদত্ত পরিমাণ</th>
+                      <th>অনুপাত (দশমিক)</th>
+                      <th>শতকরা (%)</th>
+                      <th>প্রাপ্য ভাগ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="rt-res-tbody"></tbody>
+                  <tfoot id="rt-res-tfoot"></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>ইনলাইন ক্যালকুলেটর</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-field">
+                <div class="fz-field-label"><span><i class="bi bi-calculator"></i> সমীকরণ লিখুন</span></div>
+                <div class="fz-input-wrap">
+                  <input type="text" id="rt-expr" placeholder="যেমন: 54+52+69*5/8"
+                         oninput="AppController.runExpression()">
+                </div>
+              </div>
+              <div class="fz-hero" style="margin-top:12px;margin-bottom:0">
+                <span class="l">ফলাফল</span>
+                <span class="v" id="rt-expr-res">০</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: জমির সকল সূত্র -->
+        <div id="view-land-formula" class="tool-view-content" style="display:none">
+          <div id="lf-content"></div>
+        </div>
+
+        <!-- VIEW 6: Map Pantograph Overlay -->
+        <div id="view-map-overlay" class="tool-view-content" style="display:none">
+          <div class="fz-warn">
+            <i class="bi bi-cone-striped"></i>
+            <span><b>এই টুলের কাজ চলছে।</b> এখন কেবল দুটি ম্যাপ ওভারলে করে
+            স্বচ্ছতা বদলানো যায়। <b>সূক্ষ্ম ঘোরানো (±০.১°), পয়েন্ট মিলিয়ে
+            জোড়া লাগানো, ক্রপ ও ইরেজ</b> — এগুলো এখনো যোগ করা হয়নি।</span>
+          </div>
+          <div id="pantograph-container"></div>
+        </div>
+
+        <!-- VIEW 7: Print Studio -->
+        <div id="view-print-studio" class="tool-view-content" style="display:none">
+
+          <div class="fz-warn">
+            <i class="bi bi-cone-striped"></i>
+            <span><b>এই টুলের কাজ চলছে।</b> এখন তথ্য দিয়ে A4 জরিপ প্রতিবেদন
+            তৈরি ও প্রিন্ট করা যায়। <b>একাধিক ম্যাপ লেয়ার (SA/RS/CS), কম্পাস,
+            সাক্ষীগণের স্বাক্ষরের ঘর ও প্রকল্প সংরক্ষণ</b> — এগুলো পরে যোগ হবে।</span>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>জমি ও মালিকের তথ্য</h3>
+            </div>
+            <div class="fz-panel-body">
+              <p style="font-size:0.84rem;color:var(--text-muted);line-height:1.7;margin-bottom:12px">
+                যে ঘরগুলো ফাঁকা রাখবেন, প্রতিবেদনে সেখানে <b>ডট লাইন</b> ছাপা হবে —
+                হাতে লিখে নিতে পারবেন।
+              </p>
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-person"></i> জমি মালিকের নাম</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-client-name" placeholder="নাম লিখুন"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-geo"></i> মৌজা ও জেএল নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-mouza" placeholder="যেমন: মিরপুর মৌজা, জেএল- ১২"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-file-earmark"></i> খতিয়ান নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-khotian" placeholder="যেমন: ৪৫৮"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-pin-map"></i> দাগ নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-dag" placeholder="যেমন: ১২৫০"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-building"></i> জেলা / উপজেলা</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-district" placeholder="যেমন: ঢাকা"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label">
+                    <span><i class="bi bi-rulers"></i> ক্ষেত্রফল</span>
+                    <button class="fz-unit-btn active" onclick="AppController.pullAreaFromCanvas()"
+                            title="ক্যানভাসে মাপা ক্ষেত্রফল তুলে আনুন">
+                      <i class="bi bi-download"></i> ক্যানভাস থেকে
+                    </button>
+                  </div>
+                  <div class="fz-input-wrap">
+                    <input type="text" id="print-area-satak" placeholder="০">
+                    <span class="fz-unit-suffix">শতক</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>আমিন / সার্ভেয়ারের তথ্য</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-person-badge"></i> নাম</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-surveyor-name" placeholder="সার্ভেয়ারের নাম"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-telephone"></i> ফোন নম্বর</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="print-surveyor-phone" placeholder="যেমন: ০১৭XXXXXXXX"></div>
+                </div>
+              </div>
+
+              <div class="fz-katha-note" style="margin-top:14px"></div>
+
+              <div class="fz-actions">
+                <button class="fz-btn-main" onclick="AppController.triggerPrintReport()">
+                  <i class="bi bi-printer-fill"></i> A4 প্রতিবেদন প্রিন্ট / PDF
+                </button>
+                <div class="fz-btn-row">
+                  <button class="fz-btn-sub" onclick="AppController.openToolModal('canvas-measure')">
+                    <i class="bi bi-rulers"></i> জমি পরিমাপে ফিরে যান
+                  </button>
+                </div>
+              </div>
+
+              <p class="fz-cert-note" style="text-align:left;margin-top:10px">
+                প্রতিবেদনে <b>জমির নকশা</b>, <b>বাহু ও কর্ণের মাপ</b> এবং
+                ক্ষেত্রফল (শতক · কাঠা · বিঘা · বর্গফুট) সব থাকবে।
+                প্রিন্ট ডায়ালগে <b>"Save as PDF"</b> বেছে নিলে PDF হয়ে যাবে।
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: সারাদেশের মৌজা ম্যাপ -->
+        <div id="view-mouza-map" class="tool-view-content" style="display:none">
+
+          <div class="fz-warn" style="margin-bottom:14px">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>বিভাগ → জেলা → উপজেলা → জরিপ বেছে নিয়ে মৌজা ম্যাপ নামান।
+            <b>জরিপের ধরন</b> — CS (ক্যাডাস্ট্রাল) · SA (স্টেট একুইজিশন) ·
+            RS (রিভিশনাল) · BS (বর্তমান) · DIYARA (দিয়ারা) · CITY (মহানগর)।
+            একই মৌজার একাধিক জরিপের ম্যাপ থাকতে পারে।</span>
+          </div>
+
+          <!-- সারসংক্ষেপ -->
+          <div class="fz-stats" id="mm-summary" style="margin-bottom:14px"></div>
+
+          <!-- খোঁজা -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num"><i class="bi bi-search"></i></span>
+              <h3>জায়গা খুঁজুন</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" class="fz-search" id="mm-search"
+                       placeholder="উপজেলা, জেলা বা বিভাগের নাম লিখুন (যেমন কুমারখালী)"
+                       oninput="AppController.searchMouzaMap(this.value)">
+              </div>
+              <div id="mm-search-results"></div>
+            </div>
+          </div>
+
+          <!-- ধাপে ধাপে বাছাই -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>এলাকা বাছুন</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 11px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.resetMouzaMap()">
+                <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-geo-alt"></i> বিভাগ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mm-division" onchange="AppController.onMouzaMapDivision()">
+                      <option value="">লোড হচ্ছে…</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-pin-map"></i> জেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mm-district" onchange="AppController.onMouzaMapDistrict()" disabled>
+                      <option value="">আগে বিভাগ বাছুন</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-building"></i> উপজেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mm-upazila" onchange="AppController.onMouzaMapUpazila()" disabled>
+                      <option value="">আগে জেলা বাছুন</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-layers"></i> জরিপের ধরন</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mm-survey" onchange="AppController.onMouzaMapSurvey()" disabled>
+                      <option value="">আগে উপজেলা বাছুন</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ফাইলের তালিকা -->
+          <div class="fz-panel" id="mm-files-panel" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>ম্যাপের তালিকা</h3>
+              <span class="fz-pill" id="mm-file-count" style="flex:none"></span>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-search-wrap" style="margin-bottom:12px">
+                <i class="bi bi-funnel"></i>
+                <input type="text" class="fz-search" id="mm-file-filter"
+                       placeholder="মৌজার নাম বা শিট নম্বর দিয়ে ছাঁকুন"
+                       oninput="AppController.filterMouzaMapFiles(this.value)">
+              </div>
+              <div id="mm-files"></div>
+            </div>
+          </div>
+
+          <!-- ডাউনলোডের অবস্থা -->
+          <div class="fz-panel" id="mm-dl-panel" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num"><i class="bi bi-download"></i></span>
+              <h3>নামানো হচ্ছে</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div id="mm-dl"></div>
+            </div>
+          </div>
+
+          <p class="fz-cert-note" style="text-align:left;margin-top:14px">
+            <i class="bi bi-hdd"></i> ম্যাপের ফাইলগুলো বড় (গড়ে ১০ MB), তাই নামাতে
+            কিছুটা সময় লাগে — ধৈর্য ধরুন। অল্প কিছু ফাইল আকারে এত বড় যে এখান থেকে
+            নামানো যায় না; তালিকায় সেগুলো আলাদা করে চিহ্নিত আছে।
+          </p>
+
+        </div>
+
+        <!-- VIEW: খতিয়ান বিশ্লেষণ (পর্চার হিসাব) -->
+        <div id="view-khotian-porcha" class="tool-view-content" style="display:none">
+
+          <div class="fz-warn" style="margin-bottom:14px">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>প্রতিটি দাগে দুটো পরিমাণ আলাদা করে দিন — <b>দাগের মোট জমি</b>
+            (গোটা দাগে যত, ঐচ্ছিক) এবং <b>খতিয়ানে দাগের জমি</b> (এই খতিয়ানে
+            যতটুকু নিবন্ধিত)। <b>বিশ্লেষণ হবে খতিয়ানে দাগের জমির উপর।</b></span>
+          </div>
+
+          <div class="fz-btn-row" style="margin-bottom:16px">
+            <button class="fz-btn-sub" onclick="AppController.loadPorchaSample()">
+              <i class="bi bi-magic"></i> নমুনা তথ্য লোড করুন
+            </button>
+            <button class="fz-btn-sub" onclick="AppController.resetPorcha()">
+              <i class="bi bi-arrow-counterclockwise"></i> নতুন রিপোর্ট
+            </button>
+          </div>
+
+          <!-- ধাপ ১ — খতিয়ানের পরিচিতি -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>খতিয়ানের পরিচিতি</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-building"></i> জেলা</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-district" placeholder="যেমন মুন্সীগঞ্জ"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-geo"></i> উপজেলা</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-upazila" placeholder="যেমন শ্রীনগর"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-map"></i> মৌজার নাম</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-mouza" placeholder="মৌজার নাম লিখুন"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-hash"></i> জে.এল. নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-jl" placeholder="যেমন ৮৫"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-journal-text"></i> খতিয়ানের ধরণ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kp-type" onchange="AppController.onPorchaKhTypeChange()"></select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-file-earmark-text"></i> খতিয়ান নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-khotian-no" placeholder="যেমন ২৩৪"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-rulers"></i> জমির একক</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kp-unit" onchange="AppController.runPorcha()">
+                      <option value="শতক">শতক</option>
+                      <option value="একর">একর</option>
+                      <option value="কাঠা">কাঠা</option>
+                      <option value="বিঘা">বিঘা</option>
+                      <option value="বর্গফুট">বর্গফুট</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-123"></i> দশমিকের পর ঘর</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="kp-decimals" onchange="AppController.runPorcha()">
+                      <option value="2">২ ঘর</option>
+                      <option value="3">৩ ঘর</option>
+                      <option value="4" selected>৪ ঘর</option>
+                      <option value="6">৬ ঘর</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <p class="fz-cert-note" id="kp-type-hint" style="text-align:left;margin:10px 0 0"></p>
+              <div class="fz-katha-note" style="margin-top:10px"></div>
+            </div>
+          </div>
+
+          <!-- ধাপ ২ — মালিকের তথ্য ও অংশ -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>মালিকের তথ্য ও অংশ</h3>
+              <span class="fz-pill" id="kp-hissa-badge" style="flex:none">—</span>
+              <button class="fz-btn-add" onclick="AppController.addPorchaOwner()">
+                <i class="bi bi-plus-lg"></i> আরো মালিক
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets" style="margin-bottom:12px">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-people"></i> মোট মালিক (খতিয়ানে)</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="text" id="kp-total-owners" inputmode="numeric" placeholder="যেমন ৪"
+                           oninput="AppController.onPorchaTotalOwners(this)">
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-person-check"></i> বিশ্লেষণ করছেন</span></div>
+                  <div class="fz-input-wrap">
+                    <input type="text" id="kp-analyze-count" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <p class="fz-cert-note" style="text-align:left;margin:0 0 12px">
+                মোট মালিকের মধ্যে নির্দিষ্ট কয়েকজনের বিশ্লেষণ করতে পারেন — প্রতিটি
+                মালিকের অংশ সরাসরি লিখুন। <b>বাকি মালিকদের অংশ আলাদা করে দেখানো হবে</b>,
+                কারো অংশ বাড়িয়ে দেওয়া হবে না।
+              </p>
+
+              <div style="margin-bottom:6px;font-size:0.86rem;font-weight:600">অংশ দেওয়ার ধরন</div>
+              <div class="fz-seg" id="kp-type-seg" style="margin-bottom:14px"></div>
+              <div class="fz-rows" id="kp-owner-rows"></div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৩ — দাগের তথ্য -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৩</span>
+              <h3>দাগের তথ্য</h3>
+              <span class="fz-pill" id="kp-dag-total" style="flex:none">—</span>
+              <button class="fz-btn-add" onclick="AppController.addPorchaDag()">
+                <i class="bi bi-plus-lg"></i> নতুন দাগ
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-rows" id="kp-dag-rows"></div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৪ — রিপোর্টকারীর তথ্য -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৪</span>
+              <h3>রিপোর্টকারীর তথ্য (ঐচ্ছিক)</h3>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-person"></i> রিপোর্টকারীর নাম</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-rep-name" placeholder="পূর্ণ নাম"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-award"></i> পদবি</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-rep-title" placeholder="যেমন সার্ভেয়ার, আইনজীবী"></div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-telephone"></i> মোবাইল নং</span></div>
+                  <div class="fz-input-wrap"><input type="text" id="kp-rep-mobile" placeholder="যেমন ০১৭০০০০০০০০"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ৫ — রিপোর্ট -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">৫</span>
+              <h3>খতিয়ান বিশ্লেষণ রিপোর্ট</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.printPorcha()">
+                <i class="bi bi-printer"></i> প্রিন্ট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div id="kp-warn"></div>
+              <div id="kp-summary"></div>
+              <div id="kp-dag-table"></div>
+              <div id="kp-owner-reports"></div>
+              <div id="kp-matrix-wrap" class="fz-only-desktop"></div>
+              <div id="kp-tofasil"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- VIEW: মৌজা মূল্য তালিকা -->
+        <div id="view-mouza-value" class="tool-view-content" style="display:none">
+
+          <div class="fz-warn" style="margin-bottom:16px">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>এখানে দেখানো হয় <b>সরকারনির্ধারিত সর্বনিম্ন বাজার মূল্যের</b> সরকারি তালিকা
+            (মৌজা রেট), যা দলিল রেজিস্ট্রেশনের সময় ব্যবহৃত হয়। প্রকৃত বাজারদর এর
+            চেয়ে বেশি বা কম হতে পারে। সর্বশেষ তালিকার জন্য
+            <b>সংশ্লিষ্ট সাব-রেজিস্ট্রি অফিসে</b> যাচাই করে নিন।</span>
+          </div>
+
+          <!-- ধাপ ১ — অফিস বাছাই -->
+          <div class="fz-panel">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">১</span>
+              <h3>অফিস ও বছর বাছুন</h3>
+              <button class="fz-btn-sub" style="flex:none;padding:6px 11px;min-height:34px;font-size:0.78rem"
+                      onclick="AppController.resetMouzaValue()">
+                <i class="bi bi-arrow-counterclockwise"></i> রিসেট
+              </button>
+            </div>
+            <div class="fz-panel-body">
+              <div class="fz-assets">
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-geo-alt"></i> বিভাগ</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mv-division" onchange="AppController.onMouzaDivision()">
+                      <option value="">লোড হচ্ছে…</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-pin-map"></i> জেলা</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mv-district" onchange="AppController.onMouzaDistrict()" disabled>
+                      <option value="">আগে বিভাগ বাছুন</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field" style="grid-column:1/-1">
+                  <div class="fz-field-label"><span><i class="bi bi-building"></i> সাব-রেজিস্ট্রি অফিস</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mv-office" onchange="AppController.onMouzaOffice()" disabled>
+                      <option value="">আগে জেলা বাছুন</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fz-field">
+                  <div class="fz-field-label"><span><i class="bi bi-calendar3"></i> বছর</span></div>
+                  <div class="fz-input-wrap fz-select-wrap">
+                    <select id="mv-year" onchange="AppController.runMouzaValue()"></select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fz-actions" style="margin-top:14px">
+                <button class="fz-btn-main" id="mv-search-btn" onclick="AppController.runMouzaValue()">
+                  <i class="bi bi-search"></i> মূল্য তালিকা দেখুন
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ধাপ ২ — ফলাফল -->
+          <div class="fz-panel" id="mv-result-panel" style="display:none">
+            <div class="fz-panel-head">
+              <span class="fz-badge-num">২</span>
+              <h3>মূল্য তালিকা</h3>
+              <span class="fz-pill" id="mv-source-pill" style="flex:none"></span>
+            </div>
+            <div class="fz-panel-body">
+
+              <div id="mv-status" class="fz-cert-note" style="text-align:left;margin:0 0 12px"></div>
+
+              <div id="mv-found" style="display:none">
+                <div class="fz-stats" id="mv-meta"></div>
+
+                <div class="fz-actions" style="margin-top:14px">
+                  <div class="fz-btn-row">
+                    <button class="fz-btn-sub" onclick="AppController.openMouzaPdf()">
+                      <i class="bi bi-box-arrow-up-right"></i> নতুন ট্যাবে খুলুন
+                    </button>
+                    <button class="fz-btn-sub" onclick="AppController.downloadMouzaPdf()">
+                      <i class="bi bi-download"></i> ডাউনলোড
+                    </button>
+                    <button class="fz-btn-sub" onclick="AppController.copyMouzaConfig()" id="mv-cfg-btn"
+                            title="নিজের Google Drive এ ফাইলটা রাখার জন্য কনফিগ কোড">
+                      <i class="bi bi-clipboard-check"></i> কনফিগ কোড কপি
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PDF ভিউয়ার -->
+                <div class="mv-viewer" id="mv-viewer-wrap">
+                  <iframe id="mv-frame" title="মৌজা মূল্য তালিকা" loading="lazy"></iframe>
+                </div>
+
+                <p class="fz-cert-note" style="text-align:left;margin-top:10px">
+                  <i class="bi bi-phone"></i> মোবাইলে PDF ঠিকমতো না দেখালে
+                  <b>"নতুন ট্যাবে খুলুন"</b> বোতামটি ব্যবহার করুন।
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="fz-warn" style="margin-top:16px">
+            <i class="bi bi-award-fill"></i>
+            <span>মূল্য তালিকার ফাইলগুলো সংগ্রহ ও প্রকাশ করেছে <b>Land Value</b> —
+              তাদের প্রতি কৃতজ্ঞতা। এখানে ফাইলগুলো সরাসরি তাদের উৎস থেকেই দেখানো হচ্ছে।</span>
+          </div>
+
+          <p class="fz-cert-note" style="text-align:left;margin-top:12px">
+            <i class="bi bi-hdd-network"></i> ধীরে ধীরে নিজস্ব কপি যুক্ত হবে —
+            তখন সেগুলো <b>নিজস্ব উৎস</b> হিসেবে দেখাবে।
+          </p>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="#" onclick="AppController.openToolModal('mouza-map')">সারাদেশের মৌজা ম্যাপ</a>
+        <a href="#" onclick="AppController.openToolModal('farayeiz')">উত্তরাধিকার (মুসলিম)</a>
+        <a href="#" onclick="AppController.openToolModal('hissa-calc')">হিস্যা ক্যালকুলেটর</a>
+        <a href="#" onclick="AppController.openToolModal('canvas-measure')">জমি পরিমাপ</a>
+        <a href="#" onclick="AppController.openToolModal('khotian-analyzer')">খতিয়ান হিসাব</a>
+        <a href="#" onclick="AppController.openToolModal('mouza-value')">মৌজা মূল্য তালিকা</a>
+        <a href="#" onclick="AppController.openToolModal('dolil-fee')">দলিল রেজিস্ট্রেশন খরচ</a>
+      </div>
+      <p>© 2026 Land Info Bangladesh. All rights reserved. 100% Free Client-Side Land Tool Suite.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/calculators.js"></script>
+  <script src="js/canvas-measure.js"></script>
+  <script src="js/map-overlay.js"></script>
+  <script src="js/report-generator.js"></script>
+  <script src="js/hindu-inheritance.js"></script>
+  <script src="js/dolil-fee.js"></script>
+  <script src="js/land-formula.js"></script>
+  <script src="js/khotian-porcha.js"></script>
+  <script src="js/mouza-map.js"></script>
+  <script src="js/mouza-sources.js"></script>
+  <script src="js/mouza-value.js"></script>
+  <script src="js/kmz-export.js"></script>
+  <script src="js/kmz-ui.js"></script>
+  <script src="js/kmz-source.js"></script>
+  <script src="js/kmz-fx.js"></script>
+  <script src="js/map-measure.js"></script>
+  <script src="js/map-measure-ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

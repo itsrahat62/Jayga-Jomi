@@ -1,0 +1,837 @@
+/* ==========================================================================
+   LAND PRO - DIGITAL LAND TOOLS & SURVEY SYSTEM
+   Design System, Custom Properties, Dark Mode, & Component Styles
+   ========================================================================== */
+
+/* ফন্ট index.html এর <head> এ <link> দিয়ে লোড হয় — @import এর চেয়ে দ্রুত */
+
+:root {
+  /* Brand Palette */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eeeffd;
+  --secondary: #10b981;
+  --secondary-hover: #059669;
+  --accent: #f59e0b;
+  --danger: #ef4444;
+  --info: #0ea5e9;
+
+  /* Neutral Shades - Light Theme */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-focus: #818cf8;
+  
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 9999px;
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* বাংলা টাইপোগ্রাফি */
+  --font-family: 'Noto Sans Bengali', 'Hind Siliguri', system-ui, sans-serif;
+  --font-display: 'Anek Bangla', 'Noto Sans Bengali', system-ui, sans-serif;
+  --font-print: 'Tiro Bangla', 'Noto Sans Bengali', serif;
+}
+
+/* Dark Mode Overrides */
+html.dark-theme {
+  --bg-main: #0b0f19;
+  --bg-surface: #111827;
+  --bg-card: #1f2937;
+  --bg-input: #374151;
+  --border-color: #374151;
+  --border-focus: #6366f1;
+
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --text-light: #6b7280;
+
+  --primary-light: rgba(79, 70, 229, 0.15);
+  --shadow-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+}
+
+/* Global Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  /* বাংলায় মাত্রা ও যুক্তাক্ষরের জন্য একটু বেশি লাইন-হাইট দরকার */
+  line-height: 1.75;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* যুক্তাক্ষর ঠিকভাবে জোড়া লাগার জন্য */
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+}
+
+/* শিরোনামে আলাদা ডিসপ্লে ফন্ট — বাংলায় স্পষ্ট চরিত্র আনে */
+h1, h2, h3, h4, h5, h6,
+.brand-text h1, .tool-title, .modal-title,
+.fz-panel-head h3, .fz-acc-title, .fz-res-name {
+  font-family: var(--font-display);
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Header Navbar */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+  transition: background var(--transition-normal);
+}
+
+html.dark-theme .app-header {
+  background: rgba(17, 24, 39, 0.85);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-main);
+}
+
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary), #818cf8);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.brand-text h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.brand-text span {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Action Buttons */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--bg-input);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-input);
+  border-color: var(--text-muted);
+}
+
+/* Mobile Nav Drawer */
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 320px;
+  height: 100vh;
+  background: var(--bg-surface);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-drawer.active {
+  right: 0;
+}
+
+.drawer-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  color: var(--text-main);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: var(--transition-fast);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.drawer-link:hover, .drawer-link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-fast);
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Notice Marquee / Banner */
+.notice-banner {
+  background: linear-gradient(90deg, #4f46e5, #0ea5e9);
+  color: #ffffff;
+  padding: 8px 16px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notice-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+/* Hero & Search Section */
+.hero-section {
+  padding: 40px 0 24px 0;
+  text-align: center;
+  background: radial-gradient(circle at top center, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.hero-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 680px;
+  margin: 0 auto 28px auto;
+}
+
+/* Search Bar */
+.search-box-wrapper {
+  max-width: 580px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 20px 16px 52px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-size: 1rem;
+  font-family: inherit;
+  box-shadow: var(--shadow-md);
+  outline: none;
+  transition: var(--transition-normal);
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  pointer-events: none;
+}
+
+/* Category Filter Chips */
+.category-filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 24px 0 32px 0;
+}
+
+.chip-btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip-btn:hover, .chip-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+/* Tools Grid */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
+}
+
+.tool-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.tool-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-lg);
+}
+
+.tool-card:hover::before {
+  opacity: 1;
+}
+
+.tool-icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 16px;
+  transition: var(--transition-fast);
+}
+
+.tool-card:hover .tool-icon-wrapper {
+  transform: scale(1.08);
+}
+
+.tool-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+}
+
+.badge-featured {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--secondary);
+}
+
+.badge-map {
+  background: rgba(14, 165, 233, 0.15);
+  color: var(--info);
+}
+
+/* কাজ চলমান — টুলটি ব্যবহারযোগ্য, তবে ফিচার এখনো যোগ হচ্ছে।
+   অ্যাম্বার রং (--accent) বেছে নেওয়া হয়েছে: "নতুন" (সবুজ) থেকে আলাদা,
+   কিন্তু "বিপদ" (লাল) নয় — কাজ করে, শুধু অসম্পূর্ণ। */
+.badge-wip {
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ছোট বিন্দুটি ধীরে জ্বলে-নেভে — "চলমান" বোঝাতে */
+.badge-wip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: wip-pulse 2s ease-in-out infinite;
+}
+
+@keyframes wip-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* যাঁরা অ্যানিমেশন বন্ধ রাখেন তাঁদের জন্য স্থির */
+@media (prefers-reduced-motion: reduce) {
+  .badge-wip::before { animation: none; }
+}
+
+.tool-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.tool-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.tool-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: auto;
+}
+
+/* কার্ডে তথ্যসূত্রের কৃতজ্ঞতা — শুধু নাম, কোনো URL বা লিংক নয় (ইউজারের নির্দেশ) */
+.tool-credit {
+  /* block রাখা হয়েছে — flex হলে লম্বা লেখাটা আইকনের নিচে আলাদা লাইনে চলে যেত */
+  display: block;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin: -10px 0 16px;
+  line-height: 1.55;
+  min-width: 0;
+}
+.tool-credit i {
+  margin-inline-end: 5px;
+  opacity: 0.75;
+}
+.tool-credit b {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* Modal View */
+/* মডাল সব পর্দায় পূর্ণ পাতা জুড়ে — ইউজারের সিদ্ধান্ত (৩০ জুলাই ২০২৬)।
+   ম্যাপ, ক্যানভাস ও বড় টেবিলওয়ালা টুলে ৯৬০px বাক্স খুব সংকীর্ণ ছিল। */
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-normal);
+}
+
+.app-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;                 /* মোবাইল ব্রাউজারের ঠিকানা-বার বাদ দিয়ে */
+  max-height: 100vh;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.985);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ভেতরের লেখা যেন খুব চওড়া পর্দায় প্রান্ত থেকে প্রান্তে ছড়িয়ে না যায় —
+   পড়তে কষ্ট হয়। বাক্সটি পূর্ণ, কিন্তু ভেতরের কনটেন্ট মাঝে সীমিত। */
+.modal-body > .tool-view-content,
+.modal-header > .modal-title {
+  max-width: 1280px;
+  margin-inline: auto;
+  width: 100%;
+}
+
+.app-modal.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.form-control, .form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Calculator Result Cards */
+.result-box {
+  background: var(--primary-light);
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.result-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px;
+}
+
+.result-item {
+  background: var(--bg-surface);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.result-val {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.result-lbl {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Canvas Measure Area */
+.canvas-wrapper {
+  position: relative;
+  background: #ffffff;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 380px;
+}
+
+html.dark-theme .canvas-wrapper {
+  background: #111827;
+  border-color: #374151;
+}
+
+canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.canvas-toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+/* Table Styling */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+
+.custom-table th, .custom-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.custom-table th {
+  background: var(--bg-input);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+/* Footer */
+.app-footer {
+  margin-top: auto;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  padding: 30px 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+}
+
+/* Print Specific Style */
+/* প্রিন্টের সব নিয়ম css/print.css এ — A4 উত্তরাধিকার সনদ */

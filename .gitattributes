@@ -1,0 +1,11 @@
+# রিপোতে সবসময় LF এ সংরক্ষিত হবে, উইন্ডোজে চেকআউটে নেটিভ (CRLF) — তাই ভবিষ্যতে
+# লাইন-এন্ডিং নিয়ে ভুয়া diff আসবে না।
+* text=auto
+
+# বাইনারি — git এদের টেক্সট ভেবে নষ্ট করবে না
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.kmz binary
+*.zip binary

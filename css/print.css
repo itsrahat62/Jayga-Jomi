@@ -1,0 +1,207 @@
+/* ==========================================================================
+   উত্তরাধিকার সনদ — A4 প্রিন্ট লেআউট
+   পর্দায় লুকানো থাকে, শুধু প্রিন্টের সময় দেখা যায়।
+   ========================================================================== */
+
+#print-report-container { display: none; }
+
+@media print {
+
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm 16mm;
+  }
+
+  /* প্রিন্টের সময় শুধু সনদটাই দেখা যাবে */
+  body > *:not(#print-report-container) { display: none !important; }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0;
+    padding: 0;
+    height: auto;
+    display: block;
+  }
+
+  #print-report-container {
+    display: block !important;
+    width: 100%;
+    font-family: 'Tiro Bangla', 'Noto Sans Bengali', serif;
+    font-size: 10.5pt;
+    line-height: 1.7;
+    color: #000;
+  }
+
+  /* ---------- শিরোনাম ---------- */
+  .pr-head {
+    text-align: center;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }
+  .pr-head h1 {
+    font-size: 17pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0 0 3px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .pr-head .pr-sub {
+    font-size: 9.5pt;
+    font-style: italic;
+  }
+
+  /* ---------- তথ্য সারি ---------- */
+  .pr-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 10pt;
+    margin-bottom: 10px;
+  }
+  .pr-meta div { flex: 1; }
+  .pr-meta b { font-weight: 700; }
+
+  /* ---------- সম্পদের বিবরণ ---------- */
+  .pr-assets {
+    border: 1px solid #000;
+    padding: 7px 10px;
+    margin-bottom: 12px;
+    font-size: 10pt;
+  }
+  .pr-assets h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .pr-assets-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 24px;
+  }
+
+  /* এক লাইনে চলমান মাপ — প্রতিটির মাঝে বিন্দু বিভাজক */
+  .pr-inline {
+    font-size: 9.5pt;
+    line-height: 1.85;
+  }
+  .pr-inline span::after {
+    content: ' · ';
+    color: #555;
+  }
+  .pr-inline span:last-child::after { content: ''; }
+
+  /* ---------- মূল টেবিল ---------- */
+  .pr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin-bottom: 14px;
+  }
+  .pr-table th,
+  .pr-table td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .pr-table th {
+    background: #e8e8e8 !important;
+    font-weight: 700;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .pr-table td.pr-left { text-align: left; }
+  .pr-table tfoot td {
+    font-weight: 700;
+    background: #f4f4f4 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* একাধিক পাতায় গেলে হেডার প্রতি পাতায় ছাপা হবে, সারি ভাঙবে না */
+  .pr-table thead { display: table-header-group; }
+  .pr-table tfoot { display: table-footer-group; }
+  .pr-table tr { page-break-inside: avoid; }
+
+  /* ---------- জমির নকশা (ক্যানভাস ছবি) ---------- */
+  .pr-plot {
+    text-align: center;
+    border: 1px solid #000;
+    padding: 8px;
+    margin-bottom: 12px;
+    page-break-inside: avoid;
+  }
+  .pr-plot h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .pr-plot img {
+    max-width: 100%;
+    max-height: 88mm;          /* A4 তে বাকি অংশের জায়গা রাখে */
+    object-fit: contain;
+  }
+
+  /* ---------- হিসাবের ধাপ ---------- */
+  .pr-steps {
+    font-size: 9pt;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+  .pr-steps h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin: 0 0 4px;
+    border-bottom: 1px solid #000;
+    padding-bottom: 2px;
+  }
+  .pr-steps ol { margin: 4px 0 0; padding-left: 18px; }
+  .pr-steps li { margin-bottom: 2px; }
+
+  /* ---------- সতর্কীকরণ ---------- */
+  .pr-note {
+    border: 1px dashed #000;
+    padding: 6px 9px;
+    font-size: 8.5pt;
+    font-style: italic;
+    margin-bottom: 22px;
+    page-break-inside: avoid;
+  }
+
+  /* ---------- স্বাক্ষর ---------- */
+  .pr-sign {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 34px;
+    page-break-inside: avoid;
+  }
+  .pr-sign div {
+    flex: 1;
+    text-align: center;
+    font-size: 9.5pt;
+    border-top: 1px solid #000;
+    padding-top: 4px;
+  }
+
+  /* ---------- ফুটার ---------- */
+  .pr-foot {
+    margin-top: 16px;
+    padding-top: 5px;
+    border-top: 1px solid #999;
+    font-size: 8pt;
+    text-align: center;
+    color: #333;
+  }
+
+  /* বণ্টনের পূর্বে বাদ যাওয়া খাতের ছোট টেবিল — মূল টেবিলের চেয়ে ছোট হরফে */
+  .pr-table-sm { font-size: 8.5pt; margin-top: 3mm; }
+  .pr-table-sm th,
+  .pr-table-sm td { padding: 1.2mm 1.6mm; }
+
+  /* লিংক থেকে URL ছাপা বন্ধ */
+  a[href]::after { content: none !important; }
+}

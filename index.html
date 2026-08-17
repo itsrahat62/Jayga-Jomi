@@ -24,6 +24,7 @@
   <!-- Custom Style System -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/faraiz.css">
+  <link rel="stylesheet" href="css/cad.css">
   <link rel="stylesheet" href="css/print.css">
 </head>
 <body>
@@ -271,6 +272,19 @@
         <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
       </div>
 
+      <!-- কার্ড: ডিজিটাল সার্ভে (CAD) — GIS ডিজিটাইজেশন -->
+      <div class="tool-card" data-category="map" data-title="ডিজিটাল সার্ভে GIS ডিজিটাইজেশন অটোক্যাড autocad cad ডিমার্কেশন পেন্টাগ্রাফ demarcation pentagraph দাগ ভেক্টর প্লট নকশা ছাপা শিট kml kmz geojson" onclick="AppController.openToolModal('survey-cad')">
+        <span class="tool-badge badge-featured">নতুন</span>
+        <div>
+          <div class="tool-icon-wrapper" style="background:#e0e7ff;color:#4338ca">
+            <i class="bi bi-vector-pen"></i>
+          </div>
+          <h3 class="tool-title">ডিজিটাল সার্ভে (GIS ডিজিটাইজেশন)</h3>
+          <p class="tool-desc">মৌজা নকশার PDF দিলে প্রতিটি দাগ ভেক্টরে রূপ নেয় — বাহুর মাপ ফুট-ইঞ্চিতে, ক্ষেত্রফল শতাংশে। ডিমার্কেশন ও পেন্টাগ্রাফ শিট ছাপুন, আর নকশা বসিয়ে দিন গুগল আর্থে।</p>
+        </div>
+        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      </div>
+
       <!-- কার্ড: গুগল আর্থে মৌজা ম্যাপ (KMZ) — কাজ চলমান -->
       <div class="tool-card" data-category="map" data-title="গুগল আর্থ KMZ এক্সপোর্ট মৌজা ম্যাপ স্যাটেলাইট ক্যালিব্রেশন google earth kmz overlay নিয়ন্ত্রণ বিন্দু" onclick="AppController.openToolModal('kmz-export')">
         <span class="tool-badge badge-wip">কাজ চলছে</span>
@@ -479,13 +493,14 @@
       
       <!-- Modal Header -->
       <div class="modal-header">
+        <button class="btn-modal-back modal-close" title="মূল তালিকায় ফিরে যান" aria-label="ফিরে যান">
+          <i class="bi bi-arrow-left"></i>
+          <span>ফিরে যান</span>
+        </button>
         <div class="modal-title">
           <i class="bi bi-tools text-primary" id="modal-title-icon"></i>
           <span id="modal-title-text">টুলস ভিউ</span>
         </div>
-        <button class="btn-icon modal-close" title="বন্ধ করুন" aria-label="বন্ধ করুন">
-          <i class="bi bi-x-lg"></i>
-        </button>
       </div>
 
       <!-- Modal Body -->
@@ -705,8 +720,13 @@
               <div class="fz-field"><div class="fz-field-label"><span>জরিপ</span></div>
                 <div class="fz-input-wrap fz-select-wrap"><select id="mm-srv" onchange="AppController.mmArchSrv()" disabled><option>—</option></select></div></div>
             </div>
-            <div class="fz-field"><div class="fz-field-label"><span><i class="bi bi-search"></i> ফাইল খুঁজুন</span></div>
-              <div class="fz-input-wrap"><input type="text" id="mm-fsearch" placeholder="ম্যাপের নাম" oninput="AppController.mmArchFilter()" disabled></div></div>
+            <div class="fz-field" style="position:relative">
+              <div class="fz-field-label"><span><i class="bi bi-lightning-charge-fill text-warning"></i> দ্রুত গতিতে ম্যাপ খুঁজুন (অটো-সাজেশনসহ)</span></div>
+              <div class="fz-input-wrap">
+                <input type="text" id="mm-fsearch" placeholder="ম্যাপের নাম, মৌজা, জেলা বা জেএল নম্বর দিয়ে দ্রুত সাজেশন দেখুন..." oninput="AppController.mmArchFilterGlobal()" autocomplete="off">
+              </div>
+              <div id="mm-search-suggestions" class="kmz-suggestions" style="display:none"></div>
+            </div>
             <div id="mm-arch-list" class="kmz-arch-list">উপরে বিভাগ থেকে জরিপ পর্যন্ত বেছে নিন।</div>
           </div>
 
@@ -849,12 +869,13 @@
                   </div>
                 </div>
               </div>
-              <div class="fz-field">
-                <div class="fz-field-label"><span><i class="bi bi-search"></i> ফাইল খুঁজুন</span></div>
+              <div class="fz-field" style="position:relative">
+                <div class="fz-field-label"><span><i class="bi bi-lightning-charge-fill text-warning"></i> দ্রুত গতিতে ম্যাপ খুঁজুন (অটো-সাজেশনসহ)</span></div>
                 <div class="fz-input-wrap">
-                  <input type="text" id="kmz-fsearch" placeholder="ম্যাপের নাম লিখুন"
-                         oninput="AppController.kmzArchFilter()" disabled>
+                  <input type="text" id="kmz-fsearch" placeholder="ম্যাপের নাম, মৌজা, জেলা বা জেএল নম্বর দিয়ে দ্রুত সাজেশন দেখুন..."
+                         oninput="AppController.kmzArchFilterGlobal()" autocomplete="off">
                 </div>
+                <div id="kmz-search-suggestions" class="kmz-suggestions" style="display:none"></div>
               </div>
               <div id="kmz-arch-list" class="kmz-arch-list">উপরে বিভাগ থেকে জরিপ পর্যন্ত বেছে নিন।</div>
             </div>
@@ -874,6 +895,7 @@
                 <button type="button" class="kmz-cbtn" title="বড়" onclick="AppController.kmzImgZoom(1)"><i class="bi bi-plus-lg"></i></button>
                 <button type="button" class="kmz-cbtn" title="ছোট" onclick="AppController.kmzImgZoom(-1)"><i class="bi bi-dash-lg"></i></button>
                 <button type="button" class="kmz-cbtn" title="পুরোটা দেখুন" onclick="AppController.kmzFitImage()"><i class="bi bi-arrows-fullscreen"></i></button>
+                <button type="button" class="kmz-cbtn text-primary" id="kmz-ocr-btn" title="OCR দিয়ে দাগ নম্বর ডিজিটাল টেক্সট ফন্টে রূপান্তর করুন" onclick="AppController.runMouzaOcr()"><i class="bi bi-fonts"></i></button>
                 <button type="button" class="kmz-cbtn" title="শেষ পয়েন্ট মুছুন" onclick="AppController.kmzUndo(1)"><i class="bi bi-arrow-counterclockwise"></i></button>
               </div>
               <div class="kmz-tip" id="kmz-tip1">জুম করে চেনা জায়গায় ক্লিক করুন — রাস্তার মোড়, পুকুরের কোণা, ব্রিজ</div>
@@ -887,16 +909,43 @@
 
           <!-- ══ ধাপ ২ — স্যাটেলাইটে একই পয়েন্ট ══ -->
           <div class="kmz-step" id="kmz-s2" style="display:none">
-            <div class="kmz-stage">
+            <div class="kmz-stage" style="position:relative;">
               <div class="kmz-pill" id="kmz-pill2"><span class="dot"></span>পয়েন্ট ১ বসান<b>০/২</b></div>
               <canvas id="kmz-canvas-map"></canvas>
-              <div class="kmz-search">
-                <i class="bi bi-search"></i>
-                <input type="text" id="kmz-goto" placeholder="স্থান খুঁজুন বা lat,lng (২৩.৭৮, ৯০.৪১)"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();AppController.kmzGoto()}">
-                <button type="button" class="kmz-cbtn" title="খুঁজুন" id="kmz-go-btn"
-                        onclick="AppController.kmzGoto()"><i class="bi bi-arrow-right-short"></i></button>
+
+              <!-- ══ Search Box — canvas এর উপরে ভাসমান ══ -->
+              <div id="kmz-search-wrap" style="
+                position:absolute; bottom:52px; left:12px; right:60px; z-index:30;
+              ">
+                <!-- Suggestion dropdown — উপরের দিকে খুলবে -->
+                <div id="kmz-goto-suggestions" style="
+                  display:none; position:absolute; bottom:100%; left:0; right:0;
+                  background:#0f172a; border:1px solid #334155; border-radius:12px;
+                  margin-bottom:6px; overflow:hidden;
+                  box-shadow:0 -8px 32px rgba(0,0,0,0.7);
+                  max-height:240px; overflow-y:auto;
+                "></div>
+                <!-- Search Input row -->
+                <div style="display:flex;align-items:center;gap:6px;background:rgba(15,23,42,0.92);
+                  backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);
+                  border-radius:10px;padding:0 8px 0 12px;">
+                  <i class="bi bi-search" style="color:#94a3b8;font-size:13px;flex-shrink:0;"></i>
+                  <input type="text" id="kmz-goto"
+                    placeholder="জায়গার নাম লিখুন — suggestion আসবে"
+                    autocomplete="off"
+                    oninput="AppController.kmzGotoSuggest(this.value)"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();AppController.kmzGoto()}"
+                    style="flex:1;background:transparent;border:none;outline:none;
+                      color:#f1f5f9;font-size:13px;padding:10px 0;min-width:0;">
+                  <button type="button" id="kmz-go-btn" title="খুঁজুন"
+                    onclick="AppController.kmzGoto()"
+                    style="background:rgba(99,102,241,0.8);border:none;border-radius:7px;
+                      color:#fff;padding:5px 10px;cursor:pointer;flex-shrink:0;font-size:13px;">
+                    <i class="bi bi-arrow-right-short"></i>
+                  </button>
+                </div>
               </div>
+
               <div id="kmz-geo-results" class="kmz-geo" style="display:none"></div>
               <div class="kmz-ctrls">
                 <button type="button" class="kmz-cbtn" title="আমার অবস্থান" id="kmz-loc-btn"
@@ -982,6 +1031,537 @@
           </div>
 
           <div class="kmz-status" id="kmz-status" style="display:none"></div>
+
+          <p class="kmz-hint" style="margin-top:14px">
+            <b>দাগ ধরে ধরে ভেক্টর নকশা চান?</b> ছবির ওভারলে নয় — প্রতিটি দাগ আলাদা
+            বহুভুজ, বাহুর মাপ ও ক্ষেত্রফলসহ পেশাদার শিট বানাতে
+            <button type="button" class="btn btn-outline" style="padding:4px 10px;font-size:0.82rem"
+                    onclick="CadApp.importFromKmz()">
+              <i class="bi bi-vector-pen"></i> ডিজিটাল সার্ভে (CAD) টুলে পাঠান
+            </button>
+          </p>
+        </div>
+
+        <!-- ================================================================
+             VIEW: ডিজিটাল সার্ভে (CAD) — GIS ডিজিটাইজেশন, ডিমার্কেশন ও পেন্টাগ্রাফ
+             ================================================================ -->
+        <div id="view-survey-cad" class="tool-view-content cad-wrap" style="display:none">
+
+          <!-- ══ শুরুর পর্দা ══ -->
+          <div id="cad-start">
+            <div class="cad-hero">
+              <h3><i class="bi bi-vector-pen"></i> ডিজিটাল সার্ভে — GIS ডিজিটাইজেশন ও প্লট</h3>
+              <p>মৌজা নকশার PDF বা ছবি দিন — প্রতিটি <b>দাগ ভেক্টর বহুভুজে</b> রূপ নেবে।
+                 বাহুর মাপ ফুট-ইঞ্চিতে, ক্ষেত্রফল শতাংশে, দাগ নম্বরসহ
+                 <b>ডিমার্কেশন</b> ও <b>পেন্টাগ্রাফ</b> শিট ছাপুন — আর একই নকশা
+                 <b>Google Earth / Google My Maps</b> এ বসিয়ে দিন।</p>
+            </div>
+
+            <!-- কোন জরিপের নকশা — আপলোডের আগেই বেছে নিন -->
+            <div class="cad-survey-bar">
+              <div class="cad-survey-lbl">
+                <i class="bi bi-layers-half"></i> এটি কোন জরিপের নকশা?
+                <small id="cad-survey-now"></small>
+              </div>
+              <div class="cad-pills" id="cad-survey-pick"></div>
+              <p class="cad-survey-note">নকশাটি যে জরিপের, সেটিই বাছুন — দাগগুলো ঐ লেয়ারে যাবে,
+                 রঙ ও সাংকেতিক চিহ্নও আপনাআপনি মিলবে। পেন্টাগ্রাফ করতে সি.এস ও বি.এস
+                 আলাদা আলাদা আপলোড করে জুড়ে নিন।</p>
+            </div>
+
+            <div class="cad-choices">
+              <button type="button" class="cad-choice" onclick="CadApp.choose('file')">
+                <span class="cad-choice-ic" style="background:#dcfce7;color:#15803d"><i class="bi bi-upload"></i></span>
+                <span class="cad-choice-t">নকশা আপলোড করুন</span>
+                <span class="cad-choice-s">মৌজা নকশার PDF, JPG বা PNG — স্ক্যান করা পুরনো নকশাও চলবে</span>
+              </button>
+              <button type="button" class="cad-choice" onclick="CadApp.choose('archive')">
+                <span class="cad-choice-ic" style="background:#dbeafe;color:#1d4ed8"><i class="bi bi-map"></i></span>
+                <span class="cad-choice-t">আর্কাইভ থেকে নিন</span>
+                <span class="cad-choice-s">সারাদেশের ১,৯৪,৩১৭টি মৌজা নকশার সংগ্রহ থেকে বেছে নিন</span>
+              </button>
+              <button type="button" class="cad-choice" onclick="CadApp.choose('blank')">
+                <span class="cad-choice-ic" style="background:#fef3c7;color:#b45309"><i class="bi bi-pencil-square"></i></span>
+                <span class="cad-choice-t">খালি পাতায় আঁকুন</span>
+                <span class="cad-choice-s">মাঠের মাপ ধরে নিজেই দাগ আঁকুন — ছবি ছাড়াই</span>
+              </button>
+              <button type="button" class="cad-choice" onclick="document.getElementById('cad-project').click()">
+                <span class="cad-choice-ic" style="background:#ede9fe;color:#6d28d9"><i class="bi bi-folder2-open"></i></span>
+                <span class="cad-choice-t">আগের কাজ খুলুন</span>
+                <span class="cad-choice-s">সংরক্ষণ করা <code>.jaygajomi.json</code> ফাইল দিন</span>
+              </button>
+            </div>
+
+            <div class="cad-steps-note">
+              <div class="cad-note"><b>১. স্কেল বসান</b>চেনা দূরত্বের দুই প্রান্তে ক্লিক করে মাপ লিখুন — এরপর সব ক্ষেত্রফল আপনাআপনি বেরোবে।</div>
+              <div class="cad-note"><b>২. ডিজিটাইজ</b>“স্বয়ংক্রিয়” চাপলে সব দাগ একসাথে, নয়তো এক ক্লিকে একটি করে বা কলম দিয়ে হাতে।</div>
+              <div class="cad-note"><b>৩. শিট বানান</b>জেলা-মৌজা-জে.এল., পরিমাপকারির নাম দিন — A4 শিট ছাপুন বা PNG নামান।</div>
+              <div class="cad-note"><b>৪. গুগল ম্যাপে</b>স্যাটেলাইটের সাথে মিলিয়ে KMZ/KML নামান — দাগে ক্লিক করলেই তথ্য দেখাবে।</div>
+            </div>
+          </div>
+
+          <input type="file" id="cad-file" accept="image/jpeg,image/png,application/pdf"
+                 style="display:none" onchange="CadApp.loadFile(this)">
+          <input type="file" id="cad-project" accept=".json,application/json"
+                 style="display:none" onchange="CadApp.loadProject(this)">
+          <input type="file" id="cad-merge" accept=".json,application/json"
+                 style="display:none" onchange="CadApp.mergeProject(this)">
+
+          <!-- ══ কাজের পর্দা ══ -->
+          <div id="cad-workbar" class="cad-workbar" style="display:none">
+            <div class="cad-steps" id="cad-steps"></div>
+            <div class="cad-next-hint" id="cad-next-hint"></div>
+          </div>
+
+          <div id="cad-work" class="cad-work" style="display:none">
+
+            <!-- বাঁয়ের টুল রেল -->
+            <div class="cad-rail" id="cad-tools">
+              <button type="button" class="cad-tool active" data-tool="pan"
+                      title="সরান / জুম — ড্র্যাগ করে সরান, চাকা ঘুরিয়ে জুম"
+                      onclick="CadApp.tool('pan')">
+                <i class="bi bi-arrows-move"></i><em>সরান</em></button>
+              <button type="button" class="cad-tool" data-tool="wand"
+                      title="জাদুকাঠি — দাগের ভেতরে এক ক্লিকেই বহুভুজ"
+                      onclick="CadApp.tool('wand')">
+                <i class="bi bi-magic"></i><em>জাদুকাঠি</em></button>
+              <button type="button" class="cad-tool" data-tool="pen"
+                      title="কলম — দাগের কোণায় কোণায় ক্লিক করে নিজে আঁকুন"
+                      onclick="CadApp.tool('pen')">
+                <i class="bi bi-pentagon"></i><em>কলম</em></button>
+              <button type="button" class="cad-tool" data-tool="edit"
+                      title="কোণা সরান, নতুন কোণা বসান বা মুছুন"
+                      onclick="CadApp.tool('edit')">
+                <i class="bi bi-node-plus"></i><em>কোণা</em></button>
+              <button type="button" class="cad-tool" data-tool="select"
+                      title="নির্বাচন — ঘের টেনে একসাথে অনেক দাগ ধরুন"
+                      onclick="CadApp.tool('select')">
+                <i class="bi bi-cursor"></i><em>বাছুন</em></button>
+              <div class="cad-rail-sep"></div>
+              <button type="button" class="cad-tool" data-tool="scale"
+                      title="স্কেল বসান — চেনা দূরত্বের দুই প্রান্তে ক্লিক করুন"
+                      onclick="CadApp.tool('scale')">
+                <i class="bi bi-rulers"></i><em>স্কেল</em></button>
+              <button type="button" class="cad-tool" data-tool="split"
+                      title="দাগ ভাগ করুন — রেখা টেনে দুই ভাগ"
+                      onclick="CadApp.tool('split')">
+                <i class="bi bi-scissors"></i><em>ভাগ</em></button>
+              <button type="button" class="cad-tool" data-tool="gcp"
+                      title="ভূ-স্থানাঙ্ক — স্যাটেলাইটের সাথে মেলান"
+                      onclick="CadApp.geoOpen()">
+                <i class="bi bi-geo-alt"></i><em>গুগল</em></button>
+              <div class="cad-rail-sep"></div>
+              <button type="button" class="cad-tool" title="ফেরত নিন (Ctrl+Z)"
+                      onclick="CadApp.undo()">
+                <i class="bi bi-arrow-counterclockwise"></i><em>ফেরত</em></button>
+              <button type="button" class="cad-tool" title="নির্বাচিত দাগ মুছুন (Delete)"
+                      onclick="CadApp.del()">
+                <i class="bi bi-trash"></i><em>মুছুন</em></button>
+              <button type="button" class="cad-tool" title="পুরো নকশা এক পর্দায় দেখুন (F)"
+                      onclick="CadApp.fit()">
+                <i class="bi bi-arrows-fullscreen"></i><em>পুরোটা</em></button>
+            </div>
+
+            <!-- মাঝের মঞ্চ -->
+            <div class="cad-stage">
+              <div class="cad-topbar">
+                <button type="button" class="cad-tbtn hot" onclick="CadApp.autoDigitize()">
+                  <i class="bi bi-stars"></i> স্বয়ংক্রিয় ডিজিটাইজ</button>
+                <span style="flex:1"></span>
+                <button type="button" class="cad-tbtn active" title="বাহুর মাপ দেখান"
+                        onclick="CadApp.toggleShow('dims', this)"><i class="bi bi-rulers"></i></button>
+                <button type="button" class="cad-tbtn active" title="দাগ নম্বর দেখান"
+                        onclick="CadApp.toggleShow('dagNo', this)"><i class="bi bi-hash"></i></button>
+                <button type="button" class="cad-tbtn active" title="ক্ষেত্রফল দেখান"
+                        onclick="CadApp.toggleShow('area', this)"><i class="bi bi-bounding-box"></i></button>
+                <button type="button" class="cad-tbtn active" title="নকশার ছবি দেখান"
+                        onclick="CadApp.toggleShow('raster', this)"><i class="bi bi-image"></i></button>
+                <button type="button" class="cad-tbtn" id="cad-multi-btn"
+                        title="চালু করলে যত দাগে ক্লিক করবেন সব জমা হবে — Shift ধরার দরকার নেই"
+                        onclick="CadApp.toggleMulti()">
+                  <i class="bi bi-square"></i> একাধিক বাছাই</button>
+                <button type="button" class="cad-tbtn" onclick="CadApp.choose('file', 2)"
+                        title="পেন্টাগ্রাফের জন্য দ্বিতীয় নকশা যোগ করুন">
+                  <i class="bi bi-layers"></i> ২য় নকশা</button>
+                <button type="button" class="cad-tbtn" onclick="CadApp.reset()"
+                        title="সব মুছে নতুন করে শুরু করুন">
+                  <i class="bi bi-arrow-repeat"></i> নতুন</button>
+              </div>
+
+              <div class="cad-canvas-wrap">
+                <canvas id="cad-canvas"></canvas>
+
+                <!-- স্কেল জিজ্ঞাসা -->
+                <div class="cad-scale-ask" id="cad-scale-ask" style="display:none">
+                  <h5><i class="bi bi-rulers"></i> এই দূরত্বটি বাস্তবে কত?</h5>
+                  <p>নকশায় মাপা হয়েছে <b id="cad-scale-px">—</b>।</p>
+
+                  <div class="cad-scalebar-tip">
+                    <b><i class="bi bi-star-fill"></i> সবচেয়ে নির্ভুল — নকশার নিজের স্কেল-দণ্ড</b>
+                    নকশার কোণায় যে মাপকাঠি আঁকা থাকে, তার <b>০ থেকে ১০ চেইন</b> দাগে ক্লিক করে
+                    নিচে <b>১০</b> লিখে একক <b>চেইন</b> বাছুন। এতে স্ক্যানের DPI জানার দরকারই নেই।
+                    <span>১০০ লিংক = ১ চেইন · ৮০ চেইন = ১ মাইল · ১ চেইন = ৬৬ ফুট</span>
+                  </div>
+
+                  <div class="cad-scale-row">
+                    <label style="flex:1.2">মাপ
+                      <input type="text" id="cad-scale-amt" inputmode="decimal" placeholder="যেমন ১০"></label>
+                    <label style="flex:1">একক
+                      <select id="cad-scale-unit" onchange="CadApp.scaleUnitChanged()"></select></label>
+                    <label id="cad-scale-in-wrap" style="flex:0.8;display:none">ইঞ্চি
+                      <input type="text" id="cad-scale-in" inputmode="decimal" placeholder="০"></label>
+                  </div>
+                  <p class="cad-unit-note" id="cad-scale-unit-note"></p>
+
+                  <div style="display:flex;gap:7px">
+                    <button type="button" class="cad-mini full" onclick="CadApp.cancelScale()">বাতিল</button>
+                    <button type="button" class="cad-tbtn hot" style="flex:1;justify-content:center"
+                            onclick="CadApp.applyKnownScale()"><i class="bi bi-check-lg"></i> বসান</button>
+                  </div>
+                </div>
+
+                <!-- অগ্রগতি -->
+                <div class="cad-prog" id="cad-prog" style="display:none">
+                  <div class="cad-prog-bar"><span id="cad-prog-fill"></span></div>
+                  <div class="cad-prog-txt" id="cad-prog-txt">…</div>
+                </div>
+
+                <!-- ভূ-স্থানাঙ্ক প্যানেল -->
+                <div class="cad-geo-panel" id="cad-geo-panel" style="display:none">
+                  <div class="cad-geo-head">
+                    <button type="button" class="cad-mini" onclick="CadApp.geoClose()">
+                      <i class="bi bi-x-lg"></i> বন্ধ</button>
+                    <input type="text" id="cad-geo-search" placeholder="জায়গার নাম বা অক্ষাংশ, দ্রাঘিমাংশ…"
+                           onkeydown="if(event.key==='Enter')CadApp.geoSearch()">
+                    <button type="button" class="cad-mini" onclick="CadApp.geoSearch()">
+                      <i class="bi bi-search"></i></button>
+                    <button type="button" class="cad-mini" onclick="CadApp.geoMyLocation()"
+                            title="আমার অবস্থান"><i class="bi bi-crosshair"></i></button>
+                    <select onchange="CadApp.geoLayer(this.value)" style="font-family:inherit;font-size:0.78rem;
+                            padding:5px;border-radius:6px;border:1px solid var(--border-color);
+                            background:var(--bg-input);color:var(--text-main)">
+                      <option value="0">স্যাটেলাইট (Esri)</option>
+                      <option value="1">Google Satellite</option>
+                      <option value="2">Google Hybrid</option>
+                      <option value="3">Google Road</option>
+                      <option value="4">OpenStreetMap</option>
+                    </select>
+                    <button type="button" class="cad-mini" onclick="CadApp.geoUndo()">
+                      <i class="bi bi-arrow-counterclockwise"></i></button>
+                  </div>
+                  <div class="cad-geo-hint">
+                    <b>কীভাবে:</b> এই প্যানেল খোলা রেখে বাঁয়ে নকশার একটি <b>চেনা জায়গায়</b> ক্লিক করুন
+                    (রাস্তার মোড়, পুকুরের কোণা, ব্রিজ) — তারপর নিচের স্যাটেলাইট ছবিতে ঠিক সেই জায়গাটিতে ক্লিক করুন।
+                    এভাবে <b>২–৫ জোড়া</b> বিন্দু বসালেই নকশাটি সঠিক জায়গায় বসে যাবে।
+                  </div>
+                  <div class="cad-geo-body"><canvas id="cad-geo-map"></canvas></div>
+                  <div class="cad-geo-info" id="cad-geo-info"></div>
+                </div>
+              </div>
+
+              <div class="cad-stats" id="cad-stats"></div>
+            </div>
+
+            <!-- ডানের প্যানেল -->
+            <div class="cad-panel">
+              <div class="cad-tabs">
+                <button type="button" class="cad-tabbtn active" id="cad-tabbtn-layers"
+                        onclick="CadApp.setTab('layers')">লেয়ার</button>
+                <button type="button" class="cad-tabbtn" id="cad-tabbtn-dags"
+                        onclick="CadApp.setTab('dags')">দাগ</button>
+                <button type="button" class="cad-tabbtn" id="cad-tabbtn-sheet"
+                        onclick="CadApp.setTab('sheet')">শিট</button>
+                <button type="button" class="cad-tabbtn" id="cad-tabbtn-export"
+                        onclick="CadApp.setTab('export')">রপ্তানি</button>
+              </div>
+
+              <!-- ── লেয়ার ── -->
+              <div class="cad-tabpane" id="cad-tab-layers">
+                <div class="cad-sec">
+                  <h5>নকশার ছবি (আন্ডারলে)</h5>
+                  <div id="cad-rasters"></div>
+                </div>
+                <div class="cad-sec">
+                  <h5>লেয়ার — যেটিতে আঁকবেন সেটি বাছুন</h5>
+                  <div id="cad-layers"></div>
+                </div>
+                <div class="cad-sec">
+                  <h5>স্কেল</h5>
+                  <p class="cad-hint-mini"><b>নকশার স্কেল-দণ্ড মেপে নিন</b> — নিচের বোতাম চেপে
+                     নকশার মাপকাঠির ০ ও ১০ চেইন দাগে ক্লিক করুন, তারপর “১০ চেইন” লিখুন।
+                     এটাই সবচেয়ে নির্ভুল, DPI জানার দরকার নেই।</p>
+                  <div style="display:flex;gap:5px;margin-bottom:8px">
+                    <button type="button" class="cad-mini full" onclick="CadApp.tool('scale')">
+                      <i class="bi bi-rulers"></i> স্কেল-দণ্ড / চেনা দূরত্ব মাপুন</button>
+                  </div>
+                  <div class="cad-form">
+                    <label class="wide">নকশায় ছাপা স্কেল (যাচাইয়ের জন্য)
+                      <select id="cad-scale-preset"
+                              onchange="CadApp.meta('scaleInch', this.value)"></select></label>
+                    <label>স্ক্যানের DPI<input type="text" id="cad-scale-dpi" inputmode="numeric"
+                           placeholder="জানা থাকলে"></label>
+                    <label style="justify-content:flex-end">
+                      <button type="button" class="cad-mini full" style="margin-top:auto"
+                              onclick="CadApp.applyPresetScale()">DPI দিয়ে বসান</button></label>
+                  </div>
+                </div>
+                <div class="cad-sec">
+                  <h5>স্বয়ংক্রিয় ডিজিটাইজের সেটিং</h5>
+                  <div class="cad-form">
+                    <label class="wide">কালি চেনার সংবেদনশীলতা
+                      <input type="range" id="cad-auto-sens" min="0" max="100" value="55"></label>
+                    <label class="wide">এর চেয়ে ছোট দাগ বাদ (শতাংশ)
+                      <input type="text" id="cad-auto-min" inputmode="decimal" placeholder="যেমন ০.৫"></label>
+                  </div>
+                  <button type="button" class="cad-mini full" style="margin-top:7px"
+                          onclick="CadApp.autoDigitize()">
+                    <i class="bi bi-stars"></i> আবার চালান</button>
+                </div>
+              </div>
+
+              <!-- ── দাগ ── -->
+              <div class="cad-tabpane" id="cad-tab-dags" style="display:none">
+                <div class="cad-sec">
+                  <h5>দাগ নম্বর ধরে কাজ</h5>
+                  <p class="cad-hint-mini">খতিয়ানের দাগ নম্বরগুলো লিখুন — <b>কমা দিয়ে একাধিক</b>।
+                     বাংলা বা ইংরেজি অঙ্ক, দুটোই চলবে। <b>“কেবল এগুলো”</b> চাপলে বাকি সব লুকিয়ে
+                     যাবে, তখন শিট · KMZ · তফসিল — সবেতেই শুধু এই দাগগুলোই যাবে।</p>
+                  <div style="display:flex;gap:5px;margin-bottom:6px">
+                    <input type="text" id="cad-dag-find" placeholder="যেমন ২৪১, ২৪২, ২৪৩"
+                           onkeydown="if(event.key==='Enter')CadApp.findDags()"
+                           style="flex:1;min-width:0;border:1px solid var(--border-color);
+                           border-radius:6px;padding:6px 8px;font-size:0.84rem;font-family:inherit;
+                           background:var(--bg-input);color:var(--text-main)">
+                    <button type="button" class="cad-mini" onclick="CadApp.findDags()">
+                      <i class="bi bi-search"></i></button>
+                  </div>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap">
+                    <button type="button" class="cad-mini" onclick="CadApp.isolate()">
+                      <i class="bi bi-eye"></i> কেবল এগুলো</button>
+                    <button type="button" class="cad-mini" onclick="CadApp.showAllFeatures()">
+                      <i class="bi bi-eye-fill"></i> সব দেখান</button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>যেগুলো বাছা হয়েছে</h5>
+                  <p class="cad-hint-mini">একাধিক দাগ বাছার তিনটি উপায় —
+                     <b>Shift ধরে ক্লিক</b>, ফাঁকা জায়গা থেকে <b>ঘের টেনে</b>,
+                     অথবা নিচের <b>একাধিক বাছাই</b> চালু করে একটার পর একটা ক্লিক
+                     (তখন Shift ধরার দরকার নেই, আবার ক্লিক করলে বাদ যাবে)।</p>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">
+                    <button type="button" class="cad-mini" id="cad-multi-btn2"
+                            onclick="CadApp.toggleMulti()">
+                      <i class="bi bi-square"></i> একাধিক বাছাই</button>
+                    <button type="button" class="cad-mini" onclick="CadApp.tool('select')">
+                      <i class="bi bi-cursor"></i> বাছুন টুল</button>
+                    <button type="button" class="cad-mini" onclick="CadApp.selectAll()">
+                      <i class="bi bi-check-all"></i> সব</button>
+                  </div>
+                  <div id="cad-selected"></div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>রেখা ঠিক করা</h5>
+                  <p class="cad-hint-mini">ডিজিটাইজের পর রেখা ঠিক করতে <b>কোণা</b> টুল নিন —
+                     <b>কোণা ধরে টানুন</b> (পাশের দাগের সীমানাও সাথে সরবে, ফাঁক হবে না),
+                     <b>রেখা ধরে টানলে</b> পুরো রেখা সরবে, <b>রেখায় ক্লিক</b> করলে নতুন কোণা বসবে,
+                     আর <b>Delete</b> চাপলে বাছা কোণা মুছবে।</p>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap">
+                    <button type="button" class="cad-mini" onclick="CadApp.tool('edit')">
+                      <i class="bi bi-node-plus"></i> কোণা টুল</button>
+                    <button type="button" class="cad-mini danger" onclick="CadApp.delVertex()">
+                      <i class="bi bi-x-circle"></i> বাছা কোণা মুছুন</button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>কাঁটা পরিষ্কার</h5>
+                  <p class="cad-hint-mini">স্ক্যানে কালির রেখা ভাঙা থাকলে বহুভুজে <b>সূচালো কাঁটা</b> ও
+                     <b>উপদ্বীপ</b> তৈরি হয়। এক চাপে সারিয়ে নিন — কিছু নির্বাচিত থাকলে শুধু সেগুলোতেই
+                     কাজ হবে। ফল পছন্দ না হলে <b>ফেরত</b> (Ctrl+Z)।</p>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap">
+                    <button type="button" class="cad-mini" onclick="CadApp.cleanup(false)">
+                      <i class="bi bi-magic"></i> কাঁটা সারান</button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>সরু দাগ যাচাই</h5>
+                  <p class="cad-hint-mini">স্ক্যানের ফাঁক থেকে আসা <b>ফালি</b> আর <b>আসল সরু দাগ</b>
+                     (আইল, নালা) — দুটোই সরু দেখায়। তাই নিজে থেকে মুছি না; সন্দেহভাজনগুলো বেছে দেখাই।
+                     দেখে নিয়ে <b>Delete</b> চাপুন, কোনোটি আসল দাগ হলে <b>Shift+ক্লিক</b> করে বাদ দিন।</p>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:flex-end">
+                    <label style="flex:0 0 74px;display:flex;flex-direction:column;gap:3px;
+                           font-size:0.72rem;color:var(--text-muted);font-weight:600">সীমা %
+                      <input type="text" id="cad-thin-lim" value="২০" inputmode="numeric"
+                             style="border:1px solid var(--border-color);border-radius:6px;padding:4px 6px;
+                             font-size:0.82rem;font-family:inherit;background:var(--bg-input);
+                             color:var(--text-main);width:100%"></label>
+                    <button type="button" class="cad-mini" onclick="CadApp.pickThin()">
+                      <i class="bi bi-funnel"></i> সরু দাগ বেছে দিন</button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>অবাঞ্ছিত বাক্স মোছা</h5>
+                  <p class="cad-hint-mini">নকশার <b>সাংকেতিক চিহ্ন বা শিরোনামের বাক্সও</b> দাগ হিসেবে
+                     আসতে পারে। <b>বাছুন</b> টুল নিয়ে ফাঁকা জায়গা থেকে ঘের টেনে সেগুলো ধরে
+                     <b>Delete</b> চাপুন।</p>
+                </div>
+                <div class="cad-sec">
+                  <h5>দাগের তালিকা</h5>
+                  <div id="cad-dag-list"></div>
+                </div>
+                <div class="cad-detail" id="cad-detail"></div>
+              </div>
+
+              <!-- ── শিট ── -->
+              <div class="cad-tabpane" id="cad-tab-sheet" style="display:none">
+                <div class="cad-sec">
+                  <h5>শিটের ধরন</h5>
+                  <select id="cad-m-type" style="width:100%;padding:6px;border-radius:6px;
+                          border:1px solid var(--border-color);background:var(--bg-input);
+                          color:var(--text-main);font-family:inherit"
+                          onchange="CadApp.meta('sheetType', this.value)">
+                    <option value="demarcation">ডিমার্কেশন — এক নকশা, বাহুর মাপসহ</option>
+                    <option value="pentagraph">পেন্টাগ্রাফ — দুই জরিপ মিলকরণ</option>
+                  </select>
+                </div>
+
+                <div class="cad-sec" id="cad-penta-cfg" style="display:none">
+                  <h5>পেন্টাগ্রাফ মিলকরণ</h5>
+                  <div class="cad-form">
+                    <label>পুরনো জরিপ<select id="cad-penta-base"></select></label>
+                    <label>নতুন জরিপ<select id="cad-penta-over"></select></label>
+                  </div>
+                  <button type="button" class="cad-mini full" style="margin-top:7px"
+                          onclick="CadApp.previewPentagraph()">
+                    <i class="bi bi-table"></i> মিলকরণ টেবিল দেখুন</button>
+                  <div id="cad-penta-preview" style="margin-top:8px"></div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>মৌজার পরিচয়</h5>
+                  <div class="cad-form">
+                    <label>জেলা<input id="cad-m-district" onchange="CadApp.meta('district', this.value)"></label>
+                    <label>উপজেলা<input id="cad-m-upazila" onchange="CadApp.meta('upazila', this.value)"></label>
+                    <label>মৌজা<input id="cad-m-mouza" onchange="CadApp.meta('mouza', this.value)"></label>
+                    <label>জে.এল. নং<input id="cad-m-jl" onchange="CadApp.meta('jl', this.value)"></label>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>পরিমাপকারি</h5>
+                  <div class="cad-form">
+                    <label class="wide">নাম<input id="cad-m-surveyor" onchange="CadApp.meta('surveyorName', this.value)"></label>
+                    <label>রেজি. নং<input id="cad-m-reg" onchange="CadApp.meta('surveyorReg', this.value)"></label>
+                    <label>মোবাইল<input id="cad-m-sphone" onchange="CadApp.meta('surveyorPhone', this.value)"></label>
+                    <label class="wide">শিক্ষা / প্রতিষ্ঠান<input id="cad-m-edu"
+                           onchange="CadApp.meta('surveyorEdu', this.value)"></label>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>প্রতিষ্ঠান</h5>
+                  <div class="cad-form">
+                    <label class="wide">নাম<input id="cad-m-firm" onchange="CadApp.meta('firmName', this.value)"></label>
+                    <label class="wide">ঠিকানা<input id="cad-m-faddr" onchange="CadApp.meta('firmAddress', this.value)"></label>
+                    <label class="wide">মোবাইল<input id="cad-m-fphone" onchange="CadApp.meta('firmPhone', this.value)"></label>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>রিপোর্টের কথা</h5>
+                  <div class="cad-form">
+                    <label class="wide">রিপোর্টের শিরোনাম<input id="cad-m-note"
+                           placeholder="বি এস জরিপ নকশা পর্যবেক্ষণ করে প্রস্তুতকৃত…"
+                           onchange="CadApp.meta('reportNote', this.value)"></label>
+                    <label class="wide">তারিখ<input id="cad-m-date" placeholder="যেমন ১৩ জুলাই ২০২৬"
+                           onchange="CadApp.meta('reportDate', this.value)"></label>
+                    <label class="wide">পাদটীকা<input id="cad-m-foot"
+                           onchange="CadApp.meta('footNote', this.value)"></label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── রপ্তানি ── -->
+              <div class="cad-tabpane" id="cad-tab-export" style="display:none">
+                <div class="cad-sec">
+                  <h5>প্রস্তুতি</h5>
+                  <div id="cad-export-state"></div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>ছাপার শিট</h5>
+                  <div class="cad-exp-grid">
+                    <button type="button" class="cad-exp" onclick="CadApp.exportSheet('print')">
+                      <i class="bi bi-printer"></i><span><b>A4 শিট ছাপুন</b>
+                      <small>বর্ডার, উত্তর তীর, শিরোনাম বাক্স, সাংকেতিক চিহ্নসহ</small></span></button>
+                    <button type="button" class="cad-exp" onclick="CadApp.exportSheet('png')">
+                      <i class="bi bi-file-earmark-image"></i><span><b>শিট PNG নামান</b>
+                      <small>ছবি হিসেবে পাঠাতে বা প্রিন্টের দোকানে দিতে</small></span></button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>গুগল আর্থ ও ম্যাপ</h5>
+                  <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;
+                         color:var(--text-muted);margin-bottom:6px">
+                    <input type="checkbox" id="cad-kmz-img"> নকশার ছবিটিও KMZ এ রাখুন (ফাইল বড় হবে)
+                  </label>
+                  <div class="cad-exp-grid">
+                    <button type="button" class="cad-exp" onclick="CadApp.exportGeo('kmz')">
+                      <i class="bi bi-globe-americas"></i><span><b>KMZ — Google Earth</b>
+                      <small>দাগে ক্লিক করলেই নম্বর, খতিয়ান ও ক্ষেত্রফল দেখাবে</small></span></button>
+                    <button type="button" class="cad-exp" onclick="CadApp.exportGeo('kml')">
+                      <i class="bi bi-pin-map"></i><span><b>KML — Google My Maps</b>
+                      <small>mymaps.google.com এ Import করে ফোনেও দেখুন</small></span></button>
+                    <button type="button" class="cad-exp" onclick="CadApp.exportGeo('geojson')">
+                      <i class="bi bi-diagram-3"></i><span><b>GeoJSON — QGIS / ArcGIS</b>
+                      <small>পেশাদার GIS সফটওয়্যারে সরাসরি খুলবে</small></span></button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>তালিকা</h5>
+                  <div class="cad-exp-grid">
+                    <button type="button" class="cad-exp" onclick="CadApp.exportCsv()">
+                      <i class="bi bi-table"></i><span><b>তফসিল CSV</b>
+                      <small>প্রতিটি দাগের ক্ষেত্রফল ও অবস্থান — Excel এ খুলবে</small></span></button>
+                  </div>
+                </div>
+
+                <div class="cad-sec">
+                  <h5>ডিজিটাল নকশা সংরক্ষণ — পরে কাজ করার জন্য</h5>
+                  <p class="cad-hint-mini">একবার ডিজিটাইজ করে সংরক্ষণ করে রাখুন — পরে যতবার দরকার
+                     খুলে কাজ করা যাবে। <b>পেন্টাগ্রাফের নিয়ম:</b> সি.এস নকশা ডিজিটাইজ করে সেভ,
+                     বি.এস নকশা ডিজিটাইজ করে সেভ — তারপর একটি খুলে অন্যটি <b>“যোগ করুন”</b>।
+                     দুটোতেই ভূ-স্থানাঙ্ক থাকলে অক্ষাংশ-দ্রাঘিমাংশ ধরে নিখুঁতভাবে বসে।</p>
+                  <label style="display:flex;align-items:center;gap:6px;font-size:0.78rem;
+                         color:var(--text-muted);margin-bottom:6px">
+                    <input type="checkbox" id="cad-save-img" checked> নকশার ছবিও সাথে রাখুন
+                    (ফাইল ~৫০০ KB বড় হবে, কিন্তু পরে খুললেই পটভূমি ফিরে আসবে)
+                  </label>
+                  <div class="cad-exp-grid">
+                    <button type="button" class="cad-exp" onclick="CadApp.saveProject()">
+                      <i class="bi bi-save"></i><span><b>সংরক্ষণ করুন</b>
+                      <small>দাগ, স্কেল, ভূ-স্থানাঙ্ক ও শিটের তথ্য — সব এক ফাইলে</small></span></button>
+                    <button type="button" class="cad-exp"
+                            onclick="document.getElementById('cad-project').click()">
+                      <i class="bi bi-folder2-open"></i><span><b>আগের কাজ খুলুন</b>
+                      <small>সংরক্ষিত ফাইল খুলে যেখানে ছিলেন সেখান থেকে শুরু করুন</small></span></button>
+                    <button type="button" class="cad-exp"
+                            onclick="document.getElementById('cad-merge').click()">
+                      <i class="bi bi-layers-fill"></i><span><b>আরেকটি নকশা যোগ করুন</b>
+                      <small>সংরক্ষিত অন্য জরিপের দাগ এই কাজে জুড়ুন — পেন্টাগ্রাফের জন্য</small></span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cad-status" id="cad-status" style="display:none"></div>
         </div>
 
         <!-- VIEW: ফরায়েজ — মুসলিম উত্তরাধিকার -->
@@ -3331,9 +3911,21 @@
   <script src="js/kmz-export.js"></script>
   <script src="js/kmz-ui.js"></script>
   <script src="js/kmz-source.js"></script>
+  <script src="js/kmz-cc.js"></script>
   <script src="js/kmz-fx.js"></script>
   <script src="js/map-measure.js"></script>
   <script src="js/map-measure-ui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/kmz-tools.js"></script>
+
+  <!-- ডিজিটাল সার্ভে (CAD) — GIS ডিজিটাইজেশন, ডিমার্কেশন ও পেন্টাগ্রাফ -->
+  <script src="js/cad-core.js"></script>
+  <script src="js/cad-trace.js"></script>
+  <script src="js/cad-overlay.js"></script>
+  <script src="js/cad-view.js"></script>
+  <script src="js/cad-sheet.js"></script>
+  <script src="js/cad-geo.js"></script>
+  <script src="js/cad-ui.js"></script>
 </body>
 </html>

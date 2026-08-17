@@ -1,0 +1,740 @@
+/* ==========================================================================
+   cad.css — ডিজিটাল সার্ভে (GIS/CAD) টুলের চেহারা
+   style.css এর কাস্টম প্রপার্টি ব্যবহার করে — তাই ডার্ক মোডেও ঠিক থাকে।
+   ========================================================================== */
+
+.cad-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+}
+
+/* ==================== শুরুর পর্দা ==================== */
+
+.cad-hero {
+  text-align: center;
+  padding: 26px 18px 18px;
+}
+.cad-hero h3 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+.cad-hero h3 i { color: var(--primary); }
+.cad-hero p {
+  color: var(--text-muted);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.85;
+  font-size: 0.95rem;
+}
+
+/* ---- কোন জরিপের নকশা ---- */
+.cad-survey-bar {
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 0 4px 14px;
+}
+.cad-survey-lbl {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.cad-survey-lbl i { color: var(--primary); }
+.cad-survey-lbl small {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.78rem;
+}
+.cad-survey-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-top: 8px;
+}
+.cad-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.cad-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+.cad-pill:hover { border-color: var(--border-focus); }
+.cad-pill.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.cad-pill-dot {
+  width: 12px; height: 4px;
+  border-radius: 2px;
+  flex: 0 0 12px;
+}
+.cad-pill.active .cad-pill-dot { box-shadow: 0 0 0 1.5px rgba(255,255,255,0.85); }
+
+.cad-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding: 6px 4px 18px;
+}
+.cad-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: right;
+  transition: var(--transition-fast);
+  font-family: inherit;
+}
+.cad-choice:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.cad-choice-ic {
+  width: 42px; height: 42px;
+  border-radius: var(--radius-sm);
+  display: grid; place-items: center;
+  font-size: 1.25rem;
+}
+.cad-choice-t { font-weight: 700; color: var(--text-main); font-size: 1rem; }
+.cad-choice-s { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+
+.cad-steps-note {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  padding: 0 4px 18px;
+}
+.cad-note {
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.cad-note b { color: var(--text-main); display: block; margin-bottom: 3px; }
+
+/* ==================== কাজের পর্দা ==================== */
+
+/* ==================== ধাপের পথনির্দেশ ==================== */
+
+.cad-workbar { margin-bottom: 8px; }
+
+.cad-steps {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: wrap;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  padding: 6px 8px;
+}
+.cad-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+.cad-step:hover { background: var(--bg-surface); color: var(--text-main); }
+.cad-step-n {
+  width: 21px; height: 21px;
+  flex: 0 0 21px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+.cad-step.done { color: var(--secondary); }
+.cad-step.done .cad-step-n {
+  background: var(--secondary); color: #fff; border-color: var(--secondary);
+}
+.cad-step.active {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+.cad-step.active .cad-step-n {
+  background: #fff; color: var(--primary); border-color: #fff;
+}
+.cad-step-sep {
+  width: 12px; height: 1px;
+  background: var(--border-color);
+  flex: 0 0 12px;
+}
+.cad-next-hint {
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.12);
+  border-right: 3px solid var(--accent);
+  color: var(--text-main);
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+.cad-next-hint i.bi-lightbulb { color: var(--accent); }
+.cad-next-hint b { color: var(--text-main); font-weight: 700; }
+
+/* ==================== কাজের পর্দা ==================== */
+
+.cad-work {
+  display: grid;
+  grid-template-columns: 70px 1fr 300px;
+  gap: 8px;
+  height: min(72vh, 740px);
+  min-height: 440px;
+}
+
+/* ---- বাঁয়ের টুল রেল ---- */
+.cad-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  overflow-y: auto;
+}
+.cad-tool {
+  width: 60px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 6px 2px 4px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.02rem;
+  font-family: inherit;
+  transition: var(--transition-fast);
+}
+.cad-tool em {
+  font-style: normal;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.2px;
+}
+.cad-tool:hover { color: var(--primary); border-color: var(--border-focus); }
+.cad-tool.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.cad-rail-sep {
+  height: 1px;
+  background: var(--border-color);
+  margin: 3px 2px;
+  flex: 0 0 1px;
+}
+
+/* ---- মাঝের মঞ্চ ---- */
+.cad-stage {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+html.dark-theme .cad-stage { background: #0f172a; }
+
+.cad-topbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  flex-wrap: wrap;
+}
+.cad-tbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+.cad-tbtn:hover { border-color: var(--primary); color: var(--primary); }
+.cad-tbtn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.cad-tbtn.hot { background: var(--secondary); color: #fff; border-color: var(--secondary); }
+.cad-tbtn.hot:hover { background: var(--secondary-hover); color: #fff; }
+.cad-tbtn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.cad-canvas-wrap { flex: 1; position: relative; min-height: 0; }
+#cad-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+
+.cad-stats {
+  display: flex;
+  gap: 14px;
+  padding: 5px 10px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+.cad-stats b { color: var(--text-main); }
+.cad-stats .ok { color: var(--secondary); font-weight: 600; }
+.cad-stats .warn { color: var(--accent); font-weight: 600; }
+.cad-stats .sel { color: var(--primary); font-weight: 600; }
+
+/* ---- ডানের প্যানেল ---- */
+.cad-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cad-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--border-color);
+}
+.cad-tabbtn {
+  padding: 9px 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-fast);
+}
+.cad-tabbtn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.cad-tabpane { padding: 10px; overflow-y: auto; flex: 1; }
+
+.cad-sec { margin-bottom: 14px; }
+.cad-sec > h5 {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-light);
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+/* ---- লেয়ার ---- */
+.cad-layer {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+  padding: 1px;
+}
+.cad-layer.active { border-color: var(--primary); background: var(--primary-light); }
+.cad-lyr-eye {
+  width: 26px; height: 26px;
+  border: none; background: transparent;
+  color: var(--text-muted); cursor: pointer;
+  border-radius: 5px; font-size: 0.82rem;
+  display: grid; place-items: center;
+}
+.cad-lyr-eye:hover { background: var(--bg-input); color: var(--text-main); }
+.cad-lyr-main {
+  flex: 1;
+  display: flex; align-items: center; gap: 7px;
+  border: none; background: transparent;
+  padding: 4px 2px; cursor: pointer;
+  font-family: inherit; font-size: 0.82rem;
+  color: var(--text-main); text-align: right;
+  min-width: 0;
+}
+.cad-lyr-swatch { width: 14px; height: 4px; border-radius: 2px; flex: 0 0 14px; }
+.cad-lyr-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cad-lyr-n { font-size: 0.72rem; color: var(--text-light); font-weight: 700; }
+.cad-lyr-color {
+  width: 22px; height: 22px; padding: 0;
+  border: 1px solid var(--border-color); border-radius: 5px;
+  background: none; cursor: pointer; flex: 0 0 22px;
+}
+
+.cad-raster {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 0.78rem; color: var(--text-main);
+  margin-bottom: 3px;
+}
+.cad-raster-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cad-raster input[type=range] { width: 66px; }
+
+.cad-empty-mini {
+  font-size: 0.8rem; color: var(--text-light);
+  padding: 10px 4px; text-align: center; line-height: 1.7;
+}
+
+.cad-hint-mini {
+  font-size: 0.76rem; color: var(--text-muted);
+  line-height: 1.75; margin-bottom: 7px;
+  background: var(--bg-input); border-radius: 6px; padding: 7px 9px;
+}
+.cad-hint-mini b { color: var(--text-main); }
+
+/* ---- দাগের তালিকা ---- */
+.cad-dag {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 5px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  margin-bottom: 4px;
+  cursor: pointer;
+  background: var(--bg-card);
+  transition: var(--transition-fast);
+}
+.cad-dag:hover { border-color: var(--border-focus); }
+.cad-dag.sel { border-color: var(--primary); background: var(--primary-light); }
+.cad-dag-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+.cad-dag-no {
+  width: 62px; flex: 0 0 62px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  padding: 3px 5px;
+  font-size: 0.8rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main);
+}
+.cad-dag-area { flex: 1; font-size: 0.78rem; color: var(--text-muted); text-align: left; }
+.cad-dag-x {
+  border: none; background: transparent; color: var(--text-light);
+  cursor: pointer; padding: 3px 5px; border-radius: 5px; font-size: 0.78rem;
+}
+.cad-dag-x:hover { color: var(--danger); background: var(--bg-input); }
+
+/* ---- যেগুলো বাছা হয়েছে ---- */
+.cad-tool.multi { box-shadow: inset 0 0 0 2px var(--accent); }
+
+.cad-sel-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.84rem; color: var(--text-main);
+  background: var(--primary-light);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px; margin-bottom: 6px;
+}
+.cad-sel-head b { font-size: 1rem; color: var(--primary); }
+.cad-sel-head span { flex: 1; font-weight: 700; }
+.cad-sel-x {
+  border: none; background: transparent; color: var(--text-muted);
+  cursor: pointer; padding: 2px 5px; border-radius: 5px; font-size: 0.76rem;
+}
+.cad-sel-x:hover { color: var(--danger); background: var(--bg-input); }
+
+.cad-sel-dags {
+  font-size: 0.78rem; color: var(--text-muted);
+  line-height: 1.75; max-height: 76px; overflow-y: auto;
+  background: var(--bg-input); border-radius: 6px;
+  padding: 6px 8px; margin-bottom: 7px;
+}
+.cad-sel-acts { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+
+.cad-sel-move {
+  border-top: 1px solid var(--border-color);
+  padding-top: 7px;
+}
+.cad-sel-move > span {
+  display: block; font-size: 0.74rem; color: var(--text-light);
+  font-weight: 700; margin-bottom: 5px;
+}
+.cad-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 8px; margin: 0 4px 4px 0;
+  border: 1px solid var(--border-color); border-radius: var(--radius-full);
+  background: var(--bg-card); color: var(--text-main);
+  font-family: inherit; font-size: 0.74rem; font-weight: 600;
+  cursor: pointer; transition: var(--transition-fast);
+}
+.cad-chip:hover { border-color: var(--primary); color: var(--primary); }
+.cad-chip span { width: 10px; height: 3px; border-radius: 2px; flex: 0 0 10px; }
+
+/* ---- নির্বাচিত দাগের বিস্তারিত ---- */
+.cad-detail {
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px; padding-top: 8px;
+}
+.cad-detail-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+}
+.cad-detail-grid label, .cad-form label {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.74rem; color: var(--text-muted); font-weight: 600;
+}
+.cad-detail-grid label.wide, .cad-form label.wide { grid-column: 1 / -1; }
+.cad-detail-grid input, .cad-detail-grid select,
+.cad-form input, .cad-form select, .cad-form textarea {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 5px 7px;
+  font-size: 0.82rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main);
+  width: 100%;
+}
+.cad-detail-grid input:focus, .cad-form input:focus,
+.cad-form textarea:focus, .cad-form select:focus {
+  outline: none; border-color: var(--primary);
+}
+.cad-form { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+.cad-detail-nums {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 4px; margin-top: 8px;
+}
+.cad-detail-nums div {
+  background: var(--bg-input); border-radius: 6px;
+  padding: 6px 3px; text-align: center;
+}
+.cad-detail-nums b { display: block; font-size: 0.86rem; color: var(--text-main); }
+.cad-detail-nums span { font-size: 0.64rem; color: var(--text-light); }
+
+.cad-sides {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
+}
+.cad-sides span {
+  font-size: 0.72rem; background: var(--bg-input);
+  color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+}
+html.dark-theme .cad-sides span { color: #93c5fd; }
+
+.cad-detail-btns { display: flex; gap: 5px; margin-top: 9px; flex-wrap: wrap; }
+.cad-mini {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 9px; font-size: 0.75rem; font-weight: 600;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  background: var(--bg-card); color: var(--text-main);
+  cursor: pointer; font-family: inherit;
+}
+.cad-mini:hover { border-color: var(--primary); color: var(--primary); }
+.cad-mini.danger:hover { border-color: var(--danger); color: var(--danger); }
+.cad-mini.full { width: 100%; justify-content: center; }
+
+/* ---- রপ্তানি ---- */
+.cad-chk {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.8rem; padding: 4px 2px;
+}
+.cad-chk.ok { color: var(--secondary); }
+.cad-chk.no { color: var(--text-light); }
+
+.cad-exp-grid { display: grid; gap: 6px; }
+.cad-exp {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 11px; width: 100%;
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+  background: var(--bg-card); cursor: pointer;
+  font-family: inherit; text-align: right;
+  transition: var(--transition-fast);
+}
+.cad-exp:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+.cad-exp i { font-size: 1.1rem; color: var(--primary); flex: 0 0 auto; }
+.cad-exp span { flex: 1; min-width: 0; }
+.cad-exp b { display: block; font-size: 0.85rem; color: var(--text-main); }
+.cad-exp small { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ---- স্কেল ---- */
+.cad-scale-ask {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  background: var(--bg-surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-lg);
+  width: min(340px, 92%);
+}
+.cad-scale-ask h5 { font-size: 0.95rem; color: var(--text-main); margin-bottom: 4px; }
+.cad-scale-ask p { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; line-height: 1.6; }
+.cad-scalebar-tip {
+  background: rgba(16, 185, 129, 0.1);
+  border-right: 3px solid var(--secondary);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  margin-bottom: 11px;
+  font-size: 0.78rem;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+.cad-scalebar-tip > b {
+  display: block;
+  color: var(--secondary);
+  font-size: 0.82rem;
+  margin-bottom: 3px;
+}
+.cad-scalebar-tip b { color: var(--text-main); }
+.cad-scalebar-tip > b i { font-size: 0.72rem; }
+.cad-scalebar-tip span {
+  display: block;
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed var(--border-color);
+  font-size: 0.74rem;
+  color: var(--text-light);
+}
+.cad-unit-note {
+  font-size: 0.74rem;
+  color: var(--text-light);
+  margin: -4px 0 9px;
+  min-height: 1em;
+}
+
+.cad-scale-row { display: flex; gap: 7px; margin-bottom: 10px; }
+.cad-scale-row select {
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 6px 8px; font-size: 0.9rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main); width: 100%;
+}
+.cad-scale-row label { flex: 1; display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.74rem; color: var(--text-muted); font-weight: 600; }
+.cad-scale-row input {
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 6px 8px; font-size: 0.9rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main); width: 100%;
+}
+
+/* ---- ভূ-স্থানাঙ্ক প্যানেল ---- */
+.cad-geo-panel {
+  position: absolute; inset: 0; z-index: 50;
+  background: var(--bg-surface);
+  display: flex; flex-direction: column;
+}
+.cad-geo-head {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+.cad-geo-head input[type=text] {
+  flex: 1; min-width: 130px;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 5px 8px; font-size: 0.8rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main);
+}
+.cad-geo-body { flex: 1; position: relative; min-height: 0; }
+#cad-geo-map { display: block; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+.cad-geo-info {
+  display: flex; gap: 12px; padding: 5px 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.78rem; color: var(--text-muted); flex-wrap: wrap;
+}
+.cad-geo-info .ok { color: var(--secondary); font-weight: 700; }
+.cad-geo-info .warn { color: var(--accent); font-weight: 700; }
+.cad-geo-hint {
+  padding: 7px 10px; font-size: 0.78rem; line-height: 1.7;
+  background: var(--primary-light); color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* ---- অগ্রগতি ও বার্তা ---- */
+.cad-prog {
+  position: absolute; left: 50%; bottom: 16px;
+  transform: translateX(-50%);
+  width: min(420px, 90%); z-index: 45;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  box-shadow: var(--shadow-lg);
+}
+.cad-prog-bar {
+  height: 6px; background: var(--bg-input);
+  border-radius: 3px; overflow: hidden; margin-bottom: 5px;
+}
+.cad-prog-bar span {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.2s;
+}
+.cad-prog-txt { font-size: 0.76rem; color: var(--text-muted); text-align: center; }
+
+.cad-status {
+  margin-top: 8px; padding: 9px 13px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-light);
+  color: var(--text-main);
+  font-size: 0.84rem; line-height: 1.7;
+  border-right: 3px solid var(--primary);
+}
+.cad-status.bad {
+  background: rgba(239, 68, 68, 0.1);
+  border-right-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ---- পেন্টাগ্রাফ প্রিভিউ ---- */
+.cad-penta-tbl {
+  width: 100%; border-collapse: collapse; font-size: 0.74rem;
+}
+.cad-penta-tbl th, .cad-penta-tbl td {
+  border: 1px solid var(--border-color);
+  padding: 3px 5px; text-align: center;
+  color: var(--text-main);
+}
+.cad-penta-tbl th { background: var(--bg-input); font-weight: 800; font-size: 0.7rem; }
+.cad-penta-tbl tr.tot td { background: var(--bg-input); font-weight: 800; color: var(--primary); }
+
+/* ---- ছোট পর্দা ---- */
+@media (max-width: 960px) {
+  .cad-work {
+    grid-template-columns: 58px 1fr;
+    grid-template-rows: 1fr auto;
+    height: auto;
+  }
+  .cad-panel { grid-column: 1 / -1; max-height: 46vh; }
+  .cad-stage { min-height: 380px; }
+  .cad-tool { width: 50px; font-size: 0.92rem; padding: 5px 1px 3px; }
+  .cad-tool em { font-size: 0.56rem; }
+  .cad-step-t { display: none; }
+  .cad-step { padding: 4px; }
+  .cad-step.active .cad-step-t { display: inline; }
+}

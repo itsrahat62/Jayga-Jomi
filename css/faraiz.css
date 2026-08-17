@@ -647,8 +647,8 @@
 /* মডাল কেবল এই বোতামেই বন্ধ হয় (বাইরে ক্লিকে নয়) — তাই স্পষ্ট রাখা দরকার */
 .modal-close { flex-shrink: 0; }
 .modal-close:hover {
-  background: var(--danger) !important;
-  border-color: var(--danger) !important;
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
   color: #fff !important;
 }
 
@@ -2161,6 +2161,8 @@
   height: 100%;
   cursor: crosshair;
   touch-action: none;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 /* উপরের পিল — ওদের মতো মাঝখানে */

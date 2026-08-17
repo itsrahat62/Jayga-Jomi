@@ -1,25 +1,11 @@
 /* ==========================================================================
    kmz-fx.js — মৌজা নকশার ছবি প্রস্তুত করা (স্বচ্ছতা ও রঙ)
-   --------------------------------------------------------------------------
-   কেন দরকার:
-     স্ক্যান করা মৌজা নকশা সাদা কাগজে আঁকা। সেটিকে সরাসরি Google Earth এ
-     বসালে সাদা কাগজটাই স্যাটেলাইট ছবি ঢেকে দেয় — নিজের জমি চেনা যায় না।
-     সাদা অংশ স্বচ্ছ করে দিলে কেবল দাগের রেখা ভেসে থাকে, নিচে স্যাটেলাইট
-     ছবি দেখা যায়।
-
-   দুটি অংশ:
-     ১. processPixels() — বিশুদ্ধ ফাংশন, RGBA বাইট নেয়-দেয়। DOM ছোঁয় না,
-        তাই Node এ টেস্ট করা যায়।
-     ২. apply() — ক্যানভাসে চালিয়ে PNG বাইট ফেরত দেয় (স্বচ্ছতার জন্য PNG
-        অপরিহার্য — JPEG এ alpha নেই)।
    ========================================================================== */
 
 const KmzFx = {
 
-  /** ডিফল্ট সাদার মাত্রা — এর চেয়ে উজ্জ্বল পিক্সেল "কাগজ" ধরা হয় */
   DEFAULT_THRESHOLD: 205,
 
-  /** '#rrggbb' → {r,g,b}; ভুল হলে null */
   hexToRgb(hex) {
     const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim());
     if (!m) return null;
@@ -27,94 +13,110 @@ const KmzFx = {
     return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
   },
 
-  /** উপলব্ধ উজ্জ্বলতা (মানুষের চোখ সবুজে বেশি সংবেদনশীল) */
   luma(r, g, b) { return 0.2126 * r + 0.7152 * g + 0.0722 * b; },
 
   /**
-   * RGBA বাইট প্রক্রিয়া করে (জায়গাতেই বদলায়)
-   *
-   * @param {Uint8ClampedArray|Uint8Array} data  RGBA, দৈর্ঘ্য = w×h×4
-   * @param {object} o
-   *   transparent : সাদা পটভূমি স্বচ্ছ করবে কি (ডিফল্ট false)
-   *   threshold   : এর বেশি উজ্জ্বল হলে কাগজ (০–২৫৫, ডিফল্ট ২০৫)
-   *   soft        : প্রান্ত মসৃণ করার পরিসর (ডিফল্ট ৪৫) — হঠাৎ কাটা এড়াতে
-   *   color       : '#rrggbb' দিলে রেখার রঙ বদলায়; null হলে মূল রঙ
-   *   strength    : রঙ কতটা বসবে ০–১ (ডিফল্ট ১)
-   * @returns {{ changed:number, kept:number }} কত পিক্সেল স্বচ্ছ হলো
+   * পেপারের উজ্জ্বলতা অটো বের করা (৯০% percentile = কাগজের রঙ)
    */
-  processPixels(data, o) {
+  estimatePaperLuma(data) {
+    if (!data || !data.length) return this.DEFAULT_THRESHOLD;
+    const step = Math.max(1, Math.floor(data.length / (4 * 3000)));
+    const lumas = [];
+    for (let i = 0; i < data.length; i += step * 4) {
+      lumas.push(Math.round(this.luma(data[i], data[i + 1], data[i + 2])));
+    }
+    lumas.sort((a, b) => a - b);
+    const p90 = lumas[Math.floor(lumas.length * 0.90)] || this.DEFAULT_THRESHOLD;
+    return Math.max(150, Math.min(255, p90));
+  },
+
+  /**
+   * RGBA pixel processing — সরল adaptive threshold, কোনো erode/dilate নেই
+   * এতে হাতে লেখা বাংলা সংখ্যা ও চিকন রেখা অক্ষত ও পরিষ্কার থাকে।
+   */
+  processPixels(data, o, w, h) {
     const opt = o || {};
     const transparent = !!opt.transparent;
-    const th = Math.max(0, Math.min(255,
-      opt.threshold == null ? this.DEFAULT_THRESHOLD : Number(opt.threshold)));
-    const soft = Math.max(0, Number(opt.soft == null ? 45 : opt.soft));
-    const col = opt.color ? this.hexToRgb(opt.color) : null;
-    const strength = Math.max(0, Math.min(1, opt.strength == null ? 1 : Number(opt.strength)));
+    const paperY = this.estimatePaperLuma(data);
+
+    // ink threshold: কাগজের রঙের ৭৫% এর নিচে = ink
+    const inkTh = Math.round(paperY * 0.78);
+    // soft zone: threshold থেকে ২০ লুমা নিচে পর্যন্ত smooth blend
+    const softRange = 28;
+
+    const col = opt.color ? this.hexToRgb(opt.color) : { r: 220, g: 38, b: 38 };
 
     let changed = 0, kept = 0;
 
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i], g = data[i + 1], b = data[i + 2];
-      // পূর্ণসংখ্যায় গোল করা জরুরি: ০.২১২৬+০.৭১৫২+০.০৭২২ ভাসমান-বিন্দুতে
-      // ঠিক ১ হয় না, তাই বিশুদ্ধ সাদার উজ্জ্বলতা ২৫৪.৯৯৯… আসত এবং
-      // থ্রেশহোল্ড ২৫৫ দিলে সাদাও বাদ পড়ত না।
-      const y = Math.round(this.luma(r, g, b));
+      const lum = this.luma(r, g, b);
+
+      // বাদামী/হলুদ কাগজের দাগ ফিল্টার: রঙিন কিন্তু হালকা → কাগজ
+      const isBrownPaper = r > 130 && g > 110 && b < 200 && lum > inkTh * 0.9;
+
+      // ইংক ফ্যাক্টর: 0 (সাদা কাগজ) থেকে 1 (গাঢ় কালো কালি)
+      let factor = 0;
+      if (!isBrownPaper) {
+        if (lum < inkTh - softRange) {
+          // গাঢ় ink — সম্পূর্ণ রঙ বসবে
+          factor = 1.0;
+        } else if (lum < inkTh) {
+          // soft edge — anti-aliased smooth blend
+          factor = (inkTh - lum) / softRange;
+          factor = Math.max(0, Math.min(1, factor));
+        }
+      }
 
       if (transparent) {
-        let a;
-        if (y >= th) {
-          a = 0;                                  // পরিষ্কার কাগজ
-        } else if (soft > 0 && y >= th - soft) {
-          // প্রান্তে ক্রমশ মিলিয়ে যায় — নইলে রেখার ধার খসখসে দেখায়
-          a = Math.round(255 * (th - y) / soft);
-        } else {
-          a = 255;                                // স্পষ্ট রেখা
-        }
-        // মূল ছবিতে আগে থেকেই স্বচ্ছতা থাকলে সেটাও মানি
+        const a = Math.round(factor * 255);
         const prev = data[i + 3];
         data[i + 3] = prev < 255 ? Math.round(a * prev / 255) : a;
         if (data[i + 3] === 0) changed++; else kept++;
       } else {
         kept++;
-      }
-
-      if (col && data[i + 3] > 0) {
-        // রেখা যত গাঢ়, রঙ তত বেশি বসে — হালকা ছায়া হালকাই থাকে
-        const k = strength * (1 - y / 255);
-        data[i]     = Math.round(r + (col.r - r) * k);
-        data[i + 1] = Math.round(g + (col.g - g) * k);
-        data[i + 2] = Math.round(b + (col.b - b) * k);
+        if (factor > 0) {
+          // কাগজের রঙ সাদা করে দাও
+          const bg = Math.round(255 * (1 - factor));
+          data[i]     = Math.round(col.r * factor + bg);
+          data[i + 1] = Math.round(col.g * factor + bg);
+          data[i + 2] = Math.round(col.b * factor + bg);
+        } else {
+          // কাগজ → সাদা
+          data[i] = data[i + 1] = data[i + 2] = 255;
+        }
       }
     }
     return { changed, kept };
   },
 
   /**
-   * ছবিটি ক্যানভাসে এনে প্রক্রিয়া করে নতুন বাইট ফেরত দেয়
-   * @param {HTMLImageElement} img
-   * @param {object} o  processPixels এর মতোই
-   * @returns {Promise<{bytes:Uint8Array, img:HTMLImageElement, mime:string, stats}>}
+   * Canvas processing & PNG/JPEG generation
    */
   async apply(img, o) {
     const opt = o || {};
     const c = document.createElement('canvas');
-    c.width = img.naturalWidth || img.width;
-    c.height = img.naturalHeight || img.height;
+    const W = img.naturalWidth || img.width;
+    const H = img.naturalHeight || img.height;
+    c.width = W; c.height = H;
     const ctx = c.getContext('2d', { willReadFrequently: true });
+
+    // সাদা পটভূমি আগে দাও — PDF স্বচ্ছ হলেও সাদা থাকে
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
     ctx.drawImage(img, 0, 0);
 
-    let stats = { changed: 0, kept: c.width * c.height };
+    let stats = { changed: 0, kept: W * H };
     if (opt.transparent || opt.color) {
-      const id = ctx.getImageData(0, 0, c.width, c.height);
-      stats = this.processPixels(id.data, opt);
-      ctx.clearRect(0, 0, c.width, c.height);
+      const id = ctx.getImageData(0, 0, W, H);
+      stats = this.processPixels(id.data, opt, W, H);
+      ctx.clearRect(0, 0, W, H);
       ctx.putImageData(id, 0, 0);
     }
 
-    // স্বচ্ছতা থাকলে PNG বাধ্যতামূলক — JPEG এ alpha নেই
     const mime = opt.transparent ? 'image/png' : 'image/jpeg';
-    const blob = await new Promise(res =>
-      c.toBlob(res, mime, mime === 'image/jpeg' ? 0.92 : undefined));
+    const quality = mime === 'image/jpeg' ? 0.96 : undefined;
+    const blob = await new Promise(res => c.toBlob(res, mime, quality));
     const bytes = new Uint8Array(await blob.arrayBuffer());
 
     const out = await new Promise((resolve, reject) => {
@@ -125,17 +127,14 @@ const KmzFx = {
       im.src = url;
     });
 
-    return { bytes, img: out, mime, stats,
-             width: c.width, height: c.height };
+    return { bytes, img: out, mime, stats, width: W, height: H };
   },
 
-  /** ফাইলের নামের এক্সটেনশন mime অনুযায়ী ঠিক করা */
   nameFor(name, mime) {
     const stem = String(name || 'map').replace(/\.[A-Za-z0-9]{1,5}$/, '');
     return stem + (mime === 'image/png' ? '.png' : '.jpg');
   },
 
-  /** কত শতাংশ স্বচ্ছ হলো — ব্যবহারকারীকে জানাতে */
   transparentPct(stats) {
     const total = (stats.changed || 0) + (stats.kept || 0);
     return total ? (stats.changed / total) * 100 : 0;

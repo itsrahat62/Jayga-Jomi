@@ -21,11 +21,11 @@ const KmzSource = {
    * PDF কত বড় করে আঁকা হবে — সীমাগুলো
    * (প্রতিযোগী ২৩৮৪×১৬৮৪ পয়েন্টের পাতা ২.২ গুণে ৫২৪৫×৩৭০৫ = ১৯.৪ MP এ আঁকে)
    */
-  MAX_SIDE: 12000,
-  MAX_PIXELS: 40e6,          // ডেস্কটপ — ক্যানভাসে পিক্সেলপ্রতি ৪ বাইট, তাই ~১৬০ MB
-  MAX_PIXELS_SMALL: 20e6,    // কম র‍্যামের ফোন
-  TARGET_DPI: 500,           // এর চেয়ে বেশি আঁকার দরকার নেই
-  DEFAULT_SIDE: 5200,        // পুরনো নাম — বাইরে ব্যবহার হয়
+  MAX_SIDE: 16000,
+  MAX_PIXELS: 60e6,          // Ultra HD 60 Megapixels
+  MAX_PIXELS_SMALL: 30e6,    // ফোন/ট্যাব
+  TARGET_DPI: 600,           // 600 DPI Ultra HD Quality
+  DEFAULT_SIDE: 6400,        // পুরনো নাম — বাইরে ব্যবহার হয়
 
   /**
    * ★ আগে সবসময় দীর্ঘতম বাহু ৫২০০px ধরা হতো। সমস্যা — স্ক্যান করা মৌজা
@@ -50,11 +50,11 @@ const KmzSource = {
   renderScaleFor(wPt, hPt, budget) {
     const w = Math.max(1, wPt), h = Math.max(1, hPt);
     const cap = budget > 0 ? budget : this.MAX_PIXELS;
-    return Math.max(0.05, Math.min(
-      this.TARGET_DPI / 72,
-      this.MAX_SIDE / Math.max(w, h),
-      Math.sqrt(cap / (w * h))
-    ));
+    const isImagePdf = Math.max(w, h) >= 1800; // PDF page points match original image pixels
+    const maxScale = Math.min(this.TARGET_DPI / 72, this.MAX_SIDE / Math.max(w, h));
+    const budgetScale = Math.sqrt(cap / (w * h));
+    const calculated = Math.min(maxScale, budgetScale);
+    return isImagePdf ? Math.max(1.0, calculated) : Math.max(0.05, calculated);
   },
 
   _pdfPromise: null,

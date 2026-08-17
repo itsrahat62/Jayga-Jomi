@@ -14,9 +14,70 @@
 
 const KmzMap = {
 
-  /* টাইল উৎস — key ছাড়া, CORS `*` (৩০ জুলাই ২০২৬ এ যাচাই করা) */
-  TILE: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  ATTRIB: 'Esri, Maxar, Earthstar Geographics',
+  /* ══ ম্যাপ লেয়ার — যেকোনো একটি বেছে নেওয়া যাবে ══ */
+  LAYERS: [
+    {
+      id: 'esri-sat',
+      name: 'স্যাটেলাইট (Esri)',
+      icon: 'bi-globe-asia-australia',
+      tile: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      attrib: 'Esri, Maxar, Earthstar Geographics'
+    },
+    {
+      id: 'google-sat',
+      name: 'Google Satellite',
+      icon: 'bi-camera',
+      tile: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+      attrib: '© Google'
+    },
+    {
+      id: 'google-hybrid',
+      name: 'Google Hybrid (Road+Sat)',
+      icon: 'bi-layers',
+      tile: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+      attrib: '© Google'
+    },
+    {
+      id: 'google-road',
+      name: 'Google Road',
+      icon: 'bi-map',
+      tile: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+      attrib: '© Google'
+    },
+    {
+      id: 'osm',
+      name: 'OpenStreetMap',
+      icon: 'bi-signpost-2',
+      tile: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attrib: '© OpenStreetMap contributors'
+    },
+    {
+      id: 'topo',
+      name: 'Topo / Terrain',
+      icon: 'bi-triangle',
+      tile: 'https://tile.opentopomap.org/{z}/{x}/{y}.png',
+      attrib: '© OpenTopoMap'
+    }
+  ],
+  _layerIdx: 0,
+
+  get TILE() { return this.LAYERS[this._layerIdx].tile; },
+  get ATTRIB() { return this.LAYERS[this._layerIdx].attrib; },
+
+  setLayer(idx) {
+    this._layerIdx = Math.max(0, Math.min(this.LAYERS.length - 1, idx));
+    if (this.state) { this.state.tiles.clear(); this.state.pending.clear(); this.draw(); }
+    // UI বোতামের active state আপডেট
+    this.LAYERS.forEach((_, i) => {
+      const btn = document.getElementById('kmz-layer-' + i);
+      if (btn) {
+        btn.style.background = i === this._layerIdx ? 'rgba(99,102,241,0.85)' : 'rgba(15,23,42,0.85)';
+        btn.style.borderColor = i === this._layerIdx ? '#818cf8' : 'rgba(255,255,255,0.15)';
+        btn.style.color = i === this._layerIdx ? '#fff' : '#94a3b8';
+      }
+    });
+  },
+
   TILE_SIZE: 256,
   MIN_Z: 5,
   MAX_Z: 19,
@@ -102,15 +163,24 @@ const KmzMap = {
     };
 
     c.addEventListener('mousedown', down);
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', up);
+    
+    // উইন্ডো ইভেন্টগুলোতে সেফটি চেক যোগ করা হলো যাতে ক্যানভাস ইনঅ্যাক্টিভ বা ইনভিজিবল থাকলে কোনো ক্লিক রেজিস্টার না হয়
+    window.addEventListener('mousemove', ev => {
+      if (s.drag && c.offsetWidth > 0) move(ev);
+    });
+    window.addEventListener('mouseup', ev => {
+      if (c.offsetWidth > 0) up(ev);
+    });
+    
     c.addEventListener('touchstart', e => down(e.touches[0]), { passive: true });
-    c.addEventListener('touchmove', e => { move(e.touches[0]); }, { passive: false });
-    c.addEventListener('touchend', e => up(e.changedTouches[0]));
+    c.addEventListener('touchmove', e => { if (c.offsetWidth > 0) move(e.touches[0]); }, { passive: false });
+    c.addEventListener('touchend', e => { if (c.offsetWidth > 0) up(e.changedTouches[0]); });
 
     c.addEventListener('wheel', ev => {
-      ev.preventDefault();
-      this.zoomBy(ev.deltaY < 0 ? 1 : -1, this._pos(ev));
+      if (c.offsetWidth > 0) {
+        ev.preventDefault();
+        this.zoomBy(ev.deltaY < 0 ? 1 : -1, this._pos(ev));
+      }
     }, { passive: false });
   },
 
@@ -207,6 +277,45 @@ const KmzMap = {
       const p = this.lngLatToPixel(m.lng, m.lat);
       this._marker(ctx, p.x, p.y, m.n, m.current);
     });
+
+    // ══ মৌজা ম্যাপ ওভারলে (ধাপ ২ ক্যালিব্রেশনে দেখানো) ══
+    if (KmzMap._mouzaOverlay) {
+      const ov = KmzMap._mouzaOverlay;
+      if (ov.img && ov.imgPts && ov.geoPts && ov.imgPts.length >= 2 && ov.geoPts.length >= 2) {
+        try {
+          const n = Math.min(ov.imgPts.length, ov.geoPts.length);
+          // সর্বোচ্চ ৪টি জোড়া ব্যবহার করে Affine Transform অনুমান
+          const iW = ov.img.width, iH = ov.img.height;
+          // সবচেয়ে দূরের দুটি জোড়া বেছে scale ও angle বের করা
+          const ip0 = ov.imgPts[0], ip1 = ov.imgPts[n - 1];
+          const gp0 = ov.geoPts[0], gp1 = ov.geoPts[n - 1];
+
+          const c0 = this.lngLatToPixel(gp0.lng, gp0.lat);
+          const c1 = this.lngLatToPixel(gp1.lng, gp1.lat);
+
+          const dxI = ip1.x - ip0.x, dyI = ip1.y - ip0.y;
+          const dxC = c1.x - c0.x, dyC = c1.y - c0.y;
+
+          const imgDist = Math.sqrt(dxI * dxI + dyI * dyI) || 1;
+          const canvDist = Math.sqrt(dxC * dxC + dyC * dyC) || 1;
+          const scale = canvDist / imgDist;
+
+          const angleI = Math.atan2(dyI, dxI);
+          const angleC = Math.atan2(dyC, dxC);
+          const rot = angleC - angleI;
+
+          ctx.save();
+          ctx.globalAlpha = 0.5;
+          ctx.translate(c0.x, c0.y);
+          ctx.rotate(rot);
+          ctx.scale(scale, scale);
+          ctx.translate(-ip0.x, -ip0.y);
+          ctx.drawImage(ov.img, 0, 0, iW, iH);
+          ctx.restore();
+          ctx.globalAlpha = 1;
+        } catch (_) {}
+      }
+    }
 
     // কৃতজ্ঞতা (টাইল উৎসের শর্ত)
     ctx.font = '11px sans-serif';
@@ -351,14 +460,24 @@ const KmzImage = {
     };
 
     c.addEventListener('mousedown', down);
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', up);
+    
+    // উইন্ডো ইভেন্টগুলোতে সেফটি চেক যোগ করা হলো যাতে ক্যানভাস ইনঅ্যাক্টিভ বা ইনভিজিবল থাকলে কোনো ক্লিক রেজিস্টার না হয়
+    window.addEventListener('mousemove', ev => {
+      if (s.drag && c.offsetWidth > 0) move(ev);
+    });
+    window.addEventListener('mouseup', ev => {
+      if (c.offsetWidth > 0) up(ev);
+    });
+
     c.addEventListener('touchstart', e => down(e.touches[0]), { passive: true });
-    c.addEventListener('touchmove', e => move(e.touches[0]), { passive: false });
-    c.addEventListener('touchend', e => up(e.changedTouches[0]));
+    c.addEventListener('touchmove', e => { if (c.offsetWidth > 0) move(e.touches[0]); }, { passive: false });
+    c.addEventListener('touchend', e => { if (c.offsetWidth > 0) up(e.changedTouches[0]); });
+    
     c.addEventListener('wheel', ev => {
-      ev.preventDefault();
-      this.zoomAt(this._pos(ev), ev.deltaY < 0 ? 1.15 : 1 / 1.15);
+      if (c.offsetWidth > 0) {
+        ev.preventDefault();
+        this.zoomAt(this._pos(ev), ev.deltaY < 0 ? 1.15 : 1 / 1.15);
+      }
     }, { passive: false });
   },
 
@@ -390,12 +509,13 @@ const KmzImage = {
   },
 
   setMarkers(list) { this.state.markers = list || []; this.draw(); },
+  setOcrLabels(list) { if (this.state) { this.state.ocrLabels = list || []; this.draw(); } },
 
   draw() {
     const s = this.state;
     if (!s) return;
     const { ctx, canvas: c } = s;
-    ctx.fillStyle = '#0b1220';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, c.width, c.height);
 
     if (!s.img) {
@@ -407,8 +527,27 @@ const KmzImage = {
       return;
     }
 
-    ctx.imageSmoothingEnabled = s.scale < 3;      // বেশি জুমে পিক্সেল স্পষ্ট থাক
+    ctx.imageSmoothingEnabled = s.scale < 1;
+    if (ctx.imageSmoothingEnabled) ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(s.img, s.off.x, s.off.y, s.img.width * s.scale, s.img.height * s.scale);
+
+    if (s.ocrLabels && s.ocrLabels.length) {
+      ctx.save();
+      s.ocrLabels.forEach(lab => {
+        const p = this.imageToCanvas(lab.x, lab.y);
+        ctx.font = 'bold 15px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(lab.text, p.x, p.y);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#dc2626';
+        ctx.fillText(lab.text, p.x, p.y);
+      });
+      ctx.restore();
+    }
 
     s.markers.forEach(m => {
       const p = this.imageToCanvas(m.x, m.y);

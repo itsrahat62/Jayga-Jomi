@@ -3,6 +3,7 @@ const path = require('path').join(__dirname, '..', 'js') + require('path').sep;
 global.CadCore = require(path + 'cad-core.js');
 global.CadTrace = require(path + 'cad-trace.js');
 global.CadOverlay = require(path + 'cad-overlay.js');
+global.CadNotes = require(path + 'cad-notes.js');
 
 let pass = 0, fail = 0;
 const ok = (name, cond, extra) => {
@@ -492,6 +493,243 @@ ok('(২০,০) ও (২২,০) মিলে একটি হয়েছে',
 // বন্ধ রিং-এ আগের মতোই সব কোণা ছাঁটার সুযোগ থাকে
 ok('বন্ধ রিং-এ নিয়ম বদলায়নি',
    CadCore.collapseShortEdges(stair, 8, true).length === 4);
+
+
+console.log('\n=== ২৭. কোণার ডিগ্রি ===');
+/* বলয়ের দিক (ঘড়ির কাঁটা / উল্টো) যাই হোক, ভেতরের কোণই বেরোতে হবে।
+   একবার উল্টো নিয়মে সব কোণা ২৭০° দেখাচ্ছিল — তাই দু'দিকেই যাচাই। */
+{
+  const sqA = [{x:0,y:0},{x:10,y:0},{x:10,y:10},{x:0,y:10}];
+  const sqB = sqA.slice().reverse();
+  const A = CadCore.angles(sqA), B = CadCore.angles(sqB);
+  ok('বর্গের চার কোণাই ৯০°', A.every(a => near(a.deg, 90, 1e-6)),
+     A.map(a => a.deg.toFixed(1)).join('/'));
+  ok('উল্টোদিকের বলয়েও ৯০°', B.every(a => near(a.deg, 90, 1e-6)),
+     B.map(a => a.deg.toFixed(1)).join('/'));
+
+  const tri = [{x:0,y:0},{x:10,y:0},{x:0,y:10}];
+  const T = CadCore.angles(tri);
+  ok('ত্রিভুজের কোণের যোগফল ১৮০°',
+     near(T.reduce((s2,a) => s2 + a.deg, 0), 180, 1e-6));
+  ok('সমকোণী ত্রিভুজে একটি ৯০°', T.some(a => near(a.deg, 90, 1e-6)));
+
+  /* L-আকৃতি — ভেতরের দিকে ঢোকা কোণাটি ২৭০° (reflex) */
+  const L = [{x:0,y:0},{x:20,y:0},{x:20,y:10},{x:10,y:10},{x:10,y:20},{x:0,y:20}];
+  const LA = CadCore.angles(L);
+  ok('L-আকৃতিতে ঠিক একটি reflex কোণা',
+     LA.filter(a => a.deg > 180).length === 1,
+     LA.map(a => Math.round(a.deg)).join('/'));
+  ok('reflex কোণাটি ২৭০°',
+     near(LA.find(a => a.deg > 180).deg, 270, 1e-6));
+  ok('বহুভুজের কোণের যোগফল = (n−2)×১৮০',
+     near(LA.reduce((s2,a) => s2 + a.deg, 0), (L.length - 2) * 180, 1e-6),
+     LA.reduce((s2,a) => s2 + a.deg, 0).toFixed(3));
+
+  /* দ্বিখণ্ডক ভেতরের দিকে তাক করে — লেখাটি যেন দাগের ভেতরে বসে */
+  const c0 = A[0];
+  ok('দ্বিখণ্ডক জমির ভেতরের দিকে',
+     c0.bisector.x > 0 && c0.bisector.y > 0, JSON.stringify(c0.bisector));
+  ok('দ্বিখণ্ডক একক দৈর্ঘ্যের',
+     near(Math.hypot(c0.bisector.x, c0.bisector.y), 1, 1e-9));
+  ok('তিনের কম বিন্দুতে কোণ নেই',
+     CadCore.angles([{x:0,y:0},{x:1,y:1}]).length === 0);
+}
+
+console.log('\n=== ২৮. ফেরত ও আবার (undo / redo) ===');
+{
+  const CadView = require(path + 'cad-view.js');
+  CadView.draw = function () {};
+  CadView._status = function () {};
+  const d = CadCore.newDoc();
+  CadView.state = { doc: d, selection: [], draft: [], show: {} };
+  CadView._undoStack.length = 0; CadView._redoStack.length = 0;
+
+  const mk = x => CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:x,y:0},{x:x+10,y:0},{x:x+10,y:10},{x:x,y:10}], {}));
+  CadView._pushUndo(); mk(0);
+  CadView._pushUndo(); mk(20);
+  ok('দুটি দাগ আছে', d.features.length === 2);
+
+  CadView.undo();
+  ok('একবার ফেরতে একটি দাগ', d.features.length === 1, d.features.length);
+  CadView.undo();
+  ok('দুবার ফেরতে শূন্য', d.features.length === 0, d.features.length);
+  ok('আর ফেরত নেই', CadView._undoStack.length === 0);
+
+  CadView.redo();
+  ok('আবার করলে একটি ফিরে আসে', d.features.length === 1, d.features.length);
+  CadView.redo();
+  ok('দুবার আবার করলে দুটি', d.features.length === 2, d.features.length);
+  CadView.redo();
+  ok('সামনে আর কিছু নেই — সংখ্যা বদলায় না', d.features.length === 2);
+
+  /* ফেরত নেওয়ার পর নতুন কাজ করলে সামনের ধাপগুলো বাতিল —
+     নইলে redo অসংলগ্ন অবস্থায় ফিরিয়ে দিত */
+  CadView.undo();
+  CadView._pushUndo(); mk(40);
+  ok('নতুন কাজে redo তালিকা মুছে যায়', CadView._redoStack.length === 0);
+
+  CadView._undoStack.length = 0;
+  for (let i = 0; i < 60; i++) CadView._pushUndo();
+  ok('ইতিহাস ৪০ ধাপে সীমিত', CadView._undoStack.length === 40, CadView._undoStack.length);
+
+  CadView.setDoc(CadCore.newDoc());
+  ok('নতুন নকশায় ইতিহাস মুছে যায়',
+     CadView._undoStack.length === 0 && CadView._redoStack.length === 0);
+}
+
+
+console.log('\n=== ২৯. লেখা, চিহ্ন ও বৃত্ত ===');
+{
+  const d = CadCore.newDoc();
+  d.ftPerPx = 0.5;
+  const t1 = CadNotes.add(d, 'text', 100, 100, { text: 'রাস্তা' });
+  const p1 = CadNotes.add(d, 'pin', 200, 150, { text: 'টিউবওয়েল' });
+  const c1 = CadNotes.add(d, 'circle', 300, 300, { r: 40, text: 'কুয়া' });
+  ok('তিনটি নোট বসলো', d.notes.length === 3);
+  ok('আইডি আলাদা', new Set([t1.id, p1.id, c1.id]).size === 3);
+
+  /* নোট কখনো দাগের তালিকায় ঢোকে না — ঢুকলে মোট ক্ষেত্রফল ভুল হতো */
+  ok('দাগের তালিকায় যায় না', d.features.length === 0);
+  ok('activeFeatures এও নেই', CadCore.activeFeatures(d).length === 0);
+
+  /* বৃত্তের ক্ষেত্রফল: r=৪০px, ০.৫ ft/px → ২০ft ব্যাসার্ধ */
+  ok('বৃত্তের ক্ষেত্রফল পাই×র²',
+     near(CadNotes.circleSqft(d, c1), Math.PI * 400, 1e-6),
+     CadNotes.circleSqft(d, c1).toFixed(4));
+  ok('স্কেল না বসলে ক্ষেত্রফল শূন্য',
+     CadNotes.circleSqft(Object.assign({}, d, { ftPerPx: 0 }), c1) === 0);
+  ok('লেখার কোনো ক্ষেত্রফল নেই', CadNotes.circleSqft(d, t1) === 0);
+
+  /* হিট — কোন নোটে ক্লিক পড়ল */
+  ok('লেখার উপরে ক্লিক ধরে',
+     (CadNotes.hit(d, { x: 102, y: 101 }, 6) || {}).id === t1.id);
+  ok('ফাঁকা জায়গায় কিছু নেই',
+     CadNotes.hit(d, { x: 600, y: 600 }, 6) === null);
+  ok('বৃত্তের গায়ে ক্লিক ধরে',
+     (CadNotes.hit(d, { x: 340, y: 300 }, 6) || {}).id === c1.id);
+  ok('বৃত্তের ভেতরেও ধরে',
+     (CadNotes.hit(d, { x: 310, y: 305 }, 6) || {}).id === c1.id);
+
+  /* লুকানো নোট ধরা পড়বে না */
+  p1.hidden = true;
+  ok('লুকানো নোট হিট হয় না',
+     CadNotes.hit(d, { x: 200, y: 150 }, 6) === null);
+  ok('visible() এ নেই', CadNotes.visible(d).length === 2);
+  p1.hidden = false;
+
+  CadNotes.move(t1, 10, -5);
+  ok('সরানো যায়', t1.x === 110 && t1.y === 95);
+
+  const ring = CadNotes.circlePts(c1, 48);
+  ok('বৃত্ত → ৪৮ বাহুর বহুভুজ', ring.length === 48);
+  ok('সব বিন্দু পরিধিতে',
+     ring.every(q => near(Math.hypot(q.x - c1.x, q.y - c1.y), c1.r, 1e-9)));
+  ok('বহুভুজের ক্ষেত্রফল প্রায় বৃত্তের সমান',
+     Math.abs(Math.abs(CadCore.signedArea(ring)) - Math.PI * c1.r * c1.r)
+       / (Math.PI * c1.r * c1.r) < 0.006);
+
+  ok('মুছে ফেলা যায়', CadNotes.remove(d, p1.id) === true && d.notes.length === 2);
+  ok('না থাকলে false', CadNotes.remove(d, 'nope') === false);
+
+  /* সংরক্ষণ → খোলা রাউন্ডট্রিপ */
+  const back = CadCore.fromJson(CadCore.toJson(d));
+  ok('সংরক্ষণে নোট টিকে থাকে', back.notes.length === 2, back.notes.length);
+  ok('লেখা অটুট', back.notes[0].text === 'রাস্তা');
+  ok('বৃত্তের ব্যাসার্ধ অটুট',
+     back.notes[1].r === 40 && back.notes[1].kind === 'circle');
+  const nn = CadNotes.add(back, 'text', 0, 0, {});
+  ok('পুরোনো আইডি ফিরে আসে না',
+     !back.notes.slice(0, -1).some(x => x.id === nn.id), nn.id);
+
+  /* পুরোনো ফাইলে notes নেই — তবু ভাঙবে না */
+  const oldFile = CadCore.fromJson(JSON.stringify({ v: 2, features: [], ftPerPx: 1 }));
+  ok('পুরোনো ফাইলেও খোলে', Array.isArray(oldFile.notes) && oldFile.notes.length === 0);
+}
+
+console.log('\n=== ৩০. নোটও undo/redo মানে ===');
+{
+  const CadView = require(path + 'cad-view.js');
+  CadView.draw = function () {}; CadView._status = function () {};
+  const d = CadCore.newDoc();
+  CadView.state = { doc: d, selection: [], draft: [], show: {} };
+  CadView._undoStack.length = 0; CadView._redoStack.length = 0;
+
+  CadView._pushUndo();
+  CadNotes.add(d, 'text', 5, 5, { text: 'ক' });
+  CadView._pushUndo();
+  CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:0,y:0},{x:9,y:0},{x:9,y:9}], {}));
+  ok('একটি নোট ও একটি দাগ',
+     d.notes.length === 1 && d.features.length === 1);
+
+  CadView.undo();
+  ok('ফেরতে দাগ গেল, নোট থাকলো',
+     d.features.length === 0 && d.notes.length === 1);
+  CadView.undo();
+  ok('আরেকবার ফেরতে নোটও গেল', d.notes.length === 0);
+  CadView.redo(); CadView.redo();
+  ok('দুবার আবার করলে দুটোই ফেরে',
+     d.notes.length === 1 && d.features.length === 1);
+}
+
+
+console.log('\n=== ৩১. রাবার — কোণা মোছা ===');
+{
+  const CadView = require(path + 'cad-view.js');
+  CadView.draw = function () {}; CadView._status = function () {};
+  const d = CadCore.newDoc();
+  d.ftPerPx = 0.5;
+  CadView.state = { doc: d, selection: [], draft: [], show: {},
+                    scale: 1, off: { x: 0, y: 0 }, tool: 'erase' };
+
+  /* দুটি দাগ একটি সীমানা ভাগ করে নেয় — (৩০০,২০০) দুই দাগেই আছে */
+  const A = CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:100,y:100},{x:300,y:100},{x:300,y:200},{x:300,y:300},{x:100,y:300}], {dag:'১'}));
+  const B = CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:300,y:100},{x:500,y:100},{x:500,y:300},{x:300,y:300},{x:300,y:200}], {dag:'২'}));
+
+  ok('শুরুতে দুটোই ৫ কোণার', A.pts.length === 5 && B.pts.length === 5);
+
+  /* ভাগ করা কোণায় রাবার — দুই দাগ থেকেই যেতে হবে, নইলে মাঝে ফাঁক */
+  ok('কোণার বাইরে চাপে কিছু হয় না',
+     CadView.eraseVertexAt({ x: 700, y: 700 }) === false);
+  ok('ভাগ করা কোণা মোছে', CadView.eraseVertexAt({ x: 300, y: 200 }) === true);
+  ok('দুই দাগ থেকেই গেছে', A.pts.length === 4 && B.pts.length === 4,
+     A.pts.length + '/' + B.pts.length);
+
+  const key = q => q.x.toFixed(4) + ',' + q.y.toFixed(4);
+  const setA = new Set(A.pts.map(key));
+  ok('সীমানা এখনো হুবহু মেলে',
+     B.pts.filter(q => setA.has(key(q))).length >= 2);
+
+  /* ত্রিভুজের নিচে নামানো যাবে না */
+  CadView.eraseVertexAt({ x: 300, y: 100 });
+  ok('A এখন ৩ কোণার', A.pts.length === 3, A.pts.length);
+  const n3 = A.pts.length;
+  ok('৩ কোণায় আর মোছে না', CadView.eraseVertexAt({ x: 100, y: 100 }) === false);
+  ok('সংখ্যা বদলায়নি', A.pts.length === n3);
+
+  /* একটানা মোছার সময় পুরো টানটা এক ধাপে ফেরত যায় —
+     নইলে ২০টি কোণা মুছলে ২০ বার Ctrl+Z চাপতে হতো */
+  const d2 = CadCore.newDoc();
+  CadView.state = { doc: d2, selection: [], draft: [], show: {},
+                    scale: 1, off: { x: 0, y: 0 }, tool: 'erase' };
+  const C = CadCore.addFeature(d2, CadCore.newFeature(d2, 'bs',
+    [{x:0,y:0},{x:50,y:0},{x:100,y:0},{x:150,y:0},{x:150,y:100},{x:0,y:100}], {}));
+  CadView._undoStack.length = 0; CadView._redoStack.length = 0;
+  CadView._erasing = { pushed: false, count: 0 };
+  CadView.eraseVertexAt({ x: 50, y: 0 });
+  CadView.eraseVertexAt({ x: 100, y: 0 });
+  CadView._erasing = null;
+  ok('একটানে দুটি কোণা গেল', C.pts.length === 4, C.pts.length);
+  ok('ইতিহাসে এক ধাপই জমেছে', CadView._undoStack.length === 1,
+     CadView._undoStack.length);
+  CadView.undo();
+  ok('এক Ctrl+Z তে পুরোটা ফেরে',
+     CadCore.feature(d2, C.id).pts.length === 6,
+     CadCore.feature(d2, C.id).pts.length);
+}
 
 console.log('\n──────────────────────────────');
 console.log(`  পাস ${pass} · ব্যর্থ ${fail}`);

@@ -87,76 +87,52 @@
         <p style="font-size:0.82rem;color:var(--text-muted)">কোনো অ্যাকাউন্ট বা ফি ছাড়াই সকল সুবিধা ব্যবহার করুন।</p>
       </div>
 
-      <a href="#" class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('mouza-map')">
-        <i class="bi bi-map-fill text-primary"></i>
-        <span>সারাদেশের মৌজা ম্যাপ</span>
-      </a>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('farayeiz')">
-        <i class="bi bi-diagram-3 text-danger"></i>
-        <span>উত্তরাধিকার (মুসলিম)</span>
+      <!-- ড্রয়ারে ঠিক ঐ ১৩টি টুলই, কার্ডের মতো একই ক্রমে —
+           দুই জায়গায় দুই রকম তালিকা থাকলে খুঁজতে গিয়ে গুলিয়ে যায় -->
+      <div class="drawer-cat">নকশা ও ম্যাপ</div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('mouza-map')">
+        <i class="bi bi-map-fill text-primary"></i><span>সারাদেশের মৌজা নকশা</span>
       </div>
-      
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('hindu')">
-        <i class="bi bi-diagram-2 text-warning"></i>
-        <span>উত্তরাধিকার (হিন্দু) — দায়ভাগ</span>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('survey-cad')">
+        <i class="bi bi-vector-pen text-primary"></i><span>ডিজিটাল সার্ভে (GIS)</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('map-joint')">
+        <i class="bi bi-union text-warning"></i><span>সিট জোড়া লাগান</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('map-convert')">
+        <i class="bi bi-magic text-primary"></i><span>নকশা পরিষ্কার করুন</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('kmz-export')">
+        <i class="bi bi-globe-americas text-success"></i><span>গুগল আর্থে নকশা</span>
       </div>
 
+      <div class="drawer-cat">জমির হিসাব</div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('land-divider')">
+        <i class="bi bi-pie-chart-fill text-danger"></i><span>জমি ভাগ-বণ্টন</span>
+      </div>
       <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('canvas-measure')">
-        <i class="bi bi-rulers text-success"></i>
-        <span>ক্যানভাস জমি পরিমাপ</span>
+        <i class="bi bi-bounding-box text-info"></i><span>জমির ক্ষেত্রফল</span>
       </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('hissa-calc')">
-        <i class="bi bi-percent text-info"></i>
-        <span>হিস্যা ক্যালকুলেটর</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('khotian-analyzer')">
-        <i class="bi bi-file-earmark-spreadsheet text-warning"></i>
-        <span>খতিয়ান হিস্যা বিশ্লেষণ</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('dolil-fee')">
-        <i class="bi bi-cash-coin text-success"></i>
-        <span>দলিল রেজিস্ট্রেশন খরচ</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('dag-portion')">
-        <i class="bi bi-pin-map text-primary"></i>
-        <span>দাগের মধ্যে অংশ</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('tofasil')">
-        <i class="bi bi-file-earmark-text text-success"></i>
-        <span>তফসিল বন্টন</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('ratio')">
-        <i class="bi bi-pie-chart text-warning"></i>
-        <span>অনুপাত ক্যালকুলেটর</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('land-formula')">
-        <i class="bi bi-book text-info"></i>
-        <span>জমির সকল সূত্র</span>
-      </div>
-
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('ana-gonda')">
-        <i class="bi bi-calculator text-primary"></i>
-        <span>আনা-গন্ডা কনভার্টার</span>
-      </div>
-
       <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('unit-converter')">
-        <i class="bi bi-arrow-repeat text-primary"></i>
-        <span>একক পরিবর্তন</span>
+        <i class="bi bi-arrow-left-right text-primary"></i><span>একক, হিস্যা ও সূত্র</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('khotian-porcha')">
+        <i class="bi bi-table text-primary"></i><span>খতিয়ান, অংশ ও তফসিল</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('dolil-fee')">
+        <i class="bi bi-cash-coin text-success"></i><span>দলিল রেজিস্ট্রেশন খরচ</span>
+      </div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('mouza-value')">
+        <i class="bi bi-file-earmark-bar-graph text-warning"></i><span>মৌজা মূল্য তালিকা</span>
       </div>
 
-      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('map-overlay')">
-        <i class="bi bi-layers-half text-secondary"></i>
-        <span>প্যান্টোগ্রাফ (ম্যাপ তুলনা)</span>
+      <div class="drawer-cat">উত্তরাধিকার</div>
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('farayeiz')">
+        <i class="bi bi-diagram-3 text-danger"></i><span>মুসলিম — ফরায়েজ</span>
       </div>
-
+      <div class="drawer-link" onclick="AppController.toggleDrawer(false); AppController.openToolModal('hindu')">
+        <i class="bi bi-diagram-2 text-warning"></i><span>হিন্দু — দায়ভাগ</span>
+      </div>
       <hr style="border-color:var(--border-color);margin:16px 0">
 
       <div class="drawer-link" id="dark-toggle-drawer">
@@ -179,19 +155,16 @@
       <!-- Category Filter Chips -->
       <div class="category-filter">
         <button class="chip-btn active" data-filter="all">
-          <i class="bi bi-grid-fill"></i> সকল টুলস
-        </button>
-        <button class="chip-btn" data-filter="inheritance">
-          <i class="bi bi-diagram-3"></i> উত্তরাধিকার
+          <i class="bi bi-grid-3x3-gap"></i> সব টুল
         </button>
         <button class="chip-btn" data-filter="map">
-          <i class="bi bi-map"></i> ম্যাপ ও ডাউনলোড
+          <i class="bi bi-map"></i> নকশা ও ম্যাপ
         </button>
-        <button class="chip-btn" data-filter="measure">
-          <i class="bi bi-ruler"></i> পরিমাপ ও জ্যামিতি
+        <button class="chip-btn" data-filter="hisab">
+          <i class="bi bi-calculator"></i> জমির হিসাব
         </button>
-        <button class="chip-btn" data-filter="khotian">
-          <i class="bi bi-file-text"></i> খতিয়ান ও হিস্যা
+        <button class="chip-btn" data-filter="waris">
+          <i class="bi bi-diagram-3"></i> উত্তরাধিকার
         </button>
       </div>
     </div>
@@ -200,289 +173,117 @@
   <!-- Tools Main Content Grid -->
   <main class="container">
     <div class="tools-grid" id="tools-grid">
+      <!-- ===== নকশা ও ম্যাপ ===== -->
 
-      <!-- কার্ড ১: উত্তরাধিকার (মুসলিম) — ফরায়েজ -->
-      <div class="tool-card" data-category="inheritance" data-title="উত্তরাধিকার মুসলিম ফারায়েজ ফরায়েজ ওয়ারিশ বন্টন" onclick="AppController.openToolModal('farayeiz')">
-        <span class="tool-badge badge-featured">ফরায়েজ</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#d1fae5;color:#059669">
-            <i class="bi bi-diagram-3-fill"></i>
-          </div>
-          <h3 class="tool-title">উত্তরাধিকার (মুসলিম)</h3>
-          <p class="tool-desc">ইসলামিক ফরায়েজ আইন অনুযায়ী জমি (শতংশ/একর), নগদ টাকা, স্বর্ণ ও রৌপ্যের নিখুঁত ওয়ারিশ বন্টন হিসাব করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- Card: Inheritance (Hindu) — দায়ভাগ -->
-      <div class="tool-card" data-category="inheritance" data-title="উত্তরাধিকার হিন্দু দায়ভাগ inheritance-hindu সম্পত্তি বণ্টন" onclick="AppController.openToolModal('hindu')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
-            <i class="bi bi-diagram-2-fill"></i>
-          </div>
-          <h3 class="tool-title">উত্তরাধিকার (হিন্দু) - দায়ভাগ</h3>
-          <p class="tool-desc">বাংলাদেশে প্রচলিত দায়ভাগ মত ও ১৯৩৭ সালের আইন অনুযায়ী হিন্দু সম্পত্তির উত্তরাধিকার বণ্টন হিসাব করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- Card: দলিল রেজিস্ট্রেশন খরচ -->
-      <div class="tool-card" data-category="khotian" data-title="দলিল রেজিস্ট্রেশন খরচ স্ট্যাম্প শুল্ক উৎসে কর মৌজা রেট জমি রেজিস্ট্রি খরচ" onclick="AppController.openToolModal('dolil-fee')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#dcfce7;color:#16a34a">
-            <i class="bi bi-cash-coin"></i>
-          </div>
-          <h3 class="tool-title">দলিল রেজিস্ট্রেশন খরচ ক্যালকুলেটর</h3>
-          <p class="tool-desc">মৌজা রেট ও জমির পরিমাণ দিয়ে স্ট্যাম্প শুল্ক, রেজিস্ট্রেশন ফি, স্থানীয় সরকার কর ও উৎসে করসহ মোট খরচ বের করুন।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
-
-      <!-- Card: সারাদেশের মৌজা ম্যাপ -->
-      <div class="tool-card" data-category="map" data-title="মৌজা ম্যাপ ডাউনলোড সারাদেশ CS SA RS BS দিয়ারা মহানগর জরিপ mouza map archive শিট" onclick="AppController.openToolModal('mouza-map')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#1d4ed8">
-            <i class="bi bi-map-fill"></i>
-          </div>
-          <h3 class="tool-title">সারাদেশের মৌজা ম্যাপ</h3>
-          <p class="tool-desc">১ লক্ষ ৯৪ হাজারের বেশি মৌজা ম্যাপ — বিভাগ, জেলা, উপজেলা ও জরিপের ধরন অনুযায়ী খুঁজে সরাসরি নামিয়ে নিন।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
-
-      <!-- কার্ড: মৌজা ম্যাপে জমি পরিমাপ — কাজ চলমান -->
-      <div class="tool-card" data-category="measure" data-title="মৌজা ম্যাপে জমি পরিমাপ ভাগবণ্টন নকশা থেকে জমি মাপা স্কেল ক্যালিব্রেশন দাগ শতক basics measure" onclick="AppController.openToolModal('map-measure')">
-        <span class="tool-badge badge-wip">কাজ চলছে</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#b45309">
-            <i class="bi bi-rulers"></i>
-          </div>
-          <h3 class="tool-title">মৌজা ম্যাপে জমি পরিমাপ</h3>
-          <p class="tool-desc">নকশার স্কেল ঠিক করে সরাসরি ম্যাপের উপর দাগ এঁকে জমির পরিমাণ বের করুন — প্রতিটি বাহুর মাপসহ।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
 
       <!-- কার্ড: ডিজিটাল সার্ভে (CAD) — GIS ডিজিটাইজেশন -->
-      <div class="tool-card" data-category="map" data-title="ডিজিটাল সার্ভে GIS ডিজিটাইজেশন অটোক্যাড autocad cad ডিমার্কেশন পেন্টাগ্রাফ demarcation pentagraph দাগ ভেক্টর প্লট নকশা ছাপা শিট kml kmz geojson" onclick="AppController.openToolModal('survey-cad')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#e0e7ff;color:#4338ca">
-            <i class="bi bi-vector-pen"></i>
-          </div>
-          <h3 class="tool-title">ডিজিটাল সার্ভে (GIS ডিজিটাইজেশন)</h3>
-          <p class="tool-desc">মৌজা নকশার PDF দিলে প্রতিটি দাগ ভেক্টরে রূপ নেয় — বাহুর মাপ ফুট-ইঞ্চিতে, ক্ষেত্রফল শতাংশে। ডিমার্কেশন ও পেন্টাগ্রাফ শিট ছাপুন, আর নকশা বসিয়ে দিন গুগল আর্থে।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
+      <div class="tool-card" style="color:#4338ca" data-category="map" data-title="ডিজিটাল সার্ভে GIS ডিজিটাইজেশন অটোক্যাড autocad cad ডিমার্কেশন পেন্টাগ্রাফ demarcation pentagraph দাগ ভেক্টর প্লট নকশা ছাপা শিট kml kmz geojson" onclick="AppController.openToolModal('survey-cad')">
+        <div class="tool-icon-wrapper" style="background:#e0e7ff;color:#4338ca"><i class="bi bi-vector-pen"></i></div>
+        <h3 class="tool-title">ডিজিটাল সার্ভে (GIS)</h3>
+        <p class="tool-sub">নকশা → ভেক্টর দাগ · শিট · KMZ</p>
+            </div>
+
+
+      <!-- Card: সারাদেশের মৌজা ম্যাপ -->
+      <div class="tool-card" style="color:#1d4ed8" data-category="map" data-title="মৌজা ম্যাপ ডাউনলোড সারাদেশ CS SA RS BS দিয়ারা মহানগর জরিপ mouza map archive শিট" onclick="AppController.openToolModal('mouza-map')">
+        <div class="tool-icon-wrapper" style="background:#dbeafe;color:#1d4ed8"><i class="bi bi-map-fill"></i></div>
+        <h3 class="tool-title">সারাদেশের মৌজা নকশা</h3>
+        <p class="tool-sub">১,৯৪,৩১৭টি নকশা ডাউনলোড</p>
+            </div>
+
 
       <!-- কার্ড: গুগল আর্থে মৌজা ম্যাপ (KMZ) — কাজ চলমান -->
-      <div class="tool-card" data-category="map" data-title="গুগল আর্থ KMZ এক্সপোর্ট মৌজা ম্যাপ স্যাটেলাইট ক্যালিব্রেশন google earth kmz overlay নিয়ন্ত্রণ বিন্দু" onclick="AppController.openToolModal('kmz-export')">
-        <span class="tool-badge badge-wip">কাজ চলছে</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#dcfce7;color:#15803d">
-            <i class="bi bi-globe-americas"></i>
-          </div>
-          <h3 class="tool-title">গুগল আর্থে মৌজা ম্যাপ (KMZ)</h3>
-          <p class="tool-desc">মৌজা ম্যাপের ছবিকে স্যাটেলাইট ছবির সাথে মিলিয়ে KMZ ফাইল বানান — Google Earth এ খুললে জমি ঠিক জায়গায় বসবে।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+      <div class="tool-card" style="color:#15803d" data-category="map" data-title="গুগল আর্থ KMZ এক্সপোর্ট মৌজা ম্যাপ স্যাটেলাইট ক্যালিব্রেশন google earth kmz overlay নিয়ন্ত্রণ বিন্দু" onclick="AppController.openToolModal('kmz-export')">
+        <div class="tool-icon-wrapper" style="background:#dcfce7;color:#15803d"><i class="bi bi-globe-americas"></i></div>
+        <h3 class="tool-title">গুগল আর্থে নকশা বসান</h3>
+        <p class="tool-sub">স্যাটেলাইটের উপর নকশা · KMZ ফাইল</p>
+            </div>
+
+
+      <!-- কার্ড: ম্যাপ জয়েন্ট -->
+      <div class="tool-card" style="color:#b45309" data-category="map" data-title="ম্যাপ জয়েন্ট সিট জয়েন জোড়া sheet join মৌজা সিট একসাথে মেলানো" onclick="AppController.openToolModal('map-joint')">
+        <div class="tool-icon-wrapper" style="background:#fef3c7;color:#b45309"><i class="bi bi-union"></i></div>
+        <h3 class="tool-title">সিট জোড়া লাগান</h3>
+        <p class="tool-sub">মৌজার সিটগুলো জোড়া লাগান</p>
       </div>
 
-      <!-- Card: খতিয়ান বিশ্লেষণ (পর্চার হিসাব) -->
-      <div class="tool-card" data-category="khotian" data-title="খতিয়ান বিশ্লেষণ পর্চার হিসাব পর্চা গণনা দাগভিত্তিক বণ্টন khotian bisleshon porcha hisab তফসিল" onclick="AppController.openToolModal('khotian-porcha')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#e0e7ff;color:#4f46e5">
-            <i class="bi bi-table"></i>
-          </div>
-          <h3 class="tool-title">খতিয়ান বিশ্লেষণ (পর্চার হিসাব)</h3>
-          <p class="tool-desc">পর্চার একাধিক দাগ ও একাধিক মালিকের হিস্যা দিয়ে কে কোন দাগে কত জমি পাবেন তার পূর্ণ তালিকা ও তফসিল তৈরি করুন।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
+
+      <!-- কার্ড: Map Converter + Cleaner -->
+      <div class="tool-card" style="color:#15803d" data-category="map" data-title="map converter cleaner pdf to jpg নকশা পরিষ্কার কনভার্ট ছবি স্বচ্ছ background clean" onclick="AppController.openToolModal('map-convert')">
+        <div class="tool-icon-wrapper" style="background:#dcfce7;color:#15803d"><i class="bi bi-magic"></i></div>
+        <h3 class="tool-title">নকশা পরিষ্কার করুন</h3>
+        <p class="tool-sub">বাঁকা PDF/ছবি → ঝকঝকে নকশা</p>
       </div>
+
+      <!-- ===== জমির হিসাব ===== -->
+
+
+      <!-- কার্ড: জমি ভাগ-বণ্টন -->
+      <div class="tool-card" style="color:#dc2626" data-category="hisab" data-title="জমি ভাগ বণ্টন ভাগবন্টন anyshape divider যেকোনো আকৃতি ওয়ারিশ হিস্যা আনা অনুপাত অংশীদার কাটা ফালি" onclick="AppController.openToolModal('land-divider')">
+        <div class="tool-icon-wrapper" style="background:#fee2e2;color:#dc2626"><i class="bi bi-diagram-3"></i></div>
+        <h3 class="tool-title">জমি ভাগ-বণ্টন</h3>
+        <p class="tool-sub">যেকোনো আকৃতি · হিস্যা অনুযায়ী কাটা</p>
+      </div>
+
+      <!-- কার্ড: জমির ক্ষেত্রফল (৩টি ট্যাব) -->
+      <div class="tool-card" style="color:#0369a1" data-category="hisab" data-title="জমির ক্ষেত্রফল বাহু কর্ণ ত্রিভুজ চতুর্ভুজ পঞ্চভুজ ষড়ভুজ অজানা বাহু প্রতিবেদন প্রিন্ট area unknown side" onclick="AppController.openToolModal('canvas-measure')">
+        <div class="tool-icon-wrapper" style="background:#e0f2fe;color:#0369a1"><i class="bi bi-bounding-box"></i></div>
+        <h3 class="tool-title">জমির ক্ষেত্রফল</h3>
+        <p class="tool-sub">বাহু → ক্ষেত্রফল · অজানা বাহু · প্রতিবেদন</p>
+      </div>
+
+
+      <!-- কার্ড: একক, হিস্যা ও সূত্র (৫টি ট্যাব) -->
+      <div class="tool-card" style="color:#7c3aed" data-category="hisab" data-title="একক কনভার্টার শতক কাঠা বিঘা একর আনা গন্ডা কড়া ক্রান্তি তিল হিস্যা অনুপাত সূত্র unit converter hissa ratio formula" onclick="AppController.openToolModal('unit-converter')">
+        <div class="tool-icon-wrapper" style="background:#ede9fe;color:#7c3aed"><i class="bi bi-arrow-left-right"></i></div>
+        <h3 class="tool-title">একক, হিস্যা ও সূত্র</h3>
+        <p class="tool-sub">শতক-কাঠা-বিঘা · আনা-গন্ডা · হিস্যা · অনুপাত</p>
+      </div>
+
+
+      <!-- কার্ড: খতিয়ান, অংশ ও তফসিল (৪টি ট্যাব) -->
+      <div class="tool-card" style="color:#2563eb" data-category="hisab" data-title="খতিয়ান পর্চা বিশ্লেষণ মালিকানা হিস্যা দাগের অংশ পোরশন তফসিল বন্টননামা khotian porcha dag portion tofasil" onclick="AppController.openToolModal('khotian-porcha')">
+        <div class="tool-icon-wrapper" style="background:#dbeafe;color:#2563eb"><i class="bi bi-table"></i></div>
+        <h3 class="tool-title">খতিয়ান, অংশ ও তফসিল</h3>
+        <p class="tool-sub">পর্চার হিসাব · মালিকের হিস্যা · দাগের অংশ · তফসিল</p>
+      </div>
+
+
+
+      <!-- Card: দলিল রেজিস্ট্রেশন খরচ -->
+      <div class="tool-card" style="color:#16a34a" data-category="hisab" data-title="দলিল রেজিস্ট্রেশন খরচ স্ট্যাম্প শুল্ক উৎসে কর মৌজা রেট জমি রেজিস্ট্রি খরচ" onclick="AppController.openToolModal('dolil-fee')">
+        <div class="tool-icon-wrapper" style="background:#dcfce7;color:#16a34a"><i class="bi bi-cash-coin"></i></div>
+        <h3 class="tool-title">দলিল রেজিস্ট্রেশন খরচ</h3>
+        <p class="tool-sub">স্ট্যাম্প, ফি ও কর একসাথে</p>
+            </div>
+
 
       <!-- Card: মৌজা মূল্য তালিকা -->
-      <div class="tool-card" data-category="khotian" data-title="মৌজা মূল্য সম্পত্তির সর্বনিম্ন বাজার মূল্য জমির রেট mouza rate land value সরকারি মূল্য তালিকা সাব-রেজিস্ট্রি" onclick="AppController.openToolModal('mouza-value')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
-            <i class="bi bi-file-earmark-bar-graph-fill"></i>
-          </div>
-          <h3 class="tool-title">সম্পত্তির সর্বনিম্ন বাজার মূল্য (মৌজা মূল্য)</h3>
-          <p class="tool-desc">বিভাগ, জেলা ও সাব-রেজিস্ট্রি অফিস বেছে নিয়ে সরকারনির্ধারিত মৌজা রেটের তালিকা সরাসরি দেখুন ও ডাউনলোড করুন।</p>
-          <p class="tool-credit"><i class="bi bi-award"></i>তালিকার সৌজন্যে <b>Land Value</b></p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
+      <div class="tool-card" style="color:#d97706" data-category="hisab" data-title="মৌজা মূল্য সম্পত্তির সর্বনিম্ন বাজার মূল্য জমির রেট mouza rate land value সরকারি মূল্য তালিকা সাব-রেজিস্ট্রি" onclick="AppController.openToolModal('mouza-value')">
+        <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
+        <h3 class="tool-title">মৌজা মূল্য তালিকা</h3>
+        <p class="tool-sub">সরকারনির্ধারিত জমির রেট</p>
+        <p class="tool-credit"><i class="bi bi-award"></i>তালিকার সৌজন্যে <b>Land Value</b></p>
+            </div>
 
-      <!-- Card: দাগ পোরশন -->
-      <div class="tool-card" data-category="khotian" data-title="দাগ পোরশন দাগের মধ্যে অংশ dag portion খতিয়ানের অংশ" onclick="AppController.openToolModal('dag-portion')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#2563eb">
-            <i class="bi bi-pin-map-fill"></i>
-          </div>
-          <h3 class="tool-title">দাগের মধ্যে অত্র খতিয়ানের অংশ</h3>
-          <p class="tool-desc">দাগের মোট জমি ও আবেদিত জমির পরিমাণ দিয়ে আপনার নির্দিষ্ট অংশ বা হিস্যা নিখুঁতভাবে বের করুন।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
+      <!-- ===== উত্তরাধিকার ===== -->
 
-      <!-- Card: তফসিল বন্টন -->
-      <div class="tool-card" data-category="khotian" data-title="তফসিল বন্টন tofasil division নামজারি আবেদন গ্রহীতা" onclick="AppController.openToolModal('tofasil')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#d1fae5;color:#059669">
-            <i class="bi bi-file-earmark-text-fill"></i>
-          </div>
-          <h3 class="tool-title">তফসিল বন্টন ক্যালকুলেটর</h3>
-          <p class="tool-desc">নামজারির আবেদনে একাধিক গ্রহীতার জমির পরিমাণ দিয়ে প্রত্যেকের নির্ণেয় অংশ বের করুন ও বন্টননামা প্রিন্ট করুন।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
 
-      <!-- Card: অনুপাত ক্যালকুলেটর -->
-      <div class="tool-card" data-category="measure" data-title="অনুপাত ক্যালকুলেটর ratio calculator আনুপাতিক ভাগ সমীকরণ" onclick="AppController.openToolModal('ratio')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
-            <i class="bi bi-pie-chart-fill"></i>
-          </div>
-          <h3 class="tool-title">অনুপাত ক্যালকুলেটর</h3>
-          <p class="tool-desc">যেকোনো গাণিতিক অনুপাত বা আনুপাতিক ভাগ বের করুন। সাথে ইনলাইন সমীকরণ ক্যালকুলেটর।</p>
-        </div>
-        <div class="tool-footer"><span>টুল খুলুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
+      <!-- কার্ড ১: উত্তরাধিকার (মুসলিম) — ফরায়েজ -->
+      <div class="tool-card" style="color:#059669" data-category="waris" data-title="উত্তরাধিকার মুসলিম ফারায়েজ ফরায়েজ ওয়ারিশ বন্টন" onclick="AppController.openToolModal('farayeiz')">
+        <div class="tool-icon-wrapper" style="background:#d1fae5;color:#059669"><i class="bi bi-diagram-3-fill"></i></div>
+        <h3 class="tool-title">উত্তরাধিকার (মুসলিম)</h3>
+        <p class="tool-sub">ফরায়েজ অনুযায়ী ওয়ারিশ বণ্টন</p>
+            </div>
 
-      <!-- Card: জমির সকল সূত্র -->
-      <div class="tool-card" data-category="measure" data-title="জমির সকল সূত্র land formula হিরণের সূত্র ক্ষেত্রফল গড় পদ্ধতির ভুল" onclick="AppController.openToolModal('land-formula')">
-        <span class="tool-badge badge-featured">নতুন</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#e0f2fe;color:#0284c7">
-            <i class="bi bi-book-fill"></i>
-          </div>
-          <h3 class="tool-title">জমির সকল সূত্র</h3>
-          <p class="tool-desc">একক রূপান্তর, হিরণের সূত্র, ট্রাপিজিয়াম, বৃত্ত — সব ক্ষেত্রফলের সূত্র এবং গড় পদ্ধতির ভুল সম্পর্কে সতর্কতা।</p>
-        </div>
-        <div class="tool-footer"><span>দেখুন</span><i class="bi bi-arrow-right"></i></div>
-      </div>
 
-      <!-- কার্ড ৩: হিস্যা ক্যালকুলেটর -->
-      <div class="tool-card" data-category="khotian" data-title="হিস্যা ক্যালকুলেটর হিসা আনা গণ্ডা অংশ" onclick="AppController.openToolModal('hissa-calc')">
-        <div>
-          <div class="tool-icon-wrapper" style="background:#ccfbf1;color:#0d9488">
-            <i class="bi bi-percent"></i>
-          </div>
-          <h3 class="tool-title">হিস্যা ক্যালকুলেটর</h3>
-          <p class="tool-desc">মোট জমির যেকোনো আনা-গন্ডা, শতকরা (%), দশমিক বা ভগ্নাংশ হিস্যা অনুযায়ী তার নির্দিষ্ট পরিমাণ জমি বের করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
+      <!-- Card: Inheritance (Hindu) — দায়ভাগ -->
+      <div class="tool-card" style="color:#d97706" data-category="waris" data-title="উত্তরাধিকার হিন্দু দায়ভাগ inheritance-hindu সম্পত্তি বণ্টন" onclick="AppController.openToolModal('hindu')">
+        <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706"><i class="bi bi-diagram-2-fill"></i></div>
+        <h3 class="tool-title">উত্তরাধিকার (হিন্দু)</h3>
+        <p class="tool-sub">দায়ভাগ মত অনুযায়ী বণ্টন</p>
+            </div>
 
-      <!-- কার্ড ৪: ক্যানভাস জমি পরিমাপ -->
-      <div class="tool-card" data-category="measure" data-title="মৌজা ম্যাপে জমি পরিমাপ ক্যানভাস বাহু কর্ণ ক্ষেত্রফল" onclick="AppController.openToolModal('canvas-measure')">
-        <div>
-          <div class="tool-icon-wrapper" style="background:#ede9fe;color:#7c3aed">
-            <i class="bi bi-vector-square"></i>
-          </div>
-          <h3 class="tool-title">ক্যানভাস জমি পরিমাপ</h3>
-          <p class="tool-desc">৪ বাহু ও কর্ণের ইনপুট দিয়ে ক্যানভাসে চিত্র এঁকে সঠিক শতাংশ, কাঠা, বিঘা এবং বর্গফুট অটোমেটিক হিসাব করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- Card 5: Khotian Owner Share Analyzer -->
-      <div class="tool-card" data-category="khotian" data-title="খতিয়ান মালিকানা হিস্যা বিশ্লেষণ" onclick="AppController.openToolModal('khotian-analyzer')">
-        <div>
-          <div class="tool-icon-wrapper" style="background:#dbeafe;color:#2563eb">
-            <i class="bi bi-file-earmark-spreadsheet"></i>
-          </div>
-          <h3 class="tool-title">খতিয়ান হিস্যা বিশ্লেষণ</h3>
-          <p class="tool-desc">খতিয়ানের আনা, গন্ডা, কড়া, ক্রান্তি ও তিল ইনপুট দিয়ে ১ ক্লিকে সকল মালিকের জমির সঠিক পরিমাণ বের করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- Card 6: Ana-Gonda Converter -->
-      <div class="tool-card" data-category="khotian" data-title="আনা-গন্ডা-কড়া-ক্রান্তি-তিল কনভার্টার" onclick="AppController.openToolModal('ana-gonda')">
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fce7f3;color:#db2777">
-            <i class="bi bi-calculator-fill"></i>
-          </div>
-          <h3 class="tool-title">আনা-গন্ডা কনভার্টার</h3>
-          <p class="tool-desc">১৬ আনার খতিয়ানি অংশকে আধুনিক দশমিক, শতাংশ, বর্গফুট ও কাঠায় তাৎক্ষণিক কনভার্ট করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- Card 7: Land Unit Converter -->
-      <div class="tool-card" data-category="measure" data-title="জমি একক পরিমাপ রূপান্তর শতক কাঠা বিঘা একর" onclick="AppController.openToolModal('unit-converter')">
-        <div>
-          <div class="tool-icon-wrapper" style="background:#fef3c7;color:#d97706">
-            <i class="bi bi-arrow-repeat"></i>
-          </div>
-          <h3 class="tool-title">জমি একক কনভার্টার</h3>
-          <p class="tool-desc">শতক, কাঠা, বিঘা, একর, বর্গফুট, বর্গগজ এবং অজুতাংশের মধ্যে দ্রুত একক রূপান্তর করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- কার্ড ৮: তুলনামূলক প্যান্টোগ্রাফ — কাজ চলমান -->
-      <div class="tool-card" data-category="map" data-title="তুলনামূলক প্যান্টোগ্রাফ ম্যাপ ওভারলে" onclick="AppController.openToolModal('map-overlay')">
-        <span class="tool-badge badge-wip">কাজ চলছে</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#f3e8ff;color:#9333ea">
-            <i class="bi bi-layers-half"></i>
-          </div>
-          <h3 class="tool-title">তুলনামূলক প্যান্টোগ্রাফ</h3>
-          <p class="tool-desc">দুটি ম্যাপের ছবি একসাথে বসিয়ে অপাসিটি (স্বচ্ছতা) কমিয়ে CS, SA, RS ম্যাপের সীমানা সহজে তুলনা করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
-
-      <!-- কার্ড ৯: প্রিন্ট স্টুডিও — কাজ চলমান -->
-      <div class="tool-card" data-category="measure" data-title="সার্ভে প্রতিবেদন প্রিন্ট স্টুডিও" onclick="AppController.openToolModal('print-studio')">
-        <span class="tool-badge badge-wip">কাজ চলছে</span>
-        <div>
-          <div class="tool-icon-wrapper" style="background:#e0f2fe;color:#0369a1">
-            <i class="bi bi-printer-fill"></i>
-          </div>
-          <h3 class="tool-title">সার্ভে প্রতিবেদন প্রিন্ট স্টুডিও</h3>
-          <p class="tool-desc">জমির মাপ ও নকশা দিয়ে পেশাদার জরিপ প্রতিবেদন তৈরি করুন এবং সরাসরি প্রিন্ট বা PDF ডাউনলোড করুন।</p>
-        </div>
-        <div class="tool-footer">
-          <span>টুল খুলুন</span>
-          <i class="bi bi-arrow-right"></i>
-        </div>
-      </div>
 
     </div>
   </main>
@@ -506,314 +307,9 @@
       <!-- Modal Body -->
       <div class="modal-body" id="modal-dynamic-body">
 
-        <!-- VIEW: মৌজা ম্যাপে জমি পরিমাপ -->
-        <div id="view-map-measure" class="tool-view-content mm-wrap" style="display:none">
+        <!-- একই কাজের কয়েকটি ট্যাব — ToolGroups বসায় -->
+        <div class="grp-tabs" id="group-tabs" style="display:none"></div>
 
-          <div class="fz-warn">
-            <i class="bi bi-cone-striped"></i>
-            <span><b>এই টুলের কাজ চলছে।</b> এখন স্কেল ঠিক করে প্লট আঁকা ও জমির
-            পরিমাণ বের করা যায়। <b>ভাগবণ্টন, লাইন, বৃত্ত, টেক্সট ও রপ্তানি</b> পরে যোগ হবে।</span>
-          </div>
-
-          <div class="mm-stage" id="mm-stage">
-            <canvas id="mm-canvas"></canvas>
-
-            <!-- শুরুর কার্ড -->
-            <div class="mm-intro" id="mm-intro">
-              <div class="mm-intro-ic"><i class="bi bi-map"></i></div>
-              <h4>মৌজা ম্যাপ নিন</h4>
-              <p>আর্কাইভ থেকে বেছে নিন, অথবা নিজের ছবি/PDF আপলোড করুন।</p>
-              <div class="mm-intro-btns">
-                <button type="button" class="btn btn-primary" onclick="AppController.mmPick('archive')">
-                  <i class="bi bi-collection"></i> আর্কাইভ থেকে
-                </button>
-                <button type="button" class="btn btn-outline" onclick="AppController.mmPick('file')">
-                  <i class="bi bi-upload"></i> আপলোড
-                </button>
-              </div>
-              <input type="file" id="mm-file" accept="image/jpeg,image/png,application/pdf"
-                     style="display:none" onchange="AppController.mmLoadFile(this)">
-            </div>
-
-            <!-- স্কেলের অবস্থা -->
-            <div class="mm-scale-pill" id="mm-scale-pill" style="display:none"
-                 onclick="AppController.mmScaleDialog(true)">
-              <i class="bi bi-rulers"></i><span id="mm-scale-txt">স্কেল ঠিক করুন</span>
-            </div>
-
-            <!-- এই জুমে এক পিক্সেল কত ফুট — নির্ভুলতার সতর্কবাতি -->
-            <div class="mm-prec" id="mm-prec" style="display:none">
-            </div>
-
-            <!-- বাঁ পাশের নিয়ন্ত্রণ -->
-            <div class="mm-left" id="mm-left" style="display:none">
-              <button type="button" class="mm-cbtn" title="বড়" onclick="AppController.mmZoom(1)"><i class="bi bi-plus-lg"></i></button>
-              <button type="button" class="mm-cbtn" title="ছোট" onclick="AppController.mmZoom(-1)"><i class="bi bi-dash-lg"></i></button>
-              <button type="button" class="mm-cbtn" title="পুরোটা" onclick="AppController.mmFit()"><i class="bi bi-arrows-fullscreen"></i></button>
-              <button type="button" class="mm-cbtn" id="mm-history-undo" title="পূর্বাবস্থায় ফিরুন"
-                      onclick="AppController.mmHistoryUndo()" disabled><i class="bi bi-arrow-counterclockwise"></i></button>
-              <button type="button" class="mm-cbtn" id="mm-history-redo" title="আবার করুন"
-                      onclick="AppController.mmHistoryRedo()" disabled><i class="bi bi-arrow-clockwise"></i></button>
-              <button type="button" class="mm-cbtn danger" title="সব মুছুন" onclick="AppController.mmClear()"><i class="bi bi-trash3"></i></button>
-            </div>
-
-            <!-- ডান পাশের টুলবার -->
-            <div class="mm-tools" id="mm-tools" style="display:none">
-              <button type="button" class="mm-tool" data-tool="map" title="ম্যাপ নিন"
-                      onclick="AppController.mmPick('menu')"><i class="bi bi-image"></i><span>ম্যাপ</span></button>
-              <button type="button" class="mm-tool" data-tool="draw" title="প্লট আঁকুন"
-                      onclick="AppController.mmTool('draw')"><i class="bi bi-pentagon"></i><span>আঁকুন</span></button>
-              <button type="button" class="mm-tool" data-tool="point" title="পয়েন্ট এডিট"
-                      onclick="AppController.mmTool('point')"><i class="bi bi-bounding-box-circles"></i><span>পয়েন্ট</span></button>
-              <button type="button" class="mm-tool active" data-tool="pan" title="সরান"
-                      onclick="AppController.mmTool('pan')"><i class="bi bi-hand-index"></i><span>প্যান</span></button>
-              <button type="button" class="mm-tool" data-tool="select" title="নির্বাচন"
-                      onclick="AppController.mmTool('select')"><i class="bi bi-cursor"></i><span>নির্বাচন</span></button>
-              <button type="button" class="mm-tool" data-tool="divide" title="ভাগবণ্টন"
-                      onclick="AppController.mmDivideMode()"><i class="bi bi-pie-chart"></i><span>ভাগ</span></button>
-            </div>
-
-            <!-- আঁকার সময় নিচের বার -->
-            <div class="mm-draw-bar" id="mm-draw-bar" style="display:none">
-              <span id="mm-draw-hint">ম্যাপে ক্লিক করে পয়েন্ট বসান</span>
-              <button type="button" class="kmz-mini" id="mm-undo" onclick="AppController.mmUndoPoint()">শেষ পয়েন্ট মুছুন</button>
-              <button type="button" class="kmz-mini" onclick="AppController.mmCancelDraft()">বাতিল</button>
-              <button type="button" class="btn btn-primary btn-sm" id="mm-finish"
-                      onclick="AppController.mmFinish()" disabled>
-                <i class="bi bi-check-lg"></i> প্লট সম্পন্ন
-              </button>
-            </div>
-
-            <!-- পয়েন্ট এডিটের বার -->
-            <div class="mm-draw-bar" id="mm-pt-bar" style="display:none">
-              <span id="mm-pt-hint">কোণার বিন্দু ধরে টানুন · বাহুর গায়ে চাপ দিলে নতুন বিন্দু</span>
-              <button type="button" class="kmz-mini danger" id="mm-pt-del"
-                      onclick="AppController.mmDelVertex()" disabled>
-                <i class="bi bi-x-circle"></i> এই বিন্দু মুছুন
-              </button>
-            </div>
-
-            <!-- নিচে-বাঁয়ে তিন টাইল -->
-            <div class="mm-tiles" id="mm-tiles" style="display:none">
-              <div class="mm-tile"><b id="mm-t-cur">০ শতক</b><span>বর্তমান প্লট</span></div>
-              <div class="mm-tile"><b id="mm-t-tot">০ শতক</b><span>মোট এলাকা</span></div>
-              <div class="mm-tile"><b id="mm-t-cnt">০টি</b><span>সম্পন্ন প্লট</span></div>
-            </div>
-          </div>
-
-          <!-- প্লট তালিকা -->
-          <div class="mm-list-wrap" id="mm-list-wrap" style="display:none">
-            <div class="fz-panel-head">
-              <span class="fz-badge-num"><i class="bi bi-list-ul"></i></span>
-              <h3>প্লটের তালিকা</h3>
-              <span class="fz-pill" id="mm-list-pill">০টি</span>
-              <label class="mm-unit-pick" title="বাহুর মাপ কোন এককে দেখাবে">
-                <i class="bi bi-rulers"></i>
-                <select id="mm-label-unit" onchange="AppController.mmLabelUnit(this.value)"></select>
-              </label>
-            </div>
-            <div id="mm-list" class="mm-list">কোনো প্লট নেই</div>
-          </div>
-
-          <div class="mm-history-wrap" id="mm-history-wrap" style="display:none">
-            <div class="fz-panel-head">
-              <span class="fz-badge-num"><i class="bi bi-clock-history"></i></span>
-              <h3>পরিবর্তনের ইতিহাস</h3>
-              <span class="fz-pill" id="mm-history-pill">১টি</span>
-            </div>
-            <div id="mm-history" class="mm-history"></div>
-          </div>
-
-          <!-- ভাগবণ্টন -->
-          <div class="mm-div-wrap" id="mm-div-wrap" style="display:none">
-            <div class="fz-panel-head">
-              <span class="fz-badge-num"><i class="bi bi-pie-chart"></i></span>
-              <h3>জমি ভাগবণ্টন</h3>
-              <span class="fz-pill" id="mm-div-plot">প্লট বাছুন</span>
-            </div>
-
-            <div class="fz-seg" style="margin-bottom:12px">
-              <button type="button" class="fz-seg-btn active" id="mm-dm-prop"
-                      onclick="AppController.mmDivMode('prop')">আনুপাতিক (শরিকের অংশ)</button>
-              <button type="button" class="fz-seg-btn" id="mm-dm-man"
-                      onclick="AppController.mmDivMode('manual')">ম্যানুয়াল (রেখা টেনে)</button>
-            </div>
-
-            <!-- আনুপাতিক -->
-            <div id="mm-div-prop">
-              <div class="fz-field">
-                <div class="fz-field-label"><span><i class="bi bi-signpost-split"></i> কাটার রেখা কোন বরাবর যাবে</span></div>
-                <div class="fz-input-wrap fz-select-wrap">
-                  <select id="mm-div-side" onchange="AppController.mmDivPreview()"></select>
-                </div>
-                <p class="kmz-hint" style="margin:6px 0 0">
-                  বাহু বাছলে বন্টনের রেখা <b>সেই বাহুর সমান্তরালে</b> যাবে;
-                  দিক বাছলে ভাগ সেই দিক থেকে শুরু হবে।
-                </p>
-              </div>
-
-              <div class="fz-field">
-                <div class="fz-field-label"><span><i class="bi bi-sliders"></i> শরিকের অংশ কীভাবে দেবেন</span></div>
-                <div class="fz-seg fz-seg-sm">
-                  <button type="button" class="fz-seg-btn" id="mm-sm-pct"
-                          onclick="AppController.mmShareMode('pct')">% দিয়ে</button>
-                  <button type="button" class="fz-seg-btn active" id="mm-sm-satak"
-                          onclick="AppController.mmShareMode('satak')">শতক দিয়ে</button>
-                  <button type="button" class="fz-seg-btn" id="mm-sm-equal"
-                          onclick="AppController.mmShareMode('equal')">সমান ভাগে</button>
-                </div>
-              </div>
-
-              <div class="fz-panel-head" style="padding:0;margin:14px 0 8px">
-                <h3 style="font-size:0.95rem">শরিকগণ</h3>
-                <span class="fz-pill" id="mm-share-pill">০ / ০ শতক</span>
-                <button type="button" class="fz-btn-add" onclick="AppController.mmAddShare()">
-                  <i class="bi bi-plus-lg"></i> শরিক যোগ
-                </button>
-              </div>
-              <div id="mm-shares" class="mm-shares"></div>
-
-              <div class="mm-div-actions">
-                <button type="button" class="btn btn-primary" onclick="AppController.mmDoDivide()">
-                  <i class="bi bi-scissors"></i> ভাগ করুন
-                </button>
-                <button type="button" class="btn btn-outline" onclick="AppController.mmClearDivision()">
-                  <i class="bi bi-arrow-counterclockwise"></i> ভাগ মুছুন
-                </button>
-              </div>
-            </div>
-
-            <!-- ম্যানুয়াল -->
-            <div id="mm-div-man" style="display:none">
-              <p class="kmz-hint">
-                প্লটের এক পাশ থেকে অন্য পাশে <b>দুটি ক্লিক</b> করে রেখা টানুন —
-                প্লটটি <b>ক</b> ও <b>খ</b> দুই ভাগে কাটবে।
-              </p>
-              <div class="mm-div-actions">
-                <button type="button" class="btn btn-primary" onclick="AppController.mmStartManualCut()">
-                  <i class="bi bi-pencil"></i> রেখা টানুন
-                </button>
-                <button type="button" class="btn btn-outline" onclick="AppController.mmClearDivision()">
-                  <i class="bi bi-arrow-counterclockwise"></i> ভাগ মুছুন
-                </button>
-              </div>
-            </div>
-
-            <div id="mm-div-result" class="mm-div-result" style="display:none"></div>
-          </div>
-
-          <!-- অগ্রগতি -->
-          <div id="mm-prog" class="kmz-prog" style="display:none">
-            <div class="kmz-prog-bar"><span id="mm-prog-fill"></span></div>
-            <div class="kmz-prog-txt" id="mm-prog-txt">…</div>
-          </div>
-
-          <!-- আর্কাইভ বাছাই -->
-          <div id="mm-arch" class="kmz-arch" style="display:none">
-            <div class="fz-assets kmz-arch-grid">
-              <div class="fz-field"><div class="fz-field-label"><span>বিভাগ</span></div>
-                <div class="fz-input-wrap fz-select-wrap"><select id="mm-div" onchange="AppController.mmArchDiv()"><option>লোড হচ্ছে…</option></select></div></div>
-              <div class="fz-field"><div class="fz-field-label"><span>জেলা</span></div>
-                <div class="fz-input-wrap fz-select-wrap"><select id="mm-dist" onchange="AppController.mmArchDist()" disabled><option>—</option></select></div></div>
-              <div class="fz-field"><div class="fz-field-label"><span>উপজেলা</span></div>
-                <div class="fz-input-wrap fz-select-wrap"><select id="mm-upa" onchange="AppController.mmArchUpa()" disabled><option>—</option></select></div></div>
-              <div class="fz-field"><div class="fz-field-label"><span>জরিপ</span></div>
-                <div class="fz-input-wrap fz-select-wrap"><select id="mm-srv" onchange="AppController.mmArchSrv()" disabled><option>—</option></select></div></div>
-            </div>
-            <div class="fz-field" style="position:relative">
-              <div class="fz-field-label"><span><i class="bi bi-lightning-charge-fill text-warning"></i> দ্রুত গতিতে ম্যাপ খুঁজুন (অটো-সাজেশনসহ)</span></div>
-              <div class="fz-input-wrap">
-                <input type="text" id="mm-fsearch" placeholder="ম্যাপের নাম, মৌজা, জেলা বা জেএল নম্বর দিয়ে দ্রুত সাজেশন দেখুন..." oninput="AppController.mmArchFilterGlobal()" autocomplete="off">
-              </div>
-              <div id="mm-search-suggestions" class="kmz-suggestions" style="display:none"></div>
-            </div>
-            <div id="mm-arch-list" class="kmz-arch-list">উপরে বিভাগ থেকে জরিপ পর্যন্ত বেছে নিন।</div>
-          </div>
-
-          <!-- স্কেল ডায়ালগ -->
-          <div class="mm-modal" id="mm-scale-modal" style="display:none">
-            <div class="mm-modal-box">
-              <div class="mm-modal-head"><i class="bi bi-rulers"></i> স্কেল সেটিংস</div>
-
-              <div class="mm-method">
-                <h5>পদ্ধতি ১ — মৌজার স্কেল</h5>
-                <div class="fz-field">
-                  <div class="fz-field-label"><span>ম্যাপের স্কেল</span></div>
-                  <div class="fz-input-wrap fz-select-wrap">
-                    <select id="mm-mapscale" onchange="AppController.mmFillBarLengths()"></select>
-                  </div>
-                  <p class="kmz-hint" style="margin:6px 0 0">
-                    <b>কোনটা বাছবেন?</b> নকশার গায়ে লেখা থাকে। <b>1″=330′</b> লেখা
-                    থাকলে ১৬″=১ মাইল — গ্রামের সাধারণ মৌজা ম্যাপ। ঢাকা বা জেলা সদরের
-                    <b>সিটি জরিপ / বি‌আর‌এস</b> নকশা সাধারণত <b>৮০″=১ মাইল</b>।
-                  </p>
-                </div>
-
-                <!-- গুনিয়া ও ফুট স্কেলে এক ঘর কত — বাছাই অনুযায়ী বদলায় -->
-                <div class="mm-gunia" id="mm-gunia"></div>
-                <div class="fz-field">
-                  <div class="fz-field-label">
-                    <span>স্ক্যান DPI</span>
-                    <span class="mm-badge" id="mm-dpi-badge" style="display:none"></span>
-                  </div>
-                  <div class="fz-input-wrap fz-select-wrap"><select id="mm-dpi"></select></div>
-                </div>
-                <p class="kmz-hint" id="mm-dpi-note">
-                  PDF হলে DPI নিজে থেকেই বেরিয়ে আসে — বাছার দরকার নেই।
-                </p>
-                <div class="mm-modal-btns">
-                  <button type="button" class="btn btn-outline" onclick="AppController.mmScaleDialog(false)">বাতিল</button>
-                  <button type="button" class="btn btn-primary" id="mm-scale-save"
-                          onclick="AppController.mmApplyMapScale()">সেভ করুন</button>
-                </div>
-              </div>
-
-              <div class="mm-method alt">
-                <h5>পদ্ধতি ২ — ম্যাপ থেকে মাপুন <span>(সর্বোচ্চ নিখুঁত)</span></h5>
-
-                <!-- ধাপ ১ — কোন দূরত্ব -->
-                <div class="mm-step">
-                  <span class="mm-step-n">১</span>
-                  <div class="mm-step-body">
-                    <b>কত দূরত্ব ধরে মাপবেন, বেছে নিন</b>
-                    <div class="fz-input-wrap fz-select-wrap" style="margin-top:7px">
-                      <select id="mm-barlen" onchange="AppController.mmDrawCalibHelp()"></select>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ধাপ ২ — ছবিতে দেখানো কোথায় ক্লিক -->
-                <div class="mm-step">
-                  <span class="mm-step-n">২</span>
-                  <div class="mm-step-body">
-                    <b>নকশার স্কেল-দণ্ডে ঠিক এই দুই জায়গায় ক্লিক করুন</b>
-                    <div class="mm-calib-help" id="mm-calib-help"></div>
-                  </div>
-                </div>
-
-                <!-- ধাপ ৩ — শুরু -->
-                <div class="mm-step">
-                  <span class="mm-step-n">৩</span>
-                  <div class="mm-step-body">
-                    <b>বোতামে চাপ দিন</b> — এই বাক্স বন্ধ হবে, নিচে গুনতি দেখাবে
-                    <button type="button" class="btn btn-purple" style="margin-top:8px"
-                            onclick="AppController.mmStartCalibrate()">
-                      <i class="bi bi-pencil"></i> শুরু করুন — নকশায় ২টি ক্লিক
-                    </button>
-                  </div>
-                </div>
-
-                <p class="kmz-hint" style="margin-top:12px">
-                  <b>স্কেল-দণ্ড না থাকলে?</b> যেকোনো <b>চেনা দূরত্ব</b> চলবে —
-                  যেমন যে দাগের মাপ খতিয়ান থেকে জানেন, তার দুই কোণা। তালিকা থেকে
-                  “অন্য দৈর্ঘ্য” বেছে মাপটা লিখে দিন।
-                  <b>আগে জুম করে নিন</b> — দুই বিন্দু পর্দাজুড়ে যত দূরে, মাপ তত নিখুঁত।
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
 
         <!-- VIEW: গুগল আর্থে মৌজা ম্যাপ (KMZ) — ধাপে ধাপে -->
         <div id="view-kmz-export" class="tool-view-content kmz-wrap" style="display:none">
@@ -1069,17 +565,29 @@
                  আলাদা আলাদা আপলোড করে জুড়ে নিন।</p>
             </div>
 
+            <div class="cad-src-head">
+              <b><i class="bi bi-diagram-2"></i> নকশা কোথা থেকে নেবেন?</b>
+              <span>একাধিক উৎস — নিজস্ব সংগ্রহ, সরকারি পোর্টাল, ড্রাইভ বা নিজের সার্ভার</span>
+            </div>
+            <div class="cad-src-list" id="cad-sources"></div>
+
+            <!-- লিংক থেকে আনার ঘর -->
+            <div class="cad-link-box" id="cad-link-box" style="display:none">
+              <label class="dv-field">নকশার লিংক বা গুগল ড্রাইভ আইডি
+                <input id="cad-link-url" placeholder="https://… অথবা ড্রাইভের শেয়ার লিংক"
+                       onkeydown="if(event.key==='Enter')CadApp.fetchLink()"></label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button type="button" class="cad-tbtn hot" onclick="CadApp.fetchLink()">
+                  <i class="bi bi-download"></i> নকশা আনুন</button>
+                <button type="button" class="cad-mini"
+                        onclick="document.getElementById('cad-link-box').style.display='none'">বাতিল</button>
+              </div>
+              <p class="cad-hint-mini" style="margin-top:8px">যে সাইট অন্য ডোমেইনে ফাইল দিতে দেয় না,
+                 সেখান থেকে সরাসরি আনা যাবে না — তখন ফাইলটি নামিয়ে
+                 <b>“কম্পিউটার / ফোন থেকে”</b> দিয়ে আপলোড করুন, কাজ একই হবে।</p>
+            </div>
+
             <div class="cad-choices">
-              <button type="button" class="cad-choice" onclick="CadApp.choose('file')">
-                <span class="cad-choice-ic" style="background:#dcfce7;color:#15803d"><i class="bi bi-upload"></i></span>
-                <span class="cad-choice-t">নকশা আপলোড করুন</span>
-                <span class="cad-choice-s">মৌজা নকশার PDF, JPG বা PNG — স্ক্যান করা পুরনো নকশাও চলবে</span>
-              </button>
-              <button type="button" class="cad-choice" onclick="CadApp.choose('archive')">
-                <span class="cad-choice-ic" style="background:#dbeafe;color:#1d4ed8"><i class="bi bi-map"></i></span>
-                <span class="cad-choice-t">আর্কাইভ থেকে নিন</span>
-                <span class="cad-choice-s">সারাদেশের ১,৯৪,৩১৭টি মৌজা নকশার সংগ্রহ থেকে বেছে নিন</span>
-              </button>
               <button type="button" class="cad-choice" onclick="CadApp.choose('blank')">
                 <span class="cad-choice-ic" style="background:#fef3c7;color:#b45309"><i class="bi bi-pencil-square"></i></span>
                 <span class="cad-choice-t">খালি পাতায় আঁকুন</span>
@@ -1091,6 +599,19 @@
                 <span class="cad-choice-s">সংরক্ষণ করা <code>.jaygajomi.json</code> ফাইল দিন</span>
               </button>
             </div>
+
+            <!-- নিজের উৎস যোগ -->
+            <details class="cad-src-add">
+              <summary><i class="bi bi-plus-circle"></i> নিজের উৎস যোগ করুন</summary>
+              <p class="cad-hint-mini">অফিসের সার্ভার, নিজের ড্রাইভ ফোল্ডার বা অন্য কোনো সাইট —
+                 ঠিকানাটি এখানে রেখে দিলে পরেরবার এক ক্লিকেই পাবেন। এই ব্রাউজারেই সংরক্ষিত থাকে।</p>
+              <div class="cad-src-add-row">
+                <input id="cad-src-name" placeholder="নাম (যেমন: অফিসের সার্ভার)">
+                <input id="cad-src-url" placeholder="https://…">
+                <button type="button" class="cad-mini" onclick="CadApp.addSource()">
+                  <i class="bi bi-plus-lg"></i> যোগ</button>
+              </div>
+            </details>
 
             <div class="cad-steps-note">
               <div class="cad-note"><b>১. স্কেল বসান</b>চেনা দূরত্বের দুই প্রান্তে ক্লিক করে মাপ লিখুন — এরপর সব ক্ষেত্রফল আপনাআপনি বেরোবে।</div>
@@ -1133,6 +654,10 @@
                       title="কোণা সরান, নতুন কোণা বসান বা মুছুন"
                       onclick="CadApp.tool('edit')">
                 <i class="bi bi-node-plus"></i><em>কোণা</em></button>
+              <button type="button" class="cad-tool" data-tool="erase"
+                      title="রাবার — কোণার উপর চাপ দিলেই মুছে যাবে · চেপে ধরে টানলে একটার পর একটা"
+                      onclick="CadApp.tool('erase')">
+                <i class="bi bi-eraser"></i><em>রাবার</em></button>
               <button type="button" class="cad-tool" data-tool="select"
                       title="নির্বাচন — ঘের টেনে একসাথে অনেক দাগ ধরুন"
                       onclick="CadApp.tool('select')">
@@ -1151,6 +676,19 @@
                       onclick="CadApp.geoOpen()">
                 <i class="bi bi-geo-alt"></i><em>গুগল</em></button>
               <div class="cad-rail-sep"></div>
+              <button type="button" class="cad-tool" data-tool="note"
+                      title="লেখা — নকশায় নাম বা মন্তব্য বসান (রাস্তা, পুকুরপাড়…)"
+                      onclick="CadApp.tool('note')">
+                <i class="bi bi-fonts"></i><em>লেখা</em></button>
+              <button type="button" class="cad-tool" data-tool="pin"
+                      title="চিহ্ন — টিউবওয়েল, খুঁটি, গাছ বসান"
+                      onclick="CadApp.tool('pin')">
+                <i class="bi bi-geo-alt-fill"></i><em>চিহ্ন</em></button>
+              <button type="button" class="cad-tool" data-tool="circle"
+                      title="বৃত্ত — কুয়া বা গোল জায়গা; গায়ে ধরে টানলে মাপ বদলায়"
+                      onclick="CadApp.tool('circle')">
+                <i class="bi bi-circle"></i><em>বৃত্ত</em></button>
+              <div class="cad-rail-sep"></div>
               <button type="button" class="cad-tool" title="ফেরত নিন (Ctrl+Z)"
                       onclick="CadApp.undo()">
                 <i class="bi bi-arrow-counterclockwise"></i><em>ফেরত</em></button>
@@ -1165,8 +703,19 @@
             <!-- মাঝের মঞ্চ -->
             <div class="cad-stage">
               <div class="cad-topbar">
-                <button type="button" class="cad-tbtn hot" onclick="CadApp.autoDigitize()">
+                <button type="button" class="cad-tbtn hot" id="cad-auto-btn" onclick="CadApp.autoDigitize()">
                   <i class="bi bi-stars"></i> স্বয়ংক্রিয় ডিজিটাইজ</button>
+                <!-- দাগ বাছা হলেই ফুটে ওঠে — পরের কাজটা যেন খুঁজতে না হয় -->
+                <button type="button" class="cad-tbtn go" id="cad-sel-go" style="display:none"
+                        onclick="DesignApp.openFromSelection()">
+                  <i class="bi bi-bounding-box-circles"></i> <span>ডিজাইনে খুলুন</span>
+                  <i class="bi bi-arrow-right"></i></button>
+                <button type="button" class="cad-tbtn" id="cad-undo-btn" disabled
+                        title="আগের অবস্থায় ফেরত (Ctrl+Z) — কিছু নেই"
+                        onclick="CadView.undo()"><i class="bi bi-arrow-counterclockwise"></i></button>
+                <button type="button" class="cad-tbtn" id="cad-redo-btn" disabled
+                        title="আবার করুন (Ctrl+Y) — কিছু নেই"
+                        onclick="CadView.redo()"><i class="bi bi-arrow-clockwise"></i></button>
                 <span style="flex:1"></span>
                 <button type="button" class="cad-tbtn active" title="বাহুর মাপ দেখান"
                         onclick="CadApp.toggleShow('dims', this)"><i class="bi bi-rulers"></i></button>
@@ -1174,8 +723,12 @@
                         onclick="CadApp.toggleShow('dagNo', this)"><i class="bi bi-hash"></i></button>
                 <button type="button" class="cad-tbtn active" title="ক্ষেত্রফল দেখান"
                         onclick="CadApp.toggleShow('area', this)"><i class="bi bi-bounding-box"></i></button>
+                <button type="button" class="cad-tbtn" title="কোণার ডিগ্রি দেখান (৯০° সবুজ)"
+                        onclick="CadApp.toggleShow('angles', this)"><i class="bi bi-triangle"></i></button>
                 <button type="button" class="cad-tbtn active" title="নকশার ছবি দেখান"
                         onclick="CadApp.toggleShow('raster', this)"><i class="bi bi-image"></i></button>
+                <button type="button" class="cad-tbtn active" title="লেখা ও চিহ্ন দেখান"
+                        onclick="CadApp.toggleShow('notes', this)"><i class="bi bi-chat-square-text"></i></button>
                 <button type="button" class="cad-tbtn" id="cad-multi-btn"
                         title="চালু করলে যত দাগে ক্লিক করবেন সব জমা হবে — Shift ধরার দরকার নেই"
                         onclick="CadApp.toggleMulti()">
@@ -1562,6 +1115,355 @@
           </div>
 
           <div class="cad-status" id="cad-status" style="display:none"></div>
+        </div>
+
+        <!-- ================================================================
+             VIEW: জমি ভাগ-বণ্টন (যেকোনো আকৃতি)
+             ================================================================ -->
+        <div id="view-land-divider" class="tool-view-content dv-wrap" style="display:none">
+          <div class="dv-grid">
+
+            <!-- বাঁ: ইনপুট -->
+            <div class="dv-side">
+              <div class="cad-sec">
+                <h5>জমির আকৃতি</h5>
+                <div class="dv-tabs">
+                  <button type="button" class="dv-tab active" id="dv-tab-sides"
+                          onclick="DivideApp.setSource('sides')">বাহুর মাপ দিন</button>
+                  <button type="button" class="dv-tab" id="dv-tab-cad"
+                          onclick="DivideApp.setSource('cad')">ডিজিটাল সার্ভে থেকে</button>
+                </div>
+
+                <div id="dv-src-sides">
+                  <p class="cad-hint-mini">বাহুর মাপ <b>ফুটে</b> লিখুন, কমা দিয়ে আলাদা করে —
+                     ঘড়ির কাঁটার দিকে ক্রমে। চতুর্ভুজে <b>একটি কর্ণ</b> দিলে আকৃতি নিখুঁত হয়
+                     (না দিলে সমকোণী ধরা হয়)।</p>
+                  <label class="dv-field">বাহুর মাপ (ফুট)
+                    <input id="dv-sides" placeholder="যেমন ১০০, ৮০, ১০০, ৮০"
+                           onchange="DivideApp.useSides()"></label>
+                  <label class="dv-field">কর্ণ (ঐচ্ছিক)
+                    <input id="dv-diag" placeholder="প্রথম ও তৃতীয় কোণার মাঝে"
+                           onchange="DivideApp.useSides()"></label>
+                  <button type="button" class="cad-mini full" onclick="DivideApp.useSides()">
+                    <i class="bi bi-bounding-box"></i> আকৃতি বানান</button>
+                </div>
+
+                <div id="dv-src-cad" style="display:none">
+                  <p class="cad-hint-mini">ডিজিটাল সার্ভে টুলে ডিজিটাইজ করা দাগ থেকে সরাসরি নিন —
+                     তখন আসল নকশার আকৃতি ও ক্ষেত্রফল ধরেই ভাগ হবে।</p>
+                  <div id="dv-cad-list"></div>
+                </div>
+              </div>
+
+              <div class="cad-sec">
+                <h5>কে কত পাবে</h5>
+                <div class="dv-field-row">
+                  <label class="dv-field">হিস্যার ধরন
+                    <select id="dv-mode" onchange="DivideApp.setMode(this.value)"></select></label>
+                </div>
+                <p class="dv-hint" id="dv-mode-hint"></p>
+                <div id="dv-shares"></div>
+                <button type="button" class="cad-mini full" style="margin-top:6px"
+                        onclick="DivideApp.addShare()">
+                  <i class="bi bi-plus-lg"></i> আরেকজন যোগ করুন</button>
+              </div>
+
+              <div class="cad-sec">
+                <h5>কোন দিকে কাটবে</h5>
+                <p class="cad-hint-mini">কাটার রেখার কোণ। রাস্তার দিক বা দাগের লম্বা বাহু বরাবর
+                   কাটলে প্রতিটি অংশ সমান সুবিধা পায়।</p>
+                <div class="dv-angle">
+                  <input type="range" id="dv-angle" min="0" max="180" value="0"
+                         oninput="DivideApp.setAngle(this.value)">
+                  <span id="dv-angle-val">০°</span>
+                  <button type="button" class="cad-mini" onclick="DivideApp.autoAngle()">
+                    <i class="bi bi-magic"></i> সেরা কোণ</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ডান: ছবি ও ফল -->
+            <div class="dv-main">
+              <div class="dv-canvas-wrap"><canvas id="dv-canvas"></canvas></div>
+              <div id="dv-result"></div>
+              <div class="dv-actions">
+                <button type="button" class="cad-mini" onclick="DivideApp.exportPng()">
+                  <i class="bi bi-file-earmark-image"></i> ছবি নামান</button>
+                <button type="button" class="cad-mini" onclick="DivideApp.exportCsv()">
+                  <i class="bi bi-table"></i> তালিকা CSV</button>
+                <button type="button" class="cad-mini" onclick="DivideApp.sendToCad()">
+                  <i class="bi bi-vector-pen"></i> ডিজিটাল সার্ভেতে পাঠান</button>
+              </div>
+            </div>
+          </div>
+          <div class="cad-status" id="dv-status" style="display:none"></div>
+        </div>
+
+        <!-- ================================================================
+             VIEW: Map Converter + Cleaner
+             ================================================================ -->
+        <div id="view-map-convert" class="tool-view-content" style="display:none">
+          <p class="cad-hint-mini" style="margin-bottom:10px">মৌজা নকশার <b>PDF বা ছবি</b> দিন —
+             ছাপার উপযোগী পরিষ্কার ছবি বানিয়ে দেবে। কাগজের হলদে ভাব ও দাগছোপ বাদ যাবে,
+             রেখা ও দাগ নম্বর স্পষ্ট থাকবে। চাইলে ব্যাকগ্রাউন্ড স্বচ্ছ করে PNG নামান।</p>
+          <div class="cv-bar">
+            <button type="button" class="cad-tbtn hot" onclick="ConvertApp.pick()">
+              <i class="bi bi-upload"></i> নকশা দিন (PDF / JPG / PNG)</button>
+            <button type="button" class="cad-tbtn" onclick="ConvertApp.clean()">
+              <i class="bi bi-magic"></i> পরিষ্কার করুন</button>
+            <label class="cv-color">রেখার রঙ
+              <input type="color" value="#111827" onchange="ConvertApp.setColor(this.value)"></label>
+            <label class="cv-check"><input type="checkbox"
+              onchange="ConvertApp.setTransparent(this.checked)"> স্বচ্ছ ব্যাকগ্রাউন্ড</label>
+            <span style="flex:1"></span>
+            <button type="button" class="cad-tbtn" onclick="ConvertApp.download('jpg')">
+              <i class="bi bi-download"></i> JPG</button>
+            <button type="button" class="cad-tbtn" onclick="ConvertApp.download('png')">
+              <i class="bi bi-download"></i> PNG</button>
+            <button type="button" class="cad-tbtn" onclick="ConvertApp.toCad()">
+              <i class="bi bi-vector-pen"></i> ডিজিটাল সার্ভেতে</button>
+          </div>
+          <input type="file" id="cv-file" accept="image/jpeg,image/png,application/pdf"
+                 style="display:none" onchange="ConvertApp.load(this)">
+          <div class="cad-prog" id="cv-prog" style="display:none;position:relative;margin:10px 0">
+            <div class="cad-prog-bar"><span id="cv-prog-fill"></span></div>
+            <div class="cad-prog-txt" id="cv-prog-txt">…</div>
+          </div>
+          <div id="cv-preview" class="cv-preview"></div>
+          <div class="cad-status" id="cv-status" style="display:none"></div>
+        </div>
+
+        <!-- ================================================================
+             VIEW: ক্ষেত্রফল ও অজানা বাহু
+             ================================================================ -->
+        <div id="view-area-unknown" class="tool-view-content" style="display:none">
+          <div class="dv-tabs" style="max-width:420px">
+            <button type="button" class="dv-tab active" id="ar-t-tri"
+                    onclick="AreaApp.setShape('tri')">ত্রিভুজ</button>
+            <button type="button" class="dv-tab" id="ar-t-quad"
+                    onclick="AreaApp.setShape('quad')">চতুর্ভুজ</button>
+            <button type="button" class="dv-tab" id="ar-t-rect"
+                    onclick="AreaApp.setShape('rect')">আয়তক্ষেত্র</button>
+          </div>
+
+          <div class="ar-grid">
+            <div>
+              <div id="ar-p-tri">
+                <p class="cad-hint-mini">তিন বাহু দিলে <b>ক্ষেত্রফল</b> বেরোবে।
+                   অথবা দুই বাহু ও ক্ষেত্রফল দিলে <b>তৃতীয় বাহু</b>।</p>
+                <div class="ar-fields">
+                  <label>বাহু ১ (ফুট)<input id="ar-tri-a" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>বাহু ২ (ফুট)<input id="ar-tri-b" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>বাহু ৩ (ফুট)<input id="ar-tri-c" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>ক্ষেত্রফল (বর্গফুট)<input id="ar-tri-area" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                </div>
+              </div>
+
+              <div id="ar-p-quad" style="display:none">
+                <p class="cad-hint-mini">চার বাহু ও <b>কর্ণ</b> দিলে নিখুঁত ক্ষেত্রফল।
+                   কর্ণ ছাড়া কেবল <b>সর্বোচ্চ সম্ভাব্য</b> মান বলা যায়।
+                   তিন বাহু, কর্ণ ও ক্ষেত্রফল দিলে <b>চতুর্থ বাহু</b> বেরোবে।</p>
+                <div class="ar-fields">
+                  <label>বাহু ১<input id="ar-q-a" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>বাহু ২<input id="ar-q-b" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>বাহু ৩<input id="ar-q-c" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>বাহু ৪<input id="ar-q-d" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>কর্ণ (১–৩ কোণা)<input id="ar-q-diag" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>ক্ষেত্রফল (বর্গফুট)<input id="ar-q-area" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                </div>
+              </div>
+
+              <div id="ar-p-rect" style="display:none">
+                <p class="cad-hint-mini">দৈর্ঘ্য · প্রস্থ · ক্ষেত্রফল — যেকোনো <b>দুটি</b> দিন,
+                   তৃতীয়টি বেরিয়ে আসবে।</p>
+                <div class="ar-fields">
+                  <label>দৈর্ঘ্য (ফুট)<input id="ar-r-len" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>প্রস্থ (ফুট)<input id="ar-r-wid" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                  <label>ক্ষেত্রফল (বর্গফুট)<input id="ar-r-area" inputmode="decimal" oninput="AreaApp.calc()"></label>
+                </div>
+              </div>
+            </div>
+            <div id="ar-out"></div>
+          </div>
+        </div>
+
+        <!-- ================================================================
+             VIEW: ম্যাপ জয়েন্ট (সিট জোড়া)
+             ================================================================ -->
+        <div id="view-map-joint" class="tool-view-content" style="display:none">
+          <p class="cad-hint-mini" style="margin-bottom:10px">একটি মৌজা কয়েকটি <b>সিটে</b> আঁকা থাকে।
+             দুটি সিটের ছবি দিন, তারপর <b>দুই সিটে একই জায়গার</b> বিন্দু জোড়ায় জোড়ায় দেখান —
+             অন্তত ২ জোড়া। সিটের কিনারার মিল-চিহ্ন বা দুই সিটে ভাগ হওয়া দাগের কোণা সবচেয়ে ভালো।</p>
+          <div class="jt-grid">
+            <div class="jt-side">
+              <div class="cad-sec">
+                <h5>সিট</h5>
+                <div id="jt-sheets"></div>
+                <button type="button" class="cad-mini full" style="margin-top:6px"
+                        onclick="JointApp.pick()"><i class="bi bi-plus-lg"></i> সিট যোগ করুন</button>
+              </div>
+              <div class="cad-sec">
+                <h5>জোড়া লাগানো</h5>
+                <button type="button" class="cad-mini full" onclick="JointApp.startPair()">
+                  <i class="bi bi-bullseye"></i> এক জোড়া বিন্দু দিন</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="JointApp.reset()"><i class="bi bi-arrow-counterclockwise"></i> বিন্দু মুছুন</button>
+              </div>
+              <div class="cad-sec">
+                <h5>ফল</h5>
+                <button type="button" class="cad-mini full" onclick="JointApp.download()">
+                  <i class="bi bi-download"></i> জোড়া নকশা নামান</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="JointApp.toCad()"><i class="bi bi-vector-pen"></i> ডিজিটাল সার্ভেতে</button>
+              </div>
+            </div>
+            <div class="jt-canvas-wrap">
+              <canvas id="jt-canvas" onclick="JointApp.onClick(event)"></canvas>
+            </div>
+          </div>
+          <input type="file" id="jt-file" accept="image/jpeg,image/png,application/pdf"
+                 style="display:none" onchange="JointApp.load(this)">
+          <div class="cad-status" id="jt-status" style="display:none"></div>
+        </div>
+
+        <!-- ================================================================
+             VIEW: হাত নকশা → ডিজিটাল রিপোর্ট
+             ================================================================ -->
+        
+
+        <!-- ================================================================
+             VIEW: বাছাই করা দাগ — ডিজাইন ও নম্বর
+             ================================================================ -->
+        <div id="view-design-plots" class="tool-view-content" style="display:none">
+          <div class="dg-bar">
+            <button type="button" class="cad-mini" onclick="DesignApp.back()">
+              <i class="bi bi-arrow-right"></i> ডিজিটাল সার্ভেতে ফিরুন</button>
+            <span class="dg-head" id="dg-head"></span>
+            <span style="flex:1"></span>
+            <label class="cv-check"><input type="checkbox" id="dg-bg"
+              onchange="DesignApp.draw()"> নকশা পটভূমিতে</label>
+            <label class="cv-check"><input type="checkbox" id="dg-dir" checked
+              onchange="DesignApp.draw()"> দিক দেখান</label>
+            <button type="button" class="cad-mini" id="dg-kh-btn" style="display:none"
+                    onclick="DesignApp.toggleKhotian()">
+              <i class="bi bi-file-earmark-text"></i> খতিয়ান দেখুন</button>
+            <button type="button" class="cad-mini" onclick="DesignApp.fit();DesignApp.draw()">
+              <i class="bi bi-arrows-fullscreen"></i> পুরোটা</button>
+          </div>
+
+          <!-- বাছাই শেষ — এখন কি করবেন? -->
+          <div class="dg-todo" id="dg-todo">
+            <span class="dg-todo-q"><i class="bi bi-lightning-charge-fill"></i>
+              এই দাগগুলো দিয়ে কি করবেন?</span>
+            <button type="button" class="cad-tbtn hot" onclick="DesignApp.isolateAndGo('sheet')">
+              <i class="bi bi-rulers"></i> ডিমার্কেশন শিট</button>
+            <button type="button" class="cad-tbtn" onclick="DesignApp.isolateAndGo('penta')">
+              <i class="bi bi-layers-half"></i> পেন্টাগ্রাফ</button>
+            <button type="button" class="cad-tbtn" onclick="DesignApp.divideCurrent()">
+              <i class="bi bi-pie-chart"></i> ভাগ-বণ্টন</button>
+            <button type="button" class="cad-tbtn" onclick="DesignApp.isolateAndGo('kmz')">
+              <i class="bi bi-globe-americas"></i> গুগল আর্থ</button>
+            <button type="button" class="cad-tbtn" onclick="DesignApp.focusInput()">
+              <i class="bi bi-123"></i> দাগ নম্বর বসান</button>
+          </div>
+
+          <div class="dg-grid">
+            <div class="dg-side">
+              <div class="cad-sec">
+                <h5>ক্রমিক নম্বর একসাথে</h5>
+                <p class="cad-hint-mini">শুরুর নম্বর দিয়ে এক চাপে সব দাগে ক্রমিক নম্বর বসান —
+                   তারপর দরকারমতো হাতে বদলে নিন।</p>
+                <div class="dg-auto">
+                  <label>শুরু<input id="dg-start" inputmode="numeric" placeholder="যেমন ২৪১"></label>
+                  <label>ধাপ<input id="dg-step" inputmode="numeric" value="1"></label>
+                  <button type="button" class="cad-mini" onclick="DesignApp.autoNumber()">
+                    <i class="bi bi-123"></i> বসান</button>
+                </div>
+                <label class="cv-check" style="margin-top:6px"><input type="checkbox" id="dg-only-empty" checked>
+                  যেগুলোতে নম্বর নেই কেবল সেগুলোতে</label>
+                <button type="button" class="cad-mini danger full" style="margin-top:6px"
+                        onclick="DesignApp.clearAll()"><i class="bi bi-eraser"></i> সব নম্বর মুছুন</button>
+              </div>
+
+              <div class="cad-sec">
+                <h5>দিক — উত্তর কোন দিকে</h5>
+                <p class="cad-hint-mini">নকশা যেভাবে স্ক্যান হয়েছে সেভাবেই বসে থাকে, উত্তর
+                   উপরে নাও হতে পারে। এখানে দিক ঠিক করে দিলে ছবিতে ও শিটে
+                   <b>উত্তর-দক্ষিণ-পূর্ব-পশ্চিম</b> ঠিকভাবে দেখাবে।</p>
+                <div class="dg-dirs">
+                  <button type="button" class="cad-mini" onclick="DesignApp.setNorth(0)">↑ উপরে</button>
+                  <button type="button" class="cad-mini" onclick="DesignApp.setNorth(90)">→ ডানে</button>
+                  <button type="button" class="cad-mini" onclick="DesignApp.setNorth(180)">↓ নিচে</button>
+                  <button type="button" class="cad-mini" onclick="DesignApp.setNorth(270)">← বামে</button>
+                </div>
+                <div class="dg-auto" style="margin-top:6px">
+                  <label>কোণ (ডিগ্রি)<input id="dg-north" inputmode="numeric" value="0"
+                         onchange="DesignApp.setNorth(this.value)"></label>
+                  <button type="button" class="cad-mini" id="dg-north-pick"
+                          onclick="DesignApp.pickNorth()">
+                    <i class="bi bi-crosshair"></i> ছবিতে দেখিয়ে দিন</button>
+                </div>
+                <p class="cad-hint-mini" id="dg-north-hint">০° = উত্তর উপরে। ঘড়ির কাঁটার দিকে বাড়ে।</p>
+              </div>
+
+              <div class="cad-sec">
+                <h5>খতিয়ান / পর্চা</h5>
+                <p class="cad-hint-mini">খতিয়ানের ছবি বা PDF দিন — পাশে খুলে রেখে দেখতে দেখতে
+                   দাগ নম্বর বসাতে পারবেন। কাজটি সংরক্ষণ করলে এটিও সাথে থাকবে।</p>
+                <button type="button" class="cad-mini full" onclick="document.getElementById('dg-kh-file').click()">
+                  <i class="bi bi-upload"></i> খতিয়ান আপলোড করুন</button>
+                <input type="file" id="dg-kh-file" accept="image/*,application/pdf"
+                       style="display:none" onchange="DesignApp.loadKhotian(this)">
+                <div id="dg-kh-info"></div>
+              </div>
+
+              <div class="cad-sec">
+                <h5>দাগের তালিকা</h5>
+                <p class="cad-hint-mini">ঘরে নম্বর লিখে <b>Enter</b> চাপলেই পরের দাগে চলে যাবে —
+                   একটানা দ্রুত বসানো যায়। ছবিতে দাগে ক্লিক করলেও ঐ ঘরটি খোলে।</p>
+                <div id="dg-list"></div>
+              </div>
+
+              <div class="cad-sec">
+                <h5>সংরক্ষণ ও রপ্তানি</h5>
+                <button type="button" class="cad-mini full" onclick="DesignApp.save()">
+                  <i class="bi bi-save"></i> কাজটি সংরক্ষণ করুন</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="DesignApp.isolateAndGo('sheet')">
+                  <i class="bi bi-printer"></i> এগুলো নিয়ে শিট ছাপুন</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="DesignApp.isolateAndGo('kmz')">
+                  <i class="bi bi-globe-americas"></i> এগুলো নিয়ে KMZ / KML</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="DesignApp.exportPng()">
+                  <i class="bi bi-file-earmark-image"></i> ছবি নামান</button>
+                <button type="button" class="cad-mini full" style="margin-top:5px"
+                        onclick="DesignApp.divideCurrent()">
+                  <i class="bi bi-pie-chart"></i> এই দাগটি ভাগ করুন</button>
+              </div>
+            </div>
+
+            <div class="dg-canvas-wrap">
+              <canvas id="dg-canvas" onclick="DesignApp.onClick(event)"
+                      onwheel="DesignApp.wheel(event)"></canvas>
+
+              <!-- খতিয়ান পাশে — দেখতে দেখতে নম্বর বসানোর জন্য -->
+              <div class="dg-kh-pane" id="dg-kh-pane" style="display:none">
+                <div class="dg-kh-bar">
+                  <span id="dg-kh-name">খতিয়ান</span>
+                  <span style="flex:1"></span>
+                  <button type="button" class="cad-mini" onclick="DesignApp.khZoom(1.25)">＋</button>
+                  <button type="button" class="cad-mini" onclick="DesignApp.khZoom(0.8)">−</button>
+                  <button type="button" class="cad-mini" onclick="DesignApp.khFit()">
+                    <i class="bi bi-arrows-fullscreen"></i></button>
+                  <button type="button" class="cad-mini danger" onclick="DesignApp.toggleKhotian(false)">
+                    <i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="dg-kh-body" id="dg-kh-body"><img id="dg-kh-img" alt="খতিয়ান"></div>
+              </div>
+            </div>
+          </div>
+          <div class="cad-status" id="dg-status" style="display:none"></div>
         </div>
 
         <!-- VIEW: ফরায়েজ — মুসলিম উত্তরাধিকার -->
@@ -2500,7 +2402,7 @@
               <h3>ক্ষেত্রফল ফলাফল</h3>
               <button class="fz-btn-sub" style="flex:none;padding:6px 12px;min-height:34px;font-size:0.78rem"
                       onclick="AppController.openToolModal('print-studio')">
-                <i class="bi bi-printer"></i> প্রিন্ট রিপোর্ট
+                <i class="bi bi-printer"></i> প্রতিবেদন ট্যাবে যান
               </button>
             </div>
             <div class="fz-panel-body">
@@ -3350,25 +3252,14 @@
           <div id="lf-content"></div>
         </div>
 
-        <!-- VIEW 6: Map Pantograph Overlay -->
-        <div id="view-map-overlay" class="tool-view-content" style="display:none">
-          <div class="fz-warn">
-            <i class="bi bi-cone-striped"></i>
-            <span><b>এই টুলের কাজ চলছে।</b> এখন কেবল দুটি ম্যাপ ওভারলে করে
-            স্বচ্ছতা বদলানো যায়। <b>সূক্ষ্ম ঘোরানো (±০.১°), পয়েন্ট মিলিয়ে
-            জোড়া লাগানো, ক্রপ ও ইরেজ</b> — এগুলো এখনো যোগ করা হয়নি।</span>
-          </div>
-          <div id="pantograph-container"></div>
-        </div>
-
         <!-- VIEW 7: Print Studio -->
         <div id="view-print-studio" class="tool-view-content" style="display:none">
 
           <div class="fz-warn">
             <i class="bi bi-cone-striped"></i>
-            <span><b>এই টুলের কাজ চলছে।</b> এখন তথ্য দিয়ে A4 জরিপ প্রতিবেদন
-            তৈরি ও প্রিন্ট করা যায়। <b>একাধিক ম্যাপ লেয়ার (SA/RS/CS), কম্পাস,
-            সাক্ষীগণের স্বাক্ষরের ঘর ও প্রকল্প সংরক্ষণ</b> — এগুলো পরে যোগ হবে।</span>
+            <span>হাতে মাপা জমির <b>A4 প্রতিবেদন</b>। নকশা থেকে ডিজিটাইজ করা জমির
+            শিট চাইলে <b>ডিজিটাল সার্ভে</b> টুল ব্যবহার করুন — সেখানে উত্তর তীর,
+            কর্ণ স্কেল ও সাংকেতিক চিহ্নসহ পূর্ণ শিট ছাপা যায়।</span>
           </div>
 
           <div class="fz-panel">
@@ -3884,13 +3775,14 @@
   <footer class="app-footer">
     <div class="container">
       <div class="footer-links">
-        <a href="#" onclick="AppController.openToolModal('mouza-map')">সারাদেশের মৌজা ম্যাপ</a>
-        <a href="#" onclick="AppController.openToolModal('farayeiz')">উত্তরাধিকার (মুসলিম)</a>
-        <a href="#" onclick="AppController.openToolModal('hissa-calc')">হিস্যা ক্যালকুলেটর</a>
-        <a href="#" onclick="AppController.openToolModal('canvas-measure')">জমি পরিমাপ</a>
-        <a href="#" onclick="AppController.openToolModal('khotian-analyzer')">খতিয়ান হিসাব</a>
-        <a href="#" onclick="AppController.openToolModal('mouza-value')">মৌজা মূল্য তালিকা</a>
-        <a href="#" onclick="AppController.openToolModal('dolil-fee')">দলিল রেজিস্ট্রেশন খরচ</a>
+        <a href="#" onclick="AppController.openToolModal('survey-cad')">ডিজিটাল সার্ভে</a>
+        <a href="#" onclick="AppController.openToolModal('mouza-map')">সারাদেশের মৌজা নকশা</a>
+        <a href="#" onclick="AppController.openToolModal('land-divider')">জমি ভাগ-বণ্টন</a>
+        <a href="#" onclick="AppController.openToolModal('canvas-measure')">জমির ক্ষেত্রফল</a>
+        <a href="#" onclick="AppController.openToolModal('unit-converter')">একক ও হিস্যা</a>
+        <a href="#" onclick="AppController.openToolModal('khotian-porcha')">খতিয়ান ও তফসিল</a>
+        <a href="#" onclick="AppController.openToolModal('dolil-fee')">দলিল খরচ</a>
+        <a href="#" onclick="AppController.openToolModal('farayeiz')">উত্তরাধিকার</a>
       </div>
       <p>© 2026 Land Info Bangladesh. All rights reserved. 100% Free Client-Side Land Tool Suite.</p>
     </div>
@@ -3899,7 +3791,6 @@
   <!-- Scripts -->
   <script src="js/calculators.js"></script>
   <script src="js/canvas-measure.js"></script>
-  <script src="js/map-overlay.js"></script>
   <script src="js/report-generator.js"></script>
   <script src="js/hindu-inheritance.js"></script>
   <script src="js/dolil-fee.js"></script>
@@ -3913,19 +3804,26 @@
   <script src="js/kmz-source.js"></script>
   <script src="js/kmz-cc.js"></script>
   <script src="js/kmz-fx.js"></script>
-  <script src="js/map-measure.js"></script>
-  <script src="js/map-measure-ui.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/kmz-tools.js"></script>
 
   <!-- ডিজিটাল সার্ভে (CAD) — GIS ডিজিটাইজেশন, ডিমার্কেশন ও পেন্টাগ্রাফ -->
+  <script src="js/mouza-multi-source.js"></script>
   <script src="js/cad-core.js"></script>
   <script src="js/cad-trace.js"></script>
   <script src="js/cad-overlay.js"></script>
+  <script src="js/cad-notes.js"></script>
   <script src="js/cad-view.js"></script>
   <script src="js/cad-sheet.js"></script>
   <script src="js/cad-geo.js"></script>
   <script src="js/cad-ui.js"></script>
+  <script src="js/cad-design.js"></script>
+  <script src="js/tool-groups.js"></script>
+  <script src="js/help-guide.js"></script>
+  <script src="js/cad-divide.js"></script>
+  <script src="js/cad-divide-ui.js"></script>
+  <script src="js/land-extra.js"></script>
+  <script src="js/land-extra-ui.js"></script>
 </body>
 </html>

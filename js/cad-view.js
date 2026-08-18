@@ -52,8 +52,8 @@ const CadView = {
       splitPts: [],
 
       show: {
-        dims: true, dagNo: true, area: true,
-        vertices: true, raster: true, fill: true, grid: false
+        dims: true, dagNo: true, area: true, angles: false,
+        vertices: true, raster: true, fill: true, grid: false, notes: true
       },
 
       shiftKey: false,
@@ -75,6 +75,10 @@ const CadView = {
     this.state.doc = doc;
     this.state.selection = [];
     this.state.draft = [];
+    // নতুন নকশা এলে পুরোনো নকশার ধাপগুলো আর প্রযোজ্য নয়
+    this._undoStack.length = 0;
+    this._redoStack.length = 0;
+    this._syncHistoryBtns();
     this.draw();
     this._changed();
   },
@@ -184,7 +188,11 @@ const CadView = {
     select: 'দাগে ক্লিক করে নির্বাচন · ফাঁকা জায়গা থেকে ঘের টেনে একসাথে অনেকগুলো · Shift ধরে যোগ · Delete দিয়ে মুছুন',
     scale:  'চেনা দূরত্বের দুই প্রান্তে ক্লিক করুন, তারপর মাপ লিখুন',
     gcp:    'নকশায় চেনা জায়গায় ক্লিক করুন — পরে স্যাটেলাইটে একই জায়গা দেখাবেন',
-    split:  'দাগ ভাগ করতে দুই প্রান্তে ক্লিক করে রেখা টানুন'
+    split:  'দাগ ভাগ করতে দুই প্রান্তে ক্লিক করে রেখা টানুন',
+    erase:  'রাবার — কোণার উপর চাপ দিলেই মুছে যাবে · চেপে ধরে টানলে একটার পর একটা · পাশের দাগের কোণাও সাথে যাবে, ফাঁক হবে না',
+    note:   'যেখানে লিখতে চান সেখানে ক্লিক করুন · আগের লেখায় ক্লিক করলে বদলাবে, টানলে সরবে, Delete দিলে মুছবে',
+    pin:    'চিহ্ন বসাতে ক্লিক করুন (টিউবওয়েল, খুঁটি, গাছ…) · নাম লিখে Enter',
+    circle: 'বৃত্তের মাঝে ক্লিক করুন · গায়ে ধরে টানলে মাপ বদলাবে, মাঝে ধরে টানলে সরবে'
   },
 
   setLayer(id) { this.state.activeLayer = id; this._status('চলতি লেয়ার: ' + (CadCore.layerPreset(id).name)); },
@@ -211,6 +219,13 @@ const CadView = {
 
       if (s.tool === 'pan' || ev.button === 1) { s.panning = p; c.style.cursor = 'grabbing'; return; }
 
+      /* রাবার — চেপে ধরে কোণার উপর দিয়ে টানলেই একটার পর একটা মুছবে */
+      if (s.tool === 'erase') {
+        this._erasing = { pushed: false, count: 0 };
+        this.eraseVertexAt(p);
+        return;
+      }
+
       if (s.tool === 'edit') {
         const hv = this._hitVertex(p);
         if (hv) {
@@ -235,6 +250,21 @@ const CadView = {
           return;
         }
         s.vertexSel = null;
+      }
+      /* নোটের টুলে ধরা নোট টেনে সরানো যায় — নইলে বসানোর পর আর নড়াতেই পারতেন না */
+      if (s.tool === 'note' || s.tool === 'pin' || s.tool === 'circle') {
+        const n = CadNotes.hit(s.doc, ip, 9 / s.scale);
+        if (n) {
+          /* বৃত্তের গায়ে ধরলে মাপ বদলায়, মাঝখানে ধরলে সরে —
+             আলাদা বোতাম বা Alt চাপার দরকার পড়ে না */
+          const onRim = n.kind === 'circle' &&
+            Math.abs(Math.hypot(ip.x - n.x, ip.y - n.y) - n.r) <= 9 / s.scale;
+          this._pushUndoNotes();
+          s.dragNote = { note: n, start: ip, moved: false, mode: onRim ? 'resize' : 'move' };
+          s.noteSel = n.id;
+          this.draw();
+          return;
+        }
       }
       if (s.tool === 'select') {
         const add = !!ev.shiftKey || s.multiSelect;
@@ -284,6 +314,26 @@ const CadView = {
         if (ev.cancelable) ev.preventDefault();
         return;
       }
+      if (this._erasing) {                       // রাবার ধরে টানা হচ্ছে
+        this.eraseVertexAt(p);
+        if (ev.cancelable) ev.preventDefault();
+        return;
+      }
+      if (s.dragNote) {
+        const d = s.dragNote;
+        const dx = ip.x - d.start.x, dy = ip.y - d.start.y;
+        if (!d.moved && Math.hypot(dx, dy) * s.scale < 4) return;   // এখনো ক্লিক
+        d.moved = true;
+        if (d.mode === 'resize') {
+          d.note.r = Math.max(1, Math.hypot(ip.x - d.note.x, ip.y - d.note.y));
+        } else {
+          CadNotes.move(d.note, dx, dy);
+        }
+        d.start = ip;
+        this.draw();
+        if (ev.cancelable) ev.preventDefault();
+        return;
+      }
       if (s.rubber) {
         s.rubber.x1 = p.x; s.rubber.y1 = p.y;
         this.draw();
@@ -326,6 +376,15 @@ const CadView = {
       const p = pos(ev);
       const wasDrag = moved > 6;
       const ip = this.toImage(p);
+
+      if (this._erasing) {
+        const n = this._erasing.count;
+        this._erasing = null;
+        this._status(n
+          ? CadCore.bn(n) + 'টি কোণা মোছা হয়েছে — ভুল হলে ↺ (Ctrl+Z)'
+          : 'কোণার ঠিক উপরে চাপ দিন · চেপে ধরে টানলে একটার পর একটা মুছবে');
+        downPt = null; return;
+      }
 
       if (s.rubber) {
         const r = s.rubber;
@@ -373,6 +432,21 @@ const CadView = {
         if (m) this._changed();
         downPt = null; return;
       }
+      if (s.dragNote) {
+        const d = s.dragNote;
+        s.dragNote = null;
+        if (d.moved) {
+          this._changed(); this.draw();
+          this._status(d.mode === 'resize'
+            ? 'বৃত্তের মাপ বদলানো হয়েছে — ' + CadNotes.describe(s.doc, d.note)
+            : 'সরানো হয়েছে — ' + CadNotes.describe(s.doc, d.note));
+        } else {
+          this._undoStack.pop();          // নড়েনি, তাই ইতিহাসে ধাপ রাখার দরকার নেই
+          this._syncHistoryBtns();
+          this.editNote(d.note);          // ক্লিক = লেখা বদলানো
+        }
+        downPt = null; return;
+      }
       if (s.panning) {
         s.panning = null;
         c.style.cursor = s.tool === 'pan' ? 'grab' : 'crosshair';
@@ -394,6 +468,9 @@ const CadView = {
         case 'scale':  this._scaleClick(ip); break;
         case 'gcp':    if (s.onGcp) s.onGcp(ip); this.draw(); break;
         case 'split':  this._splitClick(ip); break;
+        case 'note':   this._noteClick(ip, 'text'); break;
+        case 'pin':    this._noteClick(ip, 'pin'); break;
+        case 'circle': this._noteClick(ip, 'circle'); break;
       }
     };
 
@@ -433,11 +510,14 @@ const CadView = {
         s.draft.pop(); this.draw(); ev.preventDefault();
       }
       else if (ev.key === 'Delete') {
-        // কোণা সম্পাদনায় থাকলে আগে কোণা, নইলে পুরো দাগ
+        // কোণা সম্পাদনায় থাকলে আগে কোণা, নোট বাছা থাকলে নোট, নইলে পুরো দাগ
         if (s.tool === 'edit' && s.vertexSel && s.vertexSel.length) this.deleteVertex();
+        else if (s.noteSel && CadNotes.find(s.doc, s.noteSel)) this.deleteNote();
         else this.deleteSelected();
       }
+      else if (ev.key === 'z' && (ev.ctrlKey || ev.metaKey) && ev.shiftKey) { this.redo(); ev.preventDefault(); }
       else if (ev.key === 'z' && (ev.ctrlKey || ev.metaKey)) { this.undo(); ev.preventDefault(); }
+      else if (ev.key === 'y' && (ev.ctrlKey || ev.metaKey)) { this.redo(); ev.preventDefault(); }
       else if (ev.key === 'f' || ev.key === 'F') this.fit();
     });
     window.addEventListener('keyup', ev => { s.shiftKey = ev.shiftKey; });
@@ -798,6 +878,49 @@ const CadView = {
     return n;
   },
 
+  /* ==================== রাবার — কোণা মোছা ==================== */
+
+  /**
+   * ★ কেন আলাদা টুল
+   *   কোণা মুছতে আগে সেটিকে বাছতে হতো, তারপর Delete চাপতে হতো — ফোনে
+   *   Delete কী-ই নেই, আর একটার পর একটা মুছতে গেলে খুব ধীর। রাবার টুলে
+   *   কোণার উপর দিয়ে ছুঁয়ে গেলেই মুছে যায়।
+   *
+   * ★ ভাগ করা সীমানা
+   *   একটি কোণায় পাশের দাগেরও কোণা মিলে থাকে। `_nodeGroup` দিয়ে ঐ দলটাই
+   *   একসাথে মোছা হয় — নইলে এক দাগে কোণা যেত, পাশেরটায় থেকে যেত, মাঝে
+   *   ফাঁক তৈরি হতো।
+   */
+  eraseVertexAt(sp) {
+    const s = this.state;
+    const hv = this._hitVertex(sp);
+    if (!hv) return false;
+    const f = CadCore.feature(s.doc, hv.fid);
+    if (!f) return false;
+    const group = this._nodeGroup(f.pts[hv.index]);
+    if (group.some(m => m.f.pts.length <= 3)) {
+      this._status('এই দাগে মোটে ৩টি কোণা — আর মোছা যাবে না (ত্রিভুজই সবচেয়ে ছোট)', true);
+      return false;
+    }
+    if (!this._erasing || !this._erasing.pushed) {
+      this._pushUndo();
+      if (this._erasing) this._erasing.pushed = true;
+    }
+    const byFeature = new Map();
+    for (const m of group) {
+      if (!byFeature.has(m.f)) byFeature.set(m.f, []);
+      byFeature.get(m.f).push(m.i);
+    }
+    for (const [ft, idxs] of byFeature) {
+      idxs.sort((x, y) => y - x);
+      for (const i of idxs) if (ft.pts.length > 3) ft.pts.splice(i, 1);
+    }
+    s.vertexSel = null;
+    if (this._erasing) this._erasing.count += 1;
+    this._changed(); this.draw();
+    return true;
+  },
+
   /** নির্বাচিত কোণা মুছে ফেলা (দলের সবার থেকেই) */
   deleteVertex() {
     const s = this.state;
@@ -906,22 +1029,224 @@ const CadView = {
 
   /* ==================== সম্পাদনা ==================== */
 
+  /* ==================== লেখা, চিহ্ন ও বৃত্ত ==================== */
+
+  /** নোটের জন্য আলাদা ইতিহাস নয় — একই স্ট্যাক, তাই Ctrl+Z সবখানে এক রকম */
+  _pushUndoNotes() { this._pushUndo(); },
+
+  _noteClick(ip, kind) {
+    const s = this.state;
+    CadNotes.ensure(s.doc);
+    this._pushUndo();
+    const n = kind === 'circle'
+      ? CadNotes.add(s.doc, 'circle', ip.x, ip.y, { r: Math.max(8, 34 / s.scale) })
+      : CadNotes.add(s.doc, kind, ip.x, ip.y, {});
+    s.noteSel = n.id;
+    this._changed(); this.draw();
+    this.editNote(n);
+  },
+
+  /**
+   * ঠিক ঐ জায়গাতেই ছোট একটি ঘর খুলে লেখা নেওয়া
+   * prompt() ব্যবহার করিনি — ওতে নকশা ঢাকা পড়ে, আর কোথায় বসছে দেখা যায় না।
+   * Enter = হলো, Esc = বাতিল, ফাঁকা রেখে Enter = নোটটি মুছে যায়।
+   */
+  editNote(note) {
+    const s = this.state;
+    if (!note || typeof document === 'undefined') return;
+    const old = document.getElementById('cad-note-input');
+    if (old) old.remove();
+
+    const wrap = s.canvas && s.canvas.parentElement;
+    if (!wrap) return;
+    const q = this.toScreen(note);
+    const r = s.canvas.getBoundingClientRect();
+    const kx = r.width / s.canvas.width, ky = r.height / s.canvas.height;
+
+    const inp = document.createElement('input');
+    inp.id = 'cad-note-input';
+    inp.className = 'cad-note-input';
+    inp.value = note.text || '';
+    inp.placeholder = note.kind === 'circle' ? 'কী বোঝাচ্ছে? (যেমন কুয়া)'
+                    : note.kind === 'pin'    ? 'চিহ্নের নাম (যেমন টিউবওয়েল)'
+                                             : 'লেখা (যেমন রাস্তা)';
+    inp.style.left = Math.round(q.x * kx) + 'px';
+    inp.style.top  = Math.round(q.y * ky + 10) + 'px';
+    wrap.appendChild(inp);
+    inp.focus(); inp.select();
+
+    const done = (ok) => {
+      if (inp._gone) return;
+      inp._gone = true;
+      const txt = inp.value.trim();
+      inp.remove();
+      if (!ok) { this.draw(); return; }
+      if (!txt && note.kind !== 'circle') {
+        CadNotes.remove(s.doc, note.id);   // ফাঁকা লেখা রেখে লাভ নেই
+        s.noteSel = null;
+        this._status('খালি নোটটি বাদ দেওয়া হলো');
+      } else {
+        note.text = txt;
+        this._status(CadNotes.describe(s.doc, note)
+          + ' · টেনে সরান, আবার ক্লিক করলে লেখা বদলাবে, Delete চাপলে মুছবে');
+      }
+      this._changed(); this.draw();
+    };
+    inp.addEventListener('keydown', ev => {
+      ev.stopPropagation();                       // ক্যানভাসের শর্টকাট যেন না চলে
+      if (ev.key === 'Enter') { ev.preventDefault(); done(true); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); done(false); }
+    });
+    inp.addEventListener('blur', () => done(true));
+  },
+
+  deleteNote(id) {
+    const s = this.state;
+    const nid = id || s.noteSel;
+    if (!nid) return false;
+    this._pushUndo();
+    const ok = CadNotes.remove(s.doc, nid);
+    if (ok) { s.noteSel = null; this._changed(); this.draw(); this._status('নোটটি মুছে ফেলা হয়েছে'); }
+    return ok;
+  },
+
+  clearNotes() {
+    const s = this.state;
+    CadNotes.ensure(s.doc);
+    if (!s.doc.notes.length) { this._status('মোছার মতো নোট নেই'); return; }
+    this._pushUndo();
+    const n = s.doc.notes.length;
+    s.doc.notes = [];
+    s.noteSel = null;
+    this._changed(); this.draw();
+    this._status(CadCore.bn(n) + 'টি নোট মুছে ফেলা হয়েছে — ভুল হলে Ctrl+Z');
+  },
+
+  /** নোট আঁকা — লেখা পর্দার মাপে, তাই জুম করলেও পড়া যায় */
+  _drawNotes(ctx) {
+    const s = this.state;
+    CadNotes.ensure(s.doc);
+    if (s.show.notes === false || !s.doc.notes.length) return;
+
+    for (const n of s.doc.notes) {
+      if (n.hidden) continue;
+      const q = this.toScreen(n);
+      const sel = s.noteSel === n.id;
+      ctx.save();
+
+      if (n.kind === 'circle') {
+        const rr = n.r * s.scale;
+        ctx.beginPath();
+        ctx.arc(q.x, q.y, rr, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(180,83,9,0.10)';
+        ctx.fill();
+        ctx.strokeStyle = n.color; ctx.lineWidth = sel ? 2.4 : 1.6;
+        if (sel) ctx.setLineDash([6, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // মাঝের ছোট ক্রস — কোথায় ধরলে সরবে সেটি বোঝাতে
+        ctx.beginPath();
+        ctx.moveTo(q.x - 4, q.y); ctx.lineTo(q.x + 4, q.y);
+        ctx.moveTo(q.x, q.y - 4); ctx.lineTo(q.x, q.y + 4);
+        ctx.stroke();
+      } else if (n.kind === 'pin') {
+        ctx.beginPath();
+        ctx.moveTo(q.x, q.y);
+        ctx.lineTo(q.x - 5, q.y - 12);
+        ctx.arc(q.x, q.y - 16, 5.6, Math.PI * 0.85, Math.PI * 0.15, true);
+        ctx.closePath();
+        ctx.fillStyle = n.color; ctx.fill();
+        ctx.strokeStyle = sel ? '#111827' : 'rgba(255,255,255,0.9)';
+        ctx.lineWidth = sel ? 2 : 1.2;
+        ctx.stroke();
+      }
+
+      if (n.text) {
+        const fs = n.size || 14;
+        ctx.font = '600 ' + fs + 'px "Noto Sans Bengali", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = n.kind === 'pin' ? 'bottom' : 'middle';
+        const ty = n.kind === 'pin' ? q.y - 24 : q.y;
+        ctx.lineWidth = 3.4;
+        ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+        ctx.strokeText(n.text, q.x, ty);        // সাদা রেখা — নকশার উপরে পড়া যায়
+        ctx.fillStyle = n.color;
+        ctx.fillText(n.text, q.x, ty);
+      } else if (n.kind === 'text') {
+        // লেখা নেই — তবু জায়গাটি দেখা যাক
+        ctx.strokeStyle = n.color; ctx.lineWidth = 1.4;
+        ctx.strokeRect(q.x - 9, q.y - 7, 18, 14);
+      }
+
+      if (sel) {
+        ctx.strokeStyle = '#4f46e5'; ctx.lineWidth = 1.4;
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(q.x - 11, q.y - 11, 22, 22);
+        ctx.setLineDash([]);
+      }
+      ctx.restore();
+    }
+  },
+
+  /* ==================== সম্পাদনা ==================== */
+
   _undoStack: [],
+  _redoStack: [],
+
+  /* দাগ ও নোট — দুটোই একসাথে ছবি তুলে রাখি, নইলে ফেরত নিলে দাগ
+     আগের অবস্থায় যেত আর নোট থেকে যেত, দুটো আর মিলত না */
+  _snapshot() {
+    const d = this.state.doc;
+    return JSON.stringify({ f: d.features, n: d.notes || [] });
+  },
+
+  _restore(json) {
+    const d = this.state.doc;
+    const o = JSON.parse(json);
+    d.features = o.f || [];
+    d.notes = o.n || [];
+  },
 
   _pushUndo() {
-    const s = this.state;
-    this._undoStack.push(JSON.stringify(s.doc.features));
+    this._undoStack.push(this._snapshot());
     if (this._undoStack.length > 40) this._undoStack.shift();
+    this._redoStack.length = 0;          // নতুন কাজ করলে সামনের ধাপগুলো বাতিল
+    this._syncHistoryBtns();
   },
 
   undo() {
     const s = this.state;
     const prev = this._undoStack.pop();
     if (!prev) { this._status('আর ফেরত নেওয়ার কিছু নেই'); return; }
-    s.doc.features = JSON.parse(prev);
-    s.selection = [];
-    this._changed(); this.draw();
-    this._status('আগের অবস্থায় ফেরত');
+    this._redoStack.push(this._snapshot());
+    this._restore(prev);
+    s.selection = []; s.noteSel = null;
+    this._changed(); this.draw(); this._syncHistoryBtns();
+    this._status('আগের অবস্থায় ফেরত — চাইলে “আবার করুন” চাপুন');
+  },
+
+  redo() {
+    const s = this.state;
+    const next = this._redoStack.pop();
+    if (!next) { this._status('সামনে আর কিছু নেই'); return; }
+    this._undoStack.push(this._snapshot());
+    this._restore(next);
+    s.selection = []; s.noteSel = null;
+    this._changed(); this.draw(); this._syncHistoryBtns();
+    this._status('আবার করা হলো');
+  },
+
+  /** বোতাম দুটিকে বলে দিই কয় ধাপ পিছনে/সামনে যাওয়া যায় */
+  _syncHistoryBtns() {
+    if (typeof document === 'undefined') return;
+    const set = (id, n, word) => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.disabled = !n;
+      b.title = n ? word + ' (' + CadCore.bn(n) + ' ধাপ)' : word + ' — কিছু নেই';
+    };
+    set('cad-undo-btn', this._undoStack.length, 'আগের অবস্থায় ফেরত (Ctrl+Z)');
+    set('cad-redo-btn', this._redoStack.length, 'আবার করুন (Ctrl+Y)');
   },
 
   deleteSelected() {
@@ -1041,6 +1366,23 @@ const CadView = {
       for (const j of jobs) this._drawOneDim(ctx, j.sd, j.c, placed);
     }
 
+    /* কোণার ডিগ্রি — মাঠে ফিতা ধরে মেলাতে লাগে।
+       নির্বাচিত থাকলে কেবল সেগুলোর, নইলে সব দেখা দাগের। */
+    if (s.show.angles) {
+      const onlySel = s.selection.length > 0;
+      for (const L of ordered) {
+        if (!L.visible) continue;
+        for (const f of doc.features) {
+          if (f.layer !== L.id || !f.closed || f.hidden) continue;
+          if (onlySel && !s.selection.includes(f.id)) continue;
+          this._drawAngles(ctx, f, placed);
+        }
+      }
+    }
+
+    /* ── ৪খ. লেখা, চিহ্ন ও বৃত্ত ── */
+    this._drawNotes(ctx);
+
     /* ── ৫. নির্বাচন ও কোণা ── */
     this._drawHandles(ctx);
 
@@ -1151,6 +1493,39 @@ const CadView = {
     return true;
   },
 
+  /**
+   * কোণার ডিগ্রি
+   *
+   * বাহুর মাপ ঠিক থাকলেও কোণ ভুল হলে জমির আকৃতি বদলে যায় — তাই সার্ভেয়ার
+   * মাঠে কোণও মেলান। লেখাটি কোণার **ভেতরের দিকে** বসে (দ্বিখণ্ডক বরাবর),
+   * যাতে কোন কোণার ডিগ্রি তা নিয়ে সন্দেহ না থাকে।
+   */
+  _drawAngles(ctx, f, placed) {
+    const s = this.state;
+    if (!f.pts || f.pts.length < 3) return;
+    const bb = CadCore.bbox(f.pts);
+    if (bb.w * s.scale < 46 || bb.h * s.scale < 36) return;   // খুব ছোট দাগে জায়গা নেই
+
+    ctx.save();
+    ctx.font = '700 10px "Noto Sans Bengali", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (const a of CadCore.angles(f.pts)) {
+      const q = this.toScreen(a.at);
+      const cx = q.x + a.bisector.x * 17, cy = q.y + a.bisector.y * 17;
+      const txt = CadCore.bn(Math.round(a.deg)) + '°';
+      const w = ctx.measureText(txt).width;
+      if (placed && !this._claim(placed, cx, cy, w + 6, 13)) continue;
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillRect(cx - w / 2 - 3, cy - 7, w + 6, 14);
+      // সমকোণের কাছাকাছি হলে সবুজ — মাঠে দ্রুত চোখে পড়ে
+      const sq = Math.abs(a.deg - 90) < 1.5;
+      ctx.fillStyle = sq ? '#15803d' : (a.deg > 180 ? '#b45309' : '#7c3aed');
+      ctx.fillText(txt, cx, cy);
+    }
+    ctx.restore();
+  },
+
   /** একটি বাহুর মাপ — জায়গা থাকলে */
   _drawOneDim(ctx, sd, c, placed) {
     const s = this.state;
@@ -1246,7 +1621,8 @@ const CadView = {
   _drawHandles(ctx) {
     const s = this.state;
     if (!s.show.vertices && !s.selection.length) return;
-    const showAll = s.tool === 'edit';
+    // রাবারেও সব কোণা দেখা দরকার — কোনটা মুছছেন সেটি দেখেই চাপ দেবেন
+    const showAll = s.tool === 'edit' || s.tool === 'erase';
     // নির্বাচিত কোণার জায়গা — আলাদা রঙে দেখাব
     const selPt = (s.vertexSel && s.vertexSel.length)
       ? s.vertexSel[0].f.pts[s.vertexSel[0].i] : null;

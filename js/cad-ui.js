@@ -23,6 +23,7 @@ const CadApp = {
     this.renderMeta();
     this.renderLayers();
     this.renderSurveyPick();
+    this.renderSources();
     this.renderSteps();
     this.show(this.started ? 'work' : 'start');
     if (this.started) {
@@ -184,6 +185,90 @@ const CadApp = {
     if (CadView.state) { CadView.setLayer(id); this.renderLayers(); }
   },
 
+  /* ==================== নকশার উৎস ====================
+     নকশা নানা জায়গায় থাকে — নিজস্ব আর্কাইভ, সরকারি পোর্টাল, গুগল ড্রাইভ,
+     অফিসের সার্ভার। সব উৎস এক তালিকায়, আর নিজেও নতুন উৎস যোগ করা যায়।
+     ==================================================== */
+
+  renderSources() {
+    const box = document.getElementById('cad-sources');
+    if (!box || typeof MouzaMultiSource === 'undefined') return;
+    box.innerHTML = MouzaMultiSource.all().map(s => `
+      <button type="button" class="cad-src${s.direct ? '' : ' ext'}"
+              onclick="CadApp.useSource('${s.id}')" title="${s.note}">
+        <span class="cad-src-ic" style="background:${s.color}1a;color:${s.color}">
+          <i class="bi ${s.icon}"></i></span>
+        <span class="cad-src-body">
+          <b>${s.name}${s.direct ? '' : ' <i class="bi bi-box-arrow-up-right"></i>'}</b>
+          <small>${s.note}</small>
+        </span>
+        ${s.custom ? `<span class="cad-src-x" title="বাদ দিন"
+           onclick="event.stopPropagation();CadApp.delSource('${s.id}')">
+           <i class="bi bi-x-lg"></i></span>` : ''}
+      </button>`).join('');
+  },
+
+  useSource(id) {
+    const s = MouzaMultiSource.get(id);
+    if (!s) return;
+    if (s.kind === 'portal') {
+      window.open(s.url, '_blank', 'noopener');
+      this.status('<b>' + s.name + '</b> নতুন ট্যাবে খোলা হয়েছে। '
+        + 'সেখান থেকে নকশাটি নামিয়ে এখানে <b>“কম্পিউটার / ফোন থেকে”</b> দিয়ে আপলোড করুন — '
+        + 'বাকি কাজ একই। (সরকারি সাইট লগইন/ক্যাপচা চায়, তাই সরাসরি আনা যায় না।)');
+      return;
+    }
+    if (s.kind === 'upload') { this.choose('file'); return; }
+    if (s.kind === 'archive') { this.choose('archive'); return; }
+    if (s.kind === 'link') {
+      const box = document.getElementById('cad-link-box');
+      if (box) {
+        box.style.display = '';
+        const inp = document.getElementById('cad-link-url');
+        if (inp) { if (s.custom && s.url) inp.value = s.url; inp.focus(); }
+      }
+      return;
+    }
+  },
+
+  /** লিংক / ড্রাইভ থেকে নকশা আনা */
+  async fetchLink() {
+    const inp = document.getElementById('cad-link-url');
+    const txt = inp ? inp.value : '';
+    if (!String(txt).trim()) { this.status('নকশার লিংক বসান।', true); return; }
+    this.prog(5, 'লিংক পড়া হচ্ছে…');
+    try {
+      const got = await MouzaMultiSource.fetchLink(txt, (p, m) => this.prog(p, m));
+      const mime = MouzaMultiSource.sniff(got.bytes) || got.mime;
+      const r = await KmzSource.toImage(got.bytes, mime, {
+        onStage: (p, m) => this.prog(80 + p * 0.2, m), needBytes: false
+      });
+      this.prog(null);
+      const box = document.getElementById('cad-link-box');
+      if (box) box.style.display = 'none';
+      await this.useImage(r, got.name);
+    } catch (e) {
+      this.prog(null);
+      this.status(e.message, true);
+    }
+  },
+
+  addSource() {
+    const n = document.getElementById('cad-src-name');
+    const u = document.getElementById('cad-src-url');
+    const r = MouzaMultiSource.addCustom({ name: n ? n.value : '', url: u ? u.value : '' });
+    if (!r.ok) { this.status(r.error, true); return; }
+    if (n) n.value = ''; if (u) u.value = '';
+    this.renderSources();
+    this.status('উৎস যোগ হয়েছে — এই ব্রাউজারে সংরক্ষিত থাকবে।');
+  },
+
+  delSource(id) {
+    MouzaMultiSource.removeCustom(id);
+    this.renderSources();
+    this.status('উৎসটি বাদ দেওয়া হয়েছে।');
+  },
+
   choose(kind, target) {
     this._loadTarget = target || 1;
     if (kind === 'file') {
@@ -330,6 +415,7 @@ const CadApp = {
 
   fit() { CadView.fit(); },
   undo() { CadView.undo(); },
+  redo() { CadView.redo(); },
   del() { CadView.deleteSelected(); },
   selectAll() {
     CadView.selectAll();
@@ -404,6 +490,8 @@ const CadApp = {
           <i class="bi bi-eye"></i> কেবল এগুলো</button>
         <button type="button" class="cad-mini" onclick="CadApp.zoomSel()">
           <i class="bi bi-zoom-in"></i> কাছে দেখুন</button>
+        <button type="button" class="cad-mini hot" onclick="DesignApp.openFromSelection()">
+          <i class="bi bi-bounding-box-circles"></i> ডিজাইনে খুলুন</button>
         <button type="button" class="cad-mini danger" onclick="CadApp.del()">
           <i class="bi bi-trash"></i> মুছুন</button>
       </div>
@@ -790,7 +878,26 @@ const CadApp = {
 
   /* ---------------- দাগের তালিকা ---------------- */
 
+  /**
+   * উপরের বারে "ডিজাইনে খুলুন" — দাগ বাছা হলেই ফুটে ওঠে
+   * ★ কেন উপরে
+   *   আগে বোতামটি ছিল ডানের "দাগ" ট্যাবে, অনেক নিচে স্ক্রল করে — ব্যবহারকারী
+   *   দাগ বেছে বসে থাকতেন, পরের কাজটা কোথায় সেটাই চোখে পড়ত না।
+   */
+  syncSelBtn() {
+    const b = document.getElementById('cad-sel-go');
+    if (!b) return;
+    const n = (CadView.state && CadView.state.selection) ? CadView.state.selection.length : 0;
+    b.style.display = n ? '' : 'none';
+    if (!n) return;
+    const lbl = b.querySelector('span');
+    if (lbl) lbl.textContent = CadCore.bn(n) + 'টি দাগ — ডিজাইনে খুলুন';
+    b.title = 'বাছাই করা ' + CadCore.bn(n) + 'টি দাগ আলাদা পর্দায় খুলুন — '
+      + 'দাগ নম্বর, দিক, খতিয়ান, শিট, পেন্টাগ্রাফ ও ভাগ-বণ্টন সব এক জায়গায়';
+  },
+
   renderFeatures() {
+    this.syncSelBtn();
     const box = document.getElementById('cad-dag-list');
     if (!box) return;
     const feats = this.doc.features.filter(f => f.closed);

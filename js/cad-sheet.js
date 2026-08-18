@@ -77,7 +77,21 @@ const CadSheet = {
    * নমুনা শিটের তীরটি লম্বা, সরু ও কালো — উপরে ছুঁচালো, মাঝে খাঁজ।
    * সার্ভে শিটে এই ধরনই প্রচলিত।
    */
-  northArrow(ctx, x, y, w, h) {
+  /**
+   * উত্তর তীর
+   * @param {number} deg  উত্তর কোন দিকে — উপরের দিক থেকে ঘড়ির কাঁটার দিকে ডিগ্রিতে।
+   *   নকশা যেভাবে স্ক্যান হয়েছে উত্তর সেভাবে উপরে নাও থাকতে পারে, তাই
+   *   ডিজাইন পর্দায় বসানো কোণটিই এখানে আসে (`doc.meta.northDeg`)।
+   */
+  northArrow(ctx, x, y, w, h, deg) {
+    const rot = ((Number(deg) || 0) % 360 + 360) % 360;
+    /* ★ কেন ঘোরালে অন্য আকৃতি
+       চিরাচরিত লম্বা তীরটি ১১ × ৪৪ মিমি — সেটি ৯০° ঘোরালে ৪৪ মিমি চওড়া হয়ে
+       শিরোনাম বাক্সের উপর উঠে যায়। তাই উত্তর উপরে না থাকলে বাঁ মার্জিনে
+       আঁটে এমন একটি কম্পাস-বৃত্ত আঁকা হয়। উত্তর উপরে থাকলে (সাধারণ ক্ষেত্রে)
+       আগের তীরটিই হুবহু আগের মতো থাকে। */
+    if (rot > 0.5 && rot < 359.5) return this._compassRose(ctx, x, y, w, rot);
+
     const u = this._u.bind(this);
     const cx = x + w / 2;
     const shaft = w * 0.13;              // দণ্ডের অর্ধ-প্রস্থ
@@ -105,6 +119,43 @@ const CadSheet = {
     ctx.lineTo(u(x), u(y + h * 0.26));
     ctx.closePath();
     ctx.fill();
+    ctx.restore();
+  },
+
+  /** উত্তর উপরে না থাকলে — বাঁ মার্জিনে আঁটে এমন কম্পাস */
+  _compassRose(ctx, x, y, w, deg) {
+    const u = this._u.bind(this);
+    const cx = x + w / 2, cy = y + 10, R = 7.6;     // মিমি
+    const rad = deg * Math.PI / 180;
+
+    ctx.save();
+    ctx.translate(u(cx), u(cy));
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = Math.max(1, u(0.25));
+    ctx.beginPath(); ctx.arc(0, 0, u(R), 0, Math.PI * 2); ctx.stroke();
+
+    ctx.save();
+    ctx.rotate(rad);
+    ctx.fillStyle = '#000';
+    ctx.beginPath();                                  // উত্তরমুখী ফলা
+    ctx.moveTo(0, -u(R - 0.6));
+    ctx.lineTo(u(1.7), u(1.4)); ctx.lineTo(0, u(0.3)); ctx.lineTo(-u(1.7), u(1.4));
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath();                                  // দক্ষিণমুখী (ফাঁপা)
+    ctx.moveTo(0, u(R - 0.6));
+    ctx.lineTo(u(1.3), -u(1.0)); ctx.lineTo(0, 0); ctx.lineTo(-u(1.3), -u(1.0));
+    ctx.closePath(); ctx.stroke();
+    ctx.restore();
+
+    // অক্ষর সোজা থাকে, কেবল অবস্থান ঘোরে
+    const fs = Math.max(6, u(2.6));
+    ctx.font = '700 ' + Math.round(fs) + 'px "Noto Sans Bengali", sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000';
+    [['উ', 0], ['পূ', 90], ['দ', 180], ['প', 270]].forEach(([t, a]) => {
+      const th = (a + deg) * Math.PI / 180;
+      ctx.fillText(t, Math.sin(th) * u(R + 3.2), -Math.cos(th) * u(R + 3.2));
+    });
     ctx.restore();
   },
 
@@ -303,6 +354,38 @@ const CadSheet = {
       }
       ctx.restore();
     }
+
+    /* ── লেখা, চিহ্ন ও বৃত্ত ──
+       নোটগুলো শিটেও যায় — মাঠে যা লিখে রেখেছেন, ছাপা কাগজেও সেটাই থাকে।
+       কোনো হিসাবে যোগ হয় না, তাই ক্ষেত্রফলের যোগফল বদলায় না। */
+    if (o.notes !== false && typeof CadNotes !== 'undefined') {
+      const nts = CadNotes.visible(doc);
+      const nfs = o.noteSize || 2.6;
+      for (const n of nts) {
+        const q = T(n);
+        ctx.save();
+        ctx.strokeStyle = n.color || '#b45309';
+        ctx.fillStyle = n.color || '#b45309';
+        ctx.lineWidth = Math.max(0.7, u(0.25));
+        if (n.kind === 'circle') {
+          ctx.beginPath();
+          ctx.arc(q.x, q.y, Math.max(1, u(n.r * k)), 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (n.kind === 'pin') {
+          ctx.beginPath();
+          ctx.arc(q.x, q.y, Math.max(1, u(0.9)), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        if (n.text) {
+          ctx.font = '700 ' + Math.round(u(nfs)) + 'px "Noto Sans Bengali", sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = n.kind === 'pin' ? 'bottom' : 'middle';
+          const ty = n.kind === 'pin' ? q.y - u(1.6) : q.y;
+          const tw = ctx.measureText(n.text).width;
+          if (claim(q.x, ty, tw + u(0.6), u(nfs) * 1.2)) ctx.fillText(n.text, q.x, ty);
+        }
+        ctx.restore();
+      }
+    }
     return { k, ox, oy };
   },
 
@@ -377,8 +460,8 @@ const CadSheet = {
     this._box(ctx, 5, 5, 200, 287, { color: '#000', lw: 0.5 });
     this._box(ctx, 8, 8, 194, 281, { color: '#000', lw: 0.35 });
 
-    /* ── উত্তর তীর ── */
-    this.northArrow(ctx, 12, 12, 11, 44);
+    /* ── উত্তর তীর — ডিজাইন পর্দায় বসানো দিক অনুযায়ী ── */
+    this.northArrow(ctx, 12, 12, 11, 44, (doc.meta && doc.meta.northDeg) || 0);
 
     /* ── শিরোনাম বাক্স ── */
     const tb = { x: 26, y: 12, w: 54, h: 30 };

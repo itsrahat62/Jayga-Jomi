@@ -733,9 +733,12 @@ const CadCore = {
         kind: p.kind, fill: p.fill || null, visible: true, locked: false, used: false
       })),
       features: [],
+      notes: [],                         // লেখা / চিহ্ন / বৃত্ত — হিসাবে যোগ হয় না
+      khotian: null,                     // { name, data } — পর্চার ছবি
       ftPerPx: 0,                        // ০ = এখনো স্কেল বসানো হয়নি
       geo: null,                         // { params, latRef, lngRef, rmse } — ভূ-স্থানাঙ্ক
-      _seq: 1
+      _seq: 1,
+      _nseq: 1
     };
   },
 
@@ -893,6 +896,45 @@ const CadCore = {
     return first[0] + ',' + first[1] + '|' + last[0] + ',' + last[1];
   },
 
+  /**
+   * প্রতিটি কোণার ভেতরের কোণ (ডিগ্রিতে)
+   *
+   * ★ কেন লাগে
+   *   সার্ভেয়ার মাঠে কেবল বাহুর মাপ নয়, **কোণও** মেলান — দুই বাহুর মাপ ঠিক
+   *   থাকলেও কোণ ভুল হলে জমির আকৃতি বদলে যায়। শিটে ৯০°, ৮৭° লিখে দিলে
+   *   মাঠে ফিতা ধরে মিলিয়ে নেওয়া যায়।
+   *
+   * @returns {Array<{index, deg, at:{x,y}, bisector:{x,y}}>}
+   *          bisector = কোণের ভেতরের দিক, লেখা বসানোর জন্য
+   */
+  angles(pts) {
+    const out = [];
+    const n = (pts || []).length;
+    if (n < 3) return out;
+    const sArea = this.signedArea(pts);
+    for (let i = 0; i < n; i++) {
+      const v = pts[i], a = pts[(i - 1 + n) % n], b = pts[(i + 1) % n];
+      let ax = a.x - v.x, ay = a.y - v.y;
+      let bx = b.x - v.x, by = b.y - v.y;
+      const la = Math.hypot(ax, ay), lb = Math.hypot(bx, by);
+      if (la < 1e-9 || lb < 1e-9) continue;
+      ax /= la; ay /= la; bx /= lb; by /= lb;
+      let deg = Math.acos(Math.max(-1, Math.min(1, ax * bx + ay * by))) * 180 / Math.PI;
+      /* acos সবসময় ০–১৮০ দেয়। কোণাটি অবতল (reflex) কি না তা বোঝা যায়
+         বহুভুজের ঘোরার দিকের সাথে মিলিয়ে: দুই বাহুর ক্রস-গুণফলের চিহ্ন
+         আর ক্ষেত্রফলের চিহ্ন **এক হলে** কোণাটি ভেতরের দিকে ঢোকানো, তখন
+         আসল কোণ ৩৬০ থেকে বিয়োগ। (বর্গ ⇒ ৯০°, L এর খাঁজ ⇒ ২৭০°) */
+      const cross = ax * by - ay * bx;
+      if ((cross > 0) === (sArea > 0)) deg = 360 - deg;
+      let mx = ax + bx, my = ay + by;
+      const ml = Math.hypot(mx, my);
+      if (ml < 1e-9) { mx = -ay; my = ax; }
+      else { mx /= ml; my /= ml; }
+      out.push({ index: i, deg, at: { x: v.x, y: v.y }, bisector: { x: mx, y: my } });
+    }
+    return out;
+  },
+
   /** নথির মোট — লেয়ার ধরে */
   totals(doc) {
     const byLayer = {};
@@ -922,6 +964,8 @@ const CadCore = {
       meta: doc.meta,
       layers: doc.layers,
       features: doc.features,
+      notes: doc.notes || [],
+      khotian: doc.khotian || null,      // খতিয়ান/পর্চার ছবি — সাথেই থাকে
       ftPerPx: doc.ftPerPx,
       geo: doc.geo ? { params: doc.geo.params, latRef: doc.geo.latRef, lngRef: doc.geo.lngRef,
                        rmse: doc.geo.rmse, mode: doc.geo.mode, points: doc.geo.points } : null,
@@ -936,6 +980,12 @@ const CadCore = {
     doc.meta = Object.assign(doc.meta, d.meta || {});
     if (Array.isArray(d.layers) && d.layers.length) doc.layers = d.layers;
     doc.features = Array.isArray(d.features) ? d.features : [];
+    doc.notes = Array.isArray(d.notes) ? d.notes : [];
+    doc.khotian = d.khotian || null;
+    doc._nseq = doc.notes.reduce((m, n) => {
+      const k = parseInt(String(n.id).replace(/\D/g, ''), 10);
+      return isFinite(k) ? Math.max(m, k + 1) : m;
+    }, 1);
     doc.ftPerPx = Number(d.ftPerPx) || 0;
     doc.geo = d.geo || null;
     doc._image = d.image || null;             // সংরক্ষিত নয় — কেবল খোলার সময়

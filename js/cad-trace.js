@@ -22,8 +22,32 @@
 
 const CadTrace = {
 
-  /** কাজের সময় ছবিটি সর্বোচ্চ কত পিক্সেলে নামানো হবে */
-  WORK_PIXELS: 3.2e6,
+  /**
+   * কাজের সময় ছবিটি সর্বোচ্চ কত পিক্সেলে নামানো হবে
+   *
+   * ★ ৮ মেগাপিক্সেল কেন
+   *   নমুনা নকশায় (৬০ MP স্ক্যান) মেপে দেখা হয়েছে — রেখা কালির **মাঝ বরাবর**
+   *   কতটা নিখুঁত বসে:
+   *       ৩.২ MP → ২.৮৫ px   (০.৯ সেকেন্ড)
+   *       ৮   MP → ২.০২ px   (১.৩ সেকেন্ড)   ← ২৯% ভালো, সময় সামান্য বেশি
+   *       ১৬  MP → ১.৮৯ px   (২.৪ সেকেন্ড)   ← লাভ কম, সময় দ্বিগুণ
+   *   তাই ৮ MP-ই সেরা বিনিময়।
+   */
+  WORK_PIXELS: 8e6,
+
+  /**
+   * ★ সব মাপ রেজুলেশনের সাথে বদলাতে হয়
+   *   ৩.২ MP এ "১ পিক্সেল" যত বড় জায়গা, ৮ MP এ তত নয়। তাই কালির ফাঁক
+   *   জোড়ার ব্যাসার্ধ, নয়েজের সীমা, সরলীকরণের কড়াকড়ি — সবই বেসলাইনের
+   *   সাথে অনুপাতে বাড়াতে হয়। না বাড়ালে বেশি রেজুলেশনে ফাঁক আর জোড়া লাগে
+   *   না, দাগ লিক করে মিশে যায় — মেপে দেখা গেছে ২৬ MP তে দাগ ১১৯৪ → ১১৬৩
+   *   নেমে গিয়েছিল ঠিক এ কারণেই।
+   */
+  BASE_PIXELS: 3.2e6,
+
+  resScale(w, h) {
+    return Math.max(0.5, Math.min(4, Math.sqrt((w * h) / this.BASE_PIXELS)));
+  },
 
   /* ==================== ১. ছবি প্রস্তুত ==================== */
 
@@ -588,7 +612,13 @@ const CadTrace = {
     await yield_();
 
     prog(34, 'ভাঙা রেখা জোড়া দেওয়া হচ্ছে…');
-    ink = this.cleanInk(ink, w, h, o);
+    /* রেজুলেশন-ভিত্তিক মাপ — সব সীমা বেসলাইনের অনুপাতে বাড়ে/কমে,
+       নইলে বেশি রেজুলেশনে একই আসল ফাঁক আর জোড়া লাগে না */
+    const RES = this.resScale(w, h);
+    ink = this.cleanInk(ink, w, h, Object.assign({
+      close: Math.max(1, Math.round(RES)),
+      minInk: Math.max(4, Math.round(4 * RES * RES))
+    }, o));
     await yield_();
 
     prog(44, 'সীমানার রেখা ও লেখা আলাদা করা হচ্ছে…');
@@ -614,7 +644,7 @@ const CadTrace = {
     const minPix = o.minSatakPx > 0 ? o.minSatakPx
       : (hasStruct ? Math.max(40, Math.round(total * 0.000025))
                    : Math.max(500, Math.round(total * 0.0004)));
-    const minSide = o.minSide > 0 ? o.minSide : (hasStruct ? 5 : 18);
+    const minSide = o.minSide > 0 ? o.minSide : (hasStruct ? 5 * RES : 18 * RES);
     const maxPix = Math.round(total * (o.maxFrac > 0 ? o.maxFrac : 0.35));
 
     // প্রতিটি খোপের ঘের — সরু ফুটকি বাদ দিতে লাগে
@@ -658,7 +688,17 @@ const CadTrace = {
       if (id >= 0 && firstPix[id] < 0) firstPix[id] = i;
     }
 
-    const eps = o.eps > 0 ? o.eps : 1.6;
+    /* সরলীকরণের কড়াকড়ি — পুরো অনুপাতে নয়, **বর্গমূলে**
+     *
+     *   পুরো অনুপাতে বাড়ালে কোণা কমে, কিন্তু রেখা কালির কেন্দ্র থেকে সরে যায়;
+     *   একদম না বাড়ালে নিখুঁত হয়, কিন্তু অকারণে অজস্র কোণা জমে। ৮ MP তে
+     *   মেপে দেখা গেছে (দাগ সংখ্যা তিনটিতেই এক — ১৩২৪):
+     *       eps ১.৬০ → কেন্দ্র থেকে ২.৬৩ px, গড় কোণা ১১.১
+     *       eps ২.০০ → কেন্দ্র থেকে ২.৭৯ px, গড় কোণা  ৮.৯   ← ভারসাম্য
+     *       eps ২.৫৩ → কেন্দ্র থেকে ২.৯৪ px, গড় কোণা  ৭.৯
+     *   বর্গমূল ঠিক মাঝেরটিই দেয়।
+     */
+    const eps = o.eps > 0 ? o.eps : 1.6 * Math.sqrt(RES);
     const angle = o.straighten == null ? 7 : o.straighten;
     const minEdge = o.minEdge > 0 ? o.minEdge : eps * 3.2;
 

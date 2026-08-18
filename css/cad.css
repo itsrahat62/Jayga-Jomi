@@ -738,3 +738,496 @@ html.dark-theme .cad-sides span { color: #93c5fd; }
   .cad-step { padding: 4px; }
   .cad-step.active .cad-step-t { display: inline; }
 }
+
+/* ==========================================================================
+   জমি ভাগ-বণ্টন টুল
+   ========================================================================== */
+
+.dv-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+.dv-side { display: flex; flex-direction: column; }
+.dv-main { display: flex; flex-direction: column; gap: 10px; }
+
+.dv-tabs { display: flex; gap: 5px; margin-bottom: 8px; }
+.dv-tab {
+  flex: 1; padding: 7px 6px;
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+  background: var(--bg-card); color: var(--text-muted);
+  font-family: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  transition: var(--transition-fast);
+}
+.dv-tab:hover { border-color: var(--border-focus); }
+.dv-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.dv-field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 7px;
+  font-size: 0.76rem; color: var(--text-muted); font-weight: 600; }
+.dv-field input, .dv-field select {
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 7px 9px; font-size: 0.88rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main); width: 100%;
+}
+.dv-field input:focus, .dv-field select:focus { outline: none; border-color: var(--primary); }
+.dv-hint { font-size: 0.74rem; color: var(--text-light); margin: -2px 0 7px; }
+
+.dv-share { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+.dv-share-n {
+  width: 20px; height: 20px; flex: 0 0 20px;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--bg-input); color: var(--text-muted);
+  font-size: 0.7rem; font-weight: 800;
+}
+.dv-share input {
+  flex: 1; min-width: 0;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 5px 7px; font-size: 0.82rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main);
+}
+.dv-share .dv-share-v { flex: 0 0 84px; font-weight: 700; }
+
+.dv-angle { display: flex; align-items: center; gap: 8px; }
+.dv-angle input[type=range] { flex: 1; }
+.dv-angle span { font-size: 0.82rem; font-weight: 700; color: var(--primary); min-width: 38px; }
+
+.dv-canvas-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  height: min(52vh, 460px);
+  min-height: 300px;
+  overflow: hidden;
+}
+#dv-canvas { display: block; width: 100%; height: 100%; }
+
+.dv-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.dv-table th, .dv-table td {
+  border: 1px solid var(--border-color); padding: 5px 8px;
+  text-align: center; color: var(--text-main);
+}
+.dv-table th { background: var(--bg-input); font-weight: 800; font-size: 0.76rem; }
+.dv-table td:first-child, .dv-table th:first-child { text-align: right; }
+.dv-table tr.tot td { background: var(--bg-input); font-weight: 800; color: var(--primary); }
+.dv-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-left: 6px; }
+
+.dv-note { font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; line-height: 1.7; }
+.dv-note.warn { color: var(--accent); }
+.dv-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .dv-grid { grid-template-columns: 1fr; }
+  .dv-canvas-wrap { height: 42vh; }
+}
+
+/* ==========================================================================
+   বাকি টুলগুলো — কনভার্টার · ক্ষেত্রফল · ম্যাপ জয়েন্ট
+   ========================================================================== */
+
+/* ---- Map Converter + Cleaner ---- */
+.cv-bar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.cv-color, .cv-check {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; color: var(--text-muted); font-weight: 600;
+}
+.cv-color input[type=color] {
+  width: 30px; height: 26px; padding: 0; border: 1px solid var(--border-color);
+  border-radius: 6px; background: none; cursor: pointer;
+}
+.cv-preview {
+  background: var(--bg-input); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); padding: 12px;
+  display: flex; justify-content: center; min-height: 240px;
+}
+.cv-img { max-width: 100%; height: auto; border-radius: 6px; box-shadow: var(--shadow-sm); }
+/* স্বচ্ছ ব্যাকগ্রাউন্ড বোঝাতে দাবার ছক */
+.cv-img.checker {
+  background-image:
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%),
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%, transparent 75%, #e2e8f0 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+  background-color: #fff;
+}
+
+/* ---- ক্ষেত্রফল ও অজানা বাহু ---- */
+.ar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-top: 12px; }
+.ar-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ar-fields label {
+  display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.76rem; color: var(--text-muted); font-weight: 600;
+}
+.ar-fields input {
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 8px 10px; font-size: 0.95rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main); width: 100%;
+}
+.ar-fields input:focus { outline: none; border-color: var(--primary); }
+
+.ar-res {
+  background: var(--bg-input); border-radius: var(--radius-md);
+  padding: 16px 18px; margin-bottom: 10px;
+}
+.ar-res.sm { padding: 12px 14px; }
+.ar-res > b {
+  display: block; font-size: 0.78rem; color: var(--text-light);
+  font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px;
+}
+.ar-big { font-size: 1.7rem; font-weight: 800; color: var(--primary); line-height: 1.3; }
+.ar-big span { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+.ar-units { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 6px; margin-top: 12px; }
+.ar-units div { background: var(--bg-surface); border-radius: 7px; padding: 8px 4px; text-align: center; }
+.ar-units b { display: block; font-size: 0.92rem; color: var(--text-main); }
+.ar-units span { font-size: 0.68rem; color: var(--text-light); }
+.ar-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; line-height: 1.7; }
+.ar-msg {
+  border-radius: var(--radius-sm); padding: 10px 13px;
+  font-size: 0.84rem; line-height: 1.7; margin-bottom: 10px;
+}
+.ar-msg.bad { background: rgba(239,68,68,0.1); color: var(--danger); border-right: 3px solid var(--danger); }
+.ar-msg.warn { background: rgba(245,158,11,0.12); color: var(--text-main); border-right: 3px solid var(--accent); }
+
+/* ---- ম্যাপ জয়েন্ট ---- */
+.jt-grid { display: grid; grid-template-columns: 260px 1fr; gap: 12px; align-items: start; }
+.jt-canvas-wrap {
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); overflow: hidden;
+  height: min(64vh, 620px); min-height: 340px;
+}
+#jt-canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+
+@media (max-width: 900px) {
+  .ar-grid, .jt-grid { grid-template-columns: 1fr; }
+  .jt-canvas-wrap { height: 46vh; }
+}
+
+/* ==================== নকশার উৎস (একাধিক) ==================== */
+
+.cad-src-head { margin: 0 4px 10px; }
+.cad-src-head b {
+  display: block; font-size: 1rem; color: var(--text-main);
+  font-family: var(--font-display); margin-bottom: 2px;
+}
+.cad-src-head b i { color: var(--primary); }
+.cad-src-head span { font-size: 0.82rem; color: var(--text-muted); }
+
+.cad-src-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 8px; padding: 0 4px 14px;
+}
+.cad-src {
+  position: relative;
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 13px; text-align: right;
+  background: var(--bg-card); border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); cursor: pointer;
+  font-family: inherit; transition: var(--transition-fast);
+}
+.cad-src:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.cad-src.ext { border-style: dashed; }
+.cad-src-ic {
+  width: 38px; height: 38px; flex: 0 0 38px;
+  border-radius: 10px; display: grid; place-items: center; font-size: 1.1rem;
+}
+.cad-src-body { flex: 1; min-width: 0; }
+.cad-src-body b { display: block; font-size: 0.9rem; color: var(--text-main); font-weight: 700; }
+.cad-src-body b i { font-size: 0.68rem; color: var(--text-light); }
+.cad-src-body small { display: block; font-size: 0.75rem; color: var(--text-muted); line-height: 1.55; }
+.cad-src-x {
+  position: absolute; top: 6px; left: 6px;
+  color: var(--text-light); font-size: 0.7rem; padding: 3px 5px; border-radius: 5px;
+}
+.cad-src-x:hover { color: var(--danger); background: var(--bg-input); }
+
+.cad-link-box {
+  background: var(--bg-input); border-radius: var(--radius-md);
+  padding: 13px 15px; margin: 0 4px 14px;
+}
+.cad-src-add {
+  margin: 0 4px 14px; background: var(--bg-input);
+  border-radius: var(--radius-md); padding: 10px 14px;
+}
+.cad-src-add summary {
+  cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-main);
+}
+.cad-src-add summary i { color: var(--primary); }
+.cad-src-add-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.cad-src-add-row input {
+  flex: 1; min-width: 140px;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 7px 9px; font-size: 0.84rem; font-family: inherit;
+  background: var(--bg-surface); color: var(--text-main);
+}
+
+/* ==================== বাছাই করা দাগ — ডিজাইন পর্দা ==================== */
+
+.dg-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.dg-head { font-size: 0.86rem; color: var(--text-muted); }
+.dg-head b { color: var(--primary); font-size: 0.95rem; }
+
+.dg-grid { display: grid; grid-template-columns: 300px 1fr; gap: 12px; align-items: start; }
+.dg-side { max-height: min(72vh, 720px); overflow-y: auto; padding-left: 4px; }
+.dg-canvas-wrap {
+  /* খতিয়ান পাশে খুললে ক্যানভাস নিজেই ছোট হয় — ঢাকা পড়ে না */
+  display: flex;
+  background: #fff; border: 1px solid var(--border-color);
+  border-radius: var(--radius-md); overflow: hidden;
+  height: min(72vh, 720px); min-height: 360px;
+}
+html.dark-theme .dg-canvas-wrap { background: #f8fafc; }
+#dg-canvas { display: block; flex: 1; min-width: 0; height: 100%; cursor: pointer; }
+
+.dg-auto { display: flex; gap: 6px; align-items: flex-end; }
+.dg-auto label {
+  flex: 1; display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.74rem; color: var(--text-muted); font-weight: 600;
+}
+.dg-auto input {
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 6px 8px; font-size: 0.86rem; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main); width: 100%;
+}
+
+.dg-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 5px; margin-bottom: 3px;
+  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+  background: var(--bg-card); cursor: pointer; transition: var(--transition-fast);
+}
+.dg-row:hover { border-color: var(--border-focus); }
+.dg-row.cur { border-color: var(--primary); background: var(--primary-light); }
+.dg-n {
+  width: 22px; height: 22px; flex: 0 0 22px;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--bg-input); color: var(--text-muted);
+  font-size: 0.7rem; font-weight: 800;
+}
+.dg-row.cur .dg-n { background: var(--primary); color: #fff; }
+.dg-num {
+  width: 78px; flex: 0 0 78px;
+  border: 1px solid var(--border-color); border-radius: 6px;
+  padding: 4px 6px; font-size: 0.86rem; font-weight: 700; font-family: inherit;
+  background: var(--bg-input); color: var(--text-main);
+}
+.dg-num:focus { outline: none; border-color: var(--primary); background: var(--bg-surface); }
+.dg-area { flex: 1; font-size: 0.76rem; color: var(--text-muted); text-align: left; }
+
+@media (max-width: 900px) {
+  .dg-grid { grid-template-columns: 1fr; }
+  .dg-canvas-wrap { height: 44vh; }
+  .dg-side { max-height: none; }
+}
+
+/* ==================== ভেতরের গাইড ==================== */
+
+.hg-fab {
+  position: fixed; bottom: 22px; left: 22px; z-index: 1200;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 10px 16px; border: none; border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--primary), #7c6cf5);
+  color: #fff; font-family: inherit; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 6px 18px -6px rgba(79,70,229,0.75);
+  transition: var(--transition-fast);
+}
+.hg-fab:hover { transform: translateY(-2px); box-shadow: 0 9px 22px -6px rgba(79,70,229,0.85); }
+.hg-fab i { font-size: 1rem; }
+
+.hg-box {
+  position: fixed; bottom: 84px; left: 22px; z-index: 1201;
+  width: min(380px, calc(100vw - 44px));
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 45px -14px rgba(15,23,42,0.45);
+  overflow: hidden;
+}
+html.dark-theme .hg-box { box-shadow: 0 18px 45px -12px rgba(0,0,0,0.8); }
+
+.hg-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, var(--primary), #7c6cf5);
+  color: #fff;
+}
+.hg-title { flex: 1; font-weight: 700; font-size: 0.92rem; font-family: var(--font-display); }
+.hg-x {
+  border: none; background: rgba(255,255,255,0.18); color: #fff;
+  width: 26px; height: 26px; border-radius: 50%;
+  cursor: pointer; display: grid; place-items: center; font-size: 0.72rem;
+}
+.hg-x:hover { background: rgba(255,255,255,0.32); }
+
+.hg-dots { display: flex; gap: 4px; padding: 10px 14px 0; }
+.hg-dots span {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--border-color); cursor: pointer; transition: var(--transition-fast);
+}
+.hg-dots span.on { background: var(--primary); }
+.hg-dots span.done { background: var(--secondary); }
+
+.hg-body { padding: 12px 14px 4px; }
+.hg-body b { display: block; font-size: 0.95rem; color: var(--text-main); margin-bottom: 5px; }
+.hg-body p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
+
+.hg-foot {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px 14px;
+}
+.hg-count { flex: 1; text-align: center; font-size: 0.78rem; color: var(--text-light); font-weight: 700; }
+.hg-foot .cad-mini[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+/* ধাপের আসল বোতামটি ঘিরে বলয় */
+.hg-ring {
+  position: fixed; z-index: 1199; pointer-events: none;
+  border: 3px solid var(--primary);
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(15,23,42,0.45), 0 0 18px rgba(79,70,229,0.8);
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+@media (max-width: 640px) {
+  .hg-fab { bottom: 14px; left: 14px; padding: 9px 13px; font-size: 0.8rem; }
+  .hg-fab span { display: none; }
+  .hg-box { bottom: 70px; left: 14px; }
+}
+
+
+/* ==================== নকশার উপরে লেখা নেওয়ার ঘর ==================== */
+/* ঠিক যেখানে ক্লিক পড়ল সেখানেই ঘরটি খোলে — প্রম্পট বাক্সে নকশা ঢাকা পড়ত */
+.cad-note-input {
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 30;
+  min-width: 160px;
+  padding: 7px 10px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: var(--text-main);
+  background: var(--bg-surface);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 22px -8px rgba(15,23,42,0.45);
+  outline: none;
+}
+.cad-note-input::placeholder { color: var(--text-light); font-size: 0.8rem; }
+
+/* গাইডের দুটি ভাগ — কীভাবে / মানে কি */
+.hg-switch {
+  display: flex; gap: 5px; padding: 10px 14px 0;
+}
+.hg-switch button {
+  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+  min-height: 34px; padding: 6px 10px;
+  border: 1.5px solid var(--border-color); border-radius: var(--radius-full);
+  background: var(--bg-surface); color: var(--text-muted);
+  font-family: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  transition: var(--transition-fast);
+}
+.hg-switch button.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.hg-switch button[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+.hg-terms { padding: 12px 14px 14px; max-height: 46vh; overflow-y: auto; }
+.hg-term { padding: 9px 0; border-bottom: 1px dashed var(--border-color); }
+.hg-term:last-child { border-bottom: none; }
+.hg-term b { display: block; font-size: 0.88rem; color: var(--primary); margin-bottom: 3px; }
+.hg-term span { display: block; font-size: 0.83rem; color: var(--text-muted); line-height: 1.8; }
+
+
+/* ==================== ডিজাইন পর্দা — দিক, খতিয়ান, ভাগ ==================== */
+
+.dg-dirs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.dg-dirs .cad-mini { justify-content: center; }
+
+.dg-row .dg-div {
+  flex: 0 0 auto;
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  cursor: pointer; font-size: 0.8rem;
+  transition: var(--transition-fast);
+}
+.dg-row .dg-div:hover { color: var(--primary); border-color: var(--primary); }
+
+.dg-kh-chip {
+  display: flex; align-items: center; gap: 7px;
+  margin-top: 7px; padding: 7px 9px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem; color: var(--text-main);
+}
+.dg-kh-chip i { color: var(--primary); }
+.dg-kh-chip span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* খতিয়ান পাশে — দেখতে দেখতে নম্বর বসানোর জন্য */
+.dg-kh-pane {
+  flex: 0 0 min(46%, 420px);
+  width: min(46%, 420px);
+  display: flex; flex-direction: column;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-color);
+  box-shadow: -6px 0 20px -10px rgba(15,23,42,0.35);
+  z-index: 5;
+}
+.dg-kh-bar {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.8rem; font-weight: 700; color: var(--text-main);
+}
+.dg-kh-bar > span:first-child {
+  max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dg-kh-body { flex: 1; overflow: auto; background: var(--bg-input); }
+.dg-kh-body img { display: block; width: 100%; max-width: 100%; }
+
+@media (max-width: 720px) {
+  .dg-kh-pane { flex: 0 0 60%; width: 60%; }
+  .dg-dirs { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* "এই দাগগুলো দিয়ে কি করবেন?" — বাছাইয়ের পর পরবর্তী কাজ হাতের কাছে */
+.dg-todo {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(79,70,229,0.10), rgba(16,185,129,0.10));
+  border: 1px solid var(--border-color);
+}
+.dg-todo-q {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-left: 2px; margin-right: 4px;
+  font-size: 0.88rem; font-weight: 800; color: var(--text-main);
+}
+.dg-todo-q i { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .dg-todo { padding: 9px 10px; gap: 5px; }
+  .dg-todo-q { width: 100%; margin-bottom: 2px; font-size: 0.84rem; }
+}
+
+
+/* দাগ বাছা হলে উপরে ফুটে ওঠা বোতাম — পরের কাজটা যেন খুঁজতে না হয় */
+.cad-tbtn.go {
+  background: linear-gradient(135deg, var(--secondary), #0ea5e9);
+  border-color: transparent;
+  color: #fff;
+  font-weight: 800;
+  box-shadow: 0 3px 12px -4px rgba(14,165,233,0.8);
+  animation: cadGoIn 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+.cad-tbtn.go:hover { filter: brightness(1.06); }
+.cad-tbtn.go i:last-child { font-size: 0.82rem; opacity: 0.85; }
+
+@keyframes cadGoIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}

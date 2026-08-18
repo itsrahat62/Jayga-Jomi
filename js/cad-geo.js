@@ -264,6 +264,41 @@ ${marks}
 ${labelMarks}
     </Folder>` : '';
 
+    /* --- লেখা, চিহ্ন ও বৃত্ত (আলাদা ফোল্ডার) ---
+       বৃত্ত KML-এ সরাসরি নেই, তাই ৪৮ বাহুর বহুভুজে পরিণত করি —
+       গুগল আর্থে চোখে বৃত্তই দেখায়। */
+    const noteMarks = (typeof CadNotes === 'undefined' ? [] : CadNotes.visible(doc))
+      .map(n => {
+        if (n.kind === 'circle') {
+          const ring = CadNotes.circlePts(n, 48).map(p => this.toGeo(doc, p));
+          if (ring.some(g => !g)) return '';
+          const cs = ring.map(g => `${g.lng.toFixed(9)},${g.lat.toFixed(9)},0`);
+          cs.push(cs[0]);
+          const a = CadNotes.circleSqft(doc, n);
+          return `      <Placemark>
+        <name>${this.esc(n.text || 'বৃত্ত')}</name>
+        <description><![CDATA[${a > 0 ? this.esc(CadCore.satakText(a)) : ''}]]></description>
+        <styleUrl>#noteCircle</styleUrl>
+        <Polygon><tessellate>1</tessellate><altitudeMode>clampToGround</altitudeMode>
+          <outerBoundaryIs><LinearRing><coordinates>${cs.join(' ')}</coordinates></LinearRing></outerBoundaryIs>
+        </Polygon>
+      </Placemark>`;
+        }
+        const g = this.toGeo(doc, n);
+        if (!g) return '';
+        return `      <Placemark>
+        <name>${this.esc(n.text || (n.kind === 'pin' ? 'চিহ্ন' : 'লেখা'))}</name>
+        <styleUrl>#${n.kind === 'pin' ? 'notePin' : 'noteText'}</styleUrl>
+        <Point><altitudeMode>clampToGround</altitudeMode><coordinates>${g.lng.toFixed(9)},${g.lat.toFixed(9)},0</coordinates></Point>
+      </Placemark>`;
+      }).filter(Boolean).join('\n');
+
+    const noteFolder = noteMarks ? `    <Folder>
+      <name>লেখা ও চিহ্ন</name>
+      <open>1</open>
+${noteMarks}
+    </Folder>` : '';
+
     /* --- নকশার ছবি (ঐচ্ছিক আন্ডারলে) --- */
     let overlay = '';
     if (o.imageName && o.imageCorners && o.imageCorners.length === 4) {
@@ -300,9 +335,22 @@ ${styles}
       <IconStyle><scale>0.5</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle>
       <LabelStyle><scale>0.9</scale><color>ff1e40af</color></LabelStyle>
     </Style>
+    <Style id="noteText">
+      <IconStyle><scale>0</scale></IconStyle>
+      <LabelStyle><scale>1.0</scale><color>ff0953b4</color></LabelStyle>
+    </Style>
+    <Style id="notePin">
+      <IconStyle><scale>0.9</scale><Icon><href>http://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle>
+      <LabelStyle><scale>0.9</scale><color>ff0953b4</color></LabelStyle>
+    </Style>
+    <Style id="noteCircle">
+      <LineStyle><color>ff0953b4</color><width>2</width></LineStyle>
+      <PolyStyle><color>2b0953b4</color></PolyStyle>
+    </Style>
 ${overlay}
 ${folders.join('\n')}
 ${labelFolder}
+${noteFolder}
   </Document>
 </kml>`;
   },

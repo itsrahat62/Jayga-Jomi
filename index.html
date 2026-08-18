@@ -1132,6 +1132,8 @@
                           onclick="DivideApp.setSource('sides')">বাহুর মাপ দিন</button>
                   <button type="button" class="dv-tab" id="dv-tab-cad"
                           onclick="DivideApp.setSource('cad')">ডিজিটাল সার্ভে থেকে</button>
+                  <button type="button" class="dv-tab" id="dv-tab-draw"
+                          onclick="DivideApp.setSource('draw')">নিজে আঁকুন</button>
                 </div>
 
                 <div id="dv-src-sides">
@@ -1152,6 +1154,37 @@
                   <p class="cad-hint-mini">ডিজিটাল সার্ভে টুলে ডিজিটাইজ করা দাগ থেকে সরাসরি নিন —
                      তখন আসল নকশার আকৃতি ও ক্ষেত্রফল ধরেই ভাগ হবে।</p>
                   <div id="dv-cad-list"></div>
+                </div>
+
+                <div id="dv-src-draw" style="display:none">
+                  <p class="dv-hint">বাহুর মাপ হাতে নেই, নকশাও ডিজিটাইজ করা নেই — কিন্তু
+                     দলিলে <b>মোট পরিমাণ</b> লেখা আছে? তাহলে আকৃতিটা আঁকে নিন,
+                     মোট পরিমাণ দিলেই ভাগ হয়ে যাবে। আকৃতি আন্দাজি হলেও
+                     <b>প্রতিটি অংশের পরিমাণ ঠিক থাকবে</b>।</p>
+                  <div class="dv-field-row">
+                    <label class="dv-field">মোট পরিমাণ
+                      <input id="dv-draw-area" inputmode="decimal" placeholder="যেমন ২৫.৫০"></label>
+                    <label class="dv-field">একক
+                      <select id="dv-draw-unit">
+                        <option value="satak">শতক / শতাংশ</option>
+                        <option value="katha">কাঠা</option>
+                        <option value="bigha">বিঘা</option>
+                        <option value="sqft">বর্গফুট</option>
+                      </select></label>
+                  </div>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px">
+                    <button type="button" class="cad-tbtn hot" id="dv-draw-start"
+                            onclick="DivideApp.drawStart()">
+                      <i class="bi bi-pentagon"></i> আঁকা শুরু</button>
+                    <button type="button" class="cad-tbtn hot" id="dv-draw-finish" style="display:none"
+                            onclick="DivideApp.drawFinish()">
+                      <i class="bi bi-check-lg"></i> আঁকা শেষ</button>
+                    <button type="button" class="cad-mini" onclick="DivideApp.drawUndo()">
+                      <i class="bi bi-arrow-counterclockwise"></i> শেষ কোণা</button>
+                    <button type="button" class="cad-mini danger" onclick="DivideApp.drawClear()">
+                      <i class="bi bi-eraser"></i> মুছুন</button>
+                  </div>
+                  <p class="dv-hint" id="dv-draw-count"></p>
                 </div>
               </div>
 
@@ -1184,7 +1217,8 @@
 
             <!-- ডান: ছবি ও ফল -->
             <div class="dv-main">
-              <div class="dv-canvas-wrap"><canvas id="dv-canvas"></canvas></div>
+              <div class="dv-canvas-wrap"><canvas id="dv-canvas"
+                     onclick="DivideApp.onCanvasClick(event)"></canvas></div>
               <div id="dv-result"></div>
               <div class="dv-actions">
                 <button type="button" class="cad-mini" onclick="DivideApp.exportPng()">

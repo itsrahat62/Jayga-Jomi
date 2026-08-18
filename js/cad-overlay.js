@@ -256,23 +256,43 @@ const CadOverlay = {
    * @param {number} angle   কাটার রেখার কোণ (রেডিয়ান)
    */
   splitByFraction(poly, frac, angle) {
-    const target = CadCore.area(poly) * Math.max(0.001, Math.min(0.999, frac));
-    const bb = CadCore.bbox(poly);
-    const cx = bb.x + bb.w / 2, cy = bb.y + bb.h / 2;
+    const total = CadCore.area(poly);
+    if (!(total > 0)) return null;
+    const target = total * Math.max(0.001, Math.min(0.999, frac));
     const ux = Math.cos(angle), uy = Math.sin(angle);        // রেখার দিক
     const nx = -uy, ny = ux;                                  // লম্ব
-    const span = Math.hypot(bb.w, bb.h);
 
-    let lo = -span, hi = span, best = null;
-    for (let iter = 0; iter < 48; iter++) {
+    /* ★ দ্বিভাজনের সীমা দাগের প্রকৃত বিস্তার ধরে
+       আগে সীমা ছিল কেন্দ্র থেকে ±span, আর রেখা দাগের বাইরে চলে গেলে
+       (`splitByLine` → null) নিঃশর্তে `lo = t` করা হতো। কিন্তু ধনাত্মক
+       পাশে বেরিয়ে গেলে বাঁ ভাগ = পুরো দাগ, অর্থাৎ **বেশি** — তখন `hi`
+       নামানো উচিত ছিল। ফলে অনুসন্ধান বাইরে বেরিয়ে আর ফিরত না, আর
+       `best` থেকে যেত প্রথম চেষ্টাটাই (t=০, ঠিক অর্ধেক)।
+       তাই **হিস্যা অর্ধেকের বেশি হলেই ভাগ সমান হয়ে যেত** — ১২:৪ আনা
+       দিলেও ৮:৮ বেরোত। এখন সীমা [tmin, tmax] — রেখা সবসময় দাগের ভেতরেই। */
+    let tmin = Infinity, tmax = -Infinity;
+    for (const p of poly) {
+      const t = p.x * nx + p.y * ny;
+      if (t < tmin) tmin = t;
+      if (t > tmax) tmax = t;
+    }
+    if (!(tmax - tmin > 1e-9)) return null;
+
+    let lo = tmin, hi = tmax, best = null, bestErr = Infinity;
+    for (let iter = 0; iter < 60; iter++) {
       const t = (lo + hi) / 2;
-      const px = cx + nx * t, py = cy + ny * t;
+      const px = nx * t, py = ny * t;                 // ঐ রেখার একটি বিন্দু
       const cut = this.splitByLine(poly, { x: px, y: py },
                                          { x: px + ux, y: py + uy });
-      if (!cut) { lo = t; continue; }
+      if (!cut) {
+        // প্রান্তঘেঁষা — কোন পাশে বেরিয়েছে সেটি দেখে দিক ঠিক করি
+        if (t - tmin < tmax - t) lo = t; else hi = t;
+        continue;
+      }
       const aArea = CadCore.area(cut.left);
-      best = cut;
-      if (Math.abs(aArea - target) < target * 0.0005) break;
+      const err = Math.abs(aArea - target);
+      if (err < bestErr) { bestErr = err; best = cut; }
+      if (err < target * 0.0005) break;
       if (aArea < target) lo = t; else hi = t;
     }
     return best;

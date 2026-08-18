@@ -42,13 +42,157 @@ const DivideApp = {
   /* ==================== আকৃতি নেওয়া ==================== */
 
   setSource(kind) {
-    ['sides', 'cad'].forEach(k => {
+    ['sides', 'cad', 'draw'].forEach(k => {
       const p = document.getElementById('dv-src-' + k);
       if (p) p.style.display = k === kind ? '' : 'none';
       const b = document.getElementById('dv-tab-' + k);
       if (b) b.classList.toggle('active', k === kind);
     });
     if (kind === 'cad') this.renderCadList();
+    if (kind !== 'draw' && this.drawing) this.drawStop(true);
+    this.src = kind;
+    this.draw();
+  },
+
+  /* ==================== নিজে এঁকে ভাগ ====================
+     ★ কেন লাগে
+       সব জমির বাহুর মাপ হাতে থাকে না, নকশাও ডিজিটাইজ করা থাকে না — কিন্তু
+       দলিলে **মোট পরিমাণ** লেখা থাকে। তখন আকৃতিটা চোখের আন্দাজে এঁকে মোট
+       জমির পরিমাণ লিখে দিলেই ভাগ করা যায়। আঁকা আকৃতিকে ঐ পরিমাণে মিলিয়ে
+       নেওয়া হয় (ftPerPx = √(মোট বর্গফুট ÷ আঁকা ক্ষেত্রফল))।
+     ★ সীমা — আন্দাজে আঁকা, তাই **আকৃতি** আন্দাজি; কিন্তু মোট পরিমাণ ও
+       প্রতিটি অংশের পরিমাণ **হুবহু** ঠিক থাকে, কারণ ঐ পরিমাণ ধরেই মাপা হয়।
+     ==================================================== */
+
+  drawing: false,
+  draft: [],
+  src: 'sides',
+
+  drawStart() {
+    this.drawing = true;
+    this.draft = [];
+    this.poly = null; this.result = null;
+    this.renderResult(); this.draw();
+    this.status('ক্যানভাসে জমির কোণায় কোণায় ক্লিক করুন (অন্তত ৩টি)। '
+      + 'শেষ কোণা দিয়ে <b>“আঁকা শেষ”</b> চাপুন — বা প্রথম কোণায় আবার ক্লিক করুন।');
+    this._syncDrawBtns();
+  },
+
+  drawStop(silent) {
+    this.drawing = false;
+    this._syncDrawBtns();
+    if (!silent) this.draw();
+  },
+
+  drawUndo() {
+    if (!this.draft.length) return;
+    this.draft.pop();
+    this.draw();
+  },
+
+  drawClear() {
+    this.draft = []; this.poly = null; this.result = null;
+    this.renderResult(); this.draw();
+    this.status('মুছে ফেলা হয়েছে — আবার আঁকুন।');
+  },
+
+  /** আঁকা শেষ — মোট পরিমাণ দিয়ে মাপে বসানো */
+  drawFinish() {
+    if (this.draft.length < 3) {
+      this.status('অন্তত ৩টি কোণা দিন।', true); return;
+    }
+    const el = document.getElementById('dv-draw-area');
+    const amt = CadCore.num(el ? el.value : '');
+    if (!(amt > 0)) {
+      this.status('জমির <b>মোট পরিমাণ</b> লিখুন — দলিলে যা লেখা আছে। '
+        + 'ওটা দিয়েই আঁকা আকৃতিকে মাপে বসানো হবে।', true);
+      if (el) el.focus();
+      return;
+    }
+    const unitEl = document.getElementById('dv-draw-unit');
+    const unit = unitEl ? unitEl.value : 'satak';
+    const kSqft = CadCore.sqftPerKatha();           // ব্যবহারকারীর সেটিং মানে
+    const sqft = unit === 'katha' ? amt * kSqft
+               : unit === 'bigha' ? amt * kSqft * 20
+               : unit === 'sqft'  ? amt
+               : amt * 435.6;                       // শতাংশ
+    const pxArea = Math.abs(CadCore.signedArea(this.draft));
+    if (!(pxArea > 0)) { this.status('আঁকা আকৃতির ক্ষেত্রফল শূন্য — কোণাগুলো এক রেখায় পড়েছে।', true); return; }
+
+    this.poly = this.draft.map(p => ({ x: p.x, y: p.y }));
+    this.ftPerPx = Math.sqrt(sqft / pxArea);
+    this.drawing = false;
+    this.angleDeg = CadDivide.deg(CadDivide.suggestAngle(this.poly));
+    this._syncDrawBtns();
+    this.compute();
+    this.status('আঁকা আকৃতি <b>' + CadCore.satakText(sqft) + '</b> ধরে বসানো হয়েছে — '
+      + 'এখন কে কত পাবে সেটি দিন। আকৃতি আন্দাজি হলেও প্রতিটি অংশের পরিমাণ ঠিক থাকবে।');
+  },
+
+  _syncDrawBtns() {
+    const s = document.getElementById('dv-draw-start');
+    const f = document.getElementById('dv-draw-finish');
+    if (s) s.style.display = this.drawing ? 'none' : '';
+    if (f) f.style.display = this.drawing ? '' : 'none';
+    const n = document.getElementById('dv-draw-count');
+    if (n) n.textContent = this.draft.length
+      ? CadCore.bn(this.draft.length) + 'টি কোণা বসেছে' : '';
+  },
+
+  /** চলতি আঁকা — কোণা, রেখা ও নির্দেশ */
+  _drawDraft(g, W, H) {
+    const pts = this.draft;
+    g.save();
+    if (!pts.length) {
+      g.fillStyle = '#94a3b8';
+      g.font = '600 14px "Noto Sans Bengali", sans-serif';
+      g.textAlign = 'center';
+      g.fillText(this.drawing ? 'জমির কোণায় কোণায় ক্লিক করুন'
+                              : '“আঁকা শুরু” চেপে জমির আকৃতি আঁকুন', W / 2, H / 2);
+      g.restore(); return;
+    }
+    g.beginPath();
+    pts.forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y));
+    if (pts.length >= 3) {
+      g.closePath();
+      g.fillStyle = 'rgba(79,70,229,0.12)';
+      g.fill();
+    }
+    g.strokeStyle = '#4f46e5'; g.lineWidth = 2;
+    g.stroke();
+
+    pts.forEach((p, i) => {
+      g.beginPath(); g.arc(p.x, p.y, i === 0 ? 6 : 4.5, 0, Math.PI * 2);
+      g.fillStyle = i === 0 ? '#f59e0b' : '#4f46e5';
+      g.fill();
+      g.strokeStyle = '#fff'; g.lineWidth = 1.6; g.stroke();
+    });
+
+    if (this.drawing && pts.length >= 3) {
+      g.fillStyle = '#b45309';
+      g.font = '600 12px "Noto Sans Bengali", sans-serif';
+      g.textAlign = 'left';
+      g.fillText('প্রথম কোণায় (হলুদ) আবার ক্লিক করলেই আঁকা শেষ', 12, H - 14);
+    }
+    g.restore();
+  },
+
+  /** ক্যানভাসে ক্লিক — কেবল আঁকার অবস্থায় */
+  onCanvasClick(ev) {
+    if (!this.drawing) return;
+    const c = document.getElementById('dv-canvas');
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    const p = { x: (ev.clientX - r.left) * (c.width / r.width),
+                y: (ev.clientY - r.top) * (c.height / r.height) };
+    // প্রথম কোণার কাছে আবার ক্লিক = আঁকা শেষ
+    if (this.draft.length >= 3) {
+      const a = this.draft[0];
+      if (Math.hypot(p.x - a.x, p.y - a.y) < 12) { this.drawFinish(); return; }
+    }
+    this.draft.push(p);
+    this._syncDrawBtns();
+    this.draw();
   },
 
   /** বাহুর মাপ থেকে আকৃতি */
@@ -86,13 +230,27 @@ const DivideApp = {
     this.compute();
   },
 
-  /** ডিজিটাল সার্ভে টুলে আঁকা দাগগুলোর তালিকা */
+  /** সব দাগ দেখাব, নাকি কেবল যেগুলো বাছা হয়েছে */
+  cadShowAll: false,
+  cadPick: null,          // অন্য পর্দা থেকে পাঠানো দাগের তালিকা
+
+  setCadScope(all) { this.cadShowAll = !!all; this.renderCadList(); },
+
+  /**
+   * ডিজিটাল সার্ভে টুলে আঁকা দাগগুলোর তালিকা
+   *
+   * ★ কেন কেবল বাছাই করাগুলো
+   *   একটি মৌজা নকশায় হাজারেরও বেশি দাগ থাকে। একটি দাগ নিয়ে ভাগ করতে এসে
+   *   পুরো তালিকা নামলে পাতা ভেসে যায়, নিজের দাগটাই আর খুঁজে পাওয়া যায় না।
+   *   তাই বাছাই থাকলে **কেবল সেগুলোই** দেখাই; দরকার হলে “সব দাগ” চেপে
+   *   পুরো তালিকা খোলা যায়।
+   */
   renderCadList() {
     const box = document.getElementById('dv-cad-list');
     if (!box) return;
     const doc = (typeof CadApp !== 'undefined') ? CadApp.doc : null;
-    const feats = doc ? doc.features.filter(f => f.closed && f.pts.length >= 3) : [];
-    if (!feats.length) {
+    const all = doc ? doc.features.filter(f => f.closed && f.pts.length >= 3) : [];
+    if (!all.length) {
       box.innerHTML = '<div class="cad-empty-mini">ডিজিটাল সার্ভে টুলে কোনো দাগ আঁকা নেই। '
         + 'আগে সেখানে নকশা ডিজিটাইজ করুন, তারপর এখানে এসে দাগ বেছে নিন।</div>';
       return;
@@ -102,13 +260,40 @@ const DivideApp = {
         + 'তাই ক্ষেত্রফল বের হবে না। আগে স্কেল বসিয়ে নিন।</div>';
       return;
     }
-    box.innerHTML = feats.slice(0, 200).map(f => {
+
+    /* বাছাই — যে পর্দা থেকে পাঠানো হয়েছে সেটিই (`cadPick`), নইলে ক্যানভাসের
+       চলতি নির্বাচন। টুলটি নতুন করে খুললে `cadPick` মুছে যায়, তাই পুরোনো
+       বাছাই আটকে থাকে না। */
+    let picked = (this.cadPick && this.cadPick.length)
+      ? this.cadPick.slice()
+      : ((typeof CadView !== 'undefined' && CadView.state)
+          ? CadView.state.selection.slice() : []);
+    const pickSet = new Set(picked);
+    const hasPick = picked.length > 0 && all.some(f => pickSet.has(f.id));
+    const list = (hasPick && !this.cadShowAll) ? all.filter(f => pickSet.has(f.id)) : all;
+
+    const head = hasPick
+      ? `<div class="dv-scope">
+           <button type="button" class="cad-mini${this.cadShowAll ? '' : ' hot'}"
+                   onclick="DivideApp.setCadScope(false)">বাছাই করা (${CadCore.bn(picked.length)})</button>
+           <button type="button" class="cad-mini${this.cadShowAll ? ' hot' : ''}"
+                   onclick="DivideApp.setCadScope(true)">সব দাগ (${CadCore.bn(all.length)})</button>
+         </div>`
+      : (all.length > 200
+          ? `<p class="cad-hint-mini">${CadCore.bn(all.length)}টি দাগের মধ্যে প্রথম ২০০টি দেখানো হচ্ছে।
+               ডিজিটাল সার্ভেতে দাগ বেছে এলে কেবল সেগুলোই দেখাবে।</p>` : '');
+
+    const shown = list.slice(0, 200);
+    box.innerHTML = head + shown.map(f => {
       const m = CadCore.measure(doc, f);
       return `<button type="button" class="cad-mini" style="width:100%;justify-content:space-between;margin-bottom:4px"
         onclick="DivideApp.takeFromCad('${f.id}')">
         <span>${f.dag ? 'দাগ ' + CadCore.bn(f.dag) : 'দাগ (নম্বর নেই)'}</span>
         <span style="color:var(--text-muted)">${CadCore.satakText(m.sqft)}</span></button>`;
-    }).join('');
+    }).join('')
+    + (list.length > shown.length
+        ? `<p class="cad-hint-mini">আরও ${CadCore.bn(list.length - shown.length)}টি বাকি —
+             ডিজিটাল সার্ভেতে দরকারি দাগগুলো বেছে নিয়ে আসুন।</p>` : '');
   },
 
   takeFromCad(id) {
@@ -206,12 +391,16 @@ const DivideApp = {
 
   draw() {
     const c = document.getElementById('dv-canvas');
-    if (!c || !this.poly) return;
+    if (!c) return;
     const r = c.parentElement.getBoundingClientRect();
     const W = Math.max(300, Math.round(r.width)), H = Math.max(280, Math.round(r.height));
     if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
     const g = c.getContext('2d');
     g.clearRect(0, 0, W, H);
+
+    // আঁকার অবস্থায় চলতি রেখাই দেখাই
+    if (this.drawing || (!this.poly && this.draft.length)) { this._drawDraft(g, W, H); return; }
+    if (!this.poly) return;
 
     const bb = CadCore.bbox(this.poly);
     const pad = 54;
@@ -363,6 +552,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const i = document.getElementById('modal-title-icon');
       if (t) t.innerText = 'জমি ভাগ-বণ্টন (যেকোনো আকৃতি)';
       if (i) i.className = 'bi bi-diagram-3 text-primary';
+      // হোম থেকে সরাসরি খুললে আগের পর্দার বাছাই আর প্রযোজ্য নয়
+      if (!DivideApp._incoming) { DivideApp.cadPick = null; DivideApp.cadShowAll = false; }
+      DivideApp._incoming = false;
       setTimeout(() => DivideApp.init(), 60);
     }
   };

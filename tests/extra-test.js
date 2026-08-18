@@ -138,6 +138,68 @@ ok('ভুল ঠিকানা যোগ হয় না', MS.addCustom({ nam
 ok('নাম ছাড়া যোগ হয় না', MS.addCustom({ name: '', url: 'https://a.com' }).ok === false);
 ok('localStorage ছাড়াও ভাঙে না', Array.isArray(MS.custom()));
 
+
+console.log('\n=== অর্ধেকের বেশি হিস্যা (রিগ্রেশন) ===');
+/* ★ যে বাগটা ধরা পড়েছিল
+   splitByFraction এর দ্বিভাজন সীমা ছিল কেন্দ্র থেকে ±span, আর রেখা দাগের
+   বাইরে গেলে নিঃশর্তে lo = t করা হতো। ধনাত্মক পাশে বেরোলে বাঁ ভাগ = পুরো
+   দাগ, অর্থাৎ বেশি — তখন hi নামানো উচিত ছিল। ফলে অনুসন্ধান বাইরে বেরিয়ে
+   আর ফিরত না, আর best থেকে যেত প্রথম চেষ্টাটাই (ঠিক অর্ধেক)।
+   **হিস্যা অর্ধেকের বেশি হলেই ভাগ সমান হয়ে যেত** — ১২:৪ আনা দিলেও ৮:৮।
+   তিনজনের ক্ষেত্রে ধরা পড়েনি, কারণ ৮:৪:৪ এ প্রতিটি ধাপে ভগ্নাংশ ঠিক ০.৫। */
+{
+  const sq = [{x:0,y:0},{x:100,y:0},{x:100,y:100},{x:0,y:100}];
+  const A = CadCore.area(sq);
+
+  [0.1, 0.25, 0.5, 0.667, 0.8, 0.9].forEach(f => {
+    const c = CadOverlay.splitByFraction(sq, f, 0);
+    ok('ভগ্নাংশ ' + f + ' ঠিক কাটে',
+       c && Math.abs(CadCore.area(c.left) / A - f) < 0.002,
+       c ? (CadCore.area(c.left) / A).toFixed(4) : 'null');
+  });
+
+  [0, 30, 45, 90, 135].forEach(d => {
+    const c = CadOverlay.splitByFraction(sq, 0.75, d * Math.PI / 180);
+    ok('০.৭৫ ভাগ ' + d + '° কোণেও ঠিক',
+       c && Math.abs(CadCore.area(c.left) / A - 0.75) < 0.002,
+       c ? (CadCore.area(c.left) / A).toFixed(4) : 'null');
+  });
+
+  /* অনিয়মিত (L) আকৃতিতেও */
+  const L = [{x:0,y:0},{x:120,y:0},{x:120,y:60},{x:60,y:60},{x:60,y:120},{x:0,y:120}];
+  const AL = CadCore.area(L);
+  [0.25, 0.6, 0.85].forEach(f => {
+    const c = CadOverlay.splitByFraction(L, f, 0.3);
+    ok('L-আকৃতিতে ভগ্নাংশ ' + f,
+       c && Math.abs(CadCore.area(c.left) / AL - f) < 0.003,
+       c ? (CadCore.area(c.left) / AL).toFixed(4) : 'null');
+  });
+
+  /* পূর্ণ ভাগ-বণ্টনে — ১২:৪ আনা মানে তিন-চতুর্থাংশ ও এক-চতুর্থাংশ */
+  const r = CadDivide.divide({ ftPerPx: 1 }, sq,
+    [{name:'ক',value:'12'},{name:'খ',value:'4'}], { mode:'ana', angle:0 });
+  ok('১২:৪ আনা → ৭৫% ও ২৫%',
+     r.ok && Math.abs(r.parts[0].sqft / A - 0.75) < 0.002
+          && Math.abs(r.parts[1].sqft / A - 0.25) < 0.002,
+     r.ok ? r.parts.map(x => (x.sqft / A).toFixed(4)).join(' / ') : r.error);
+  ok('১২:৪ এর যোগফল পুরো জমি',
+     r.ok && Math.abs(r.parts.reduce((s2,x) => s2 + x.sqft, 0) - A) < A * 0.002);
+
+  /* দুইয়ের বেশি অংশেও অর্ধেকের বেশি প্রথমে */
+  const r3 = CadDivide.divide({ ftPerPx: 1 }, sq,
+    [{name:'ক',value:'10'},{name:'খ',value:'3'},{name:'গ',value:'3'}], { mode:'ana', angle:0 });
+  ok('১০:৩:৩ আনা ঠিক ভাগ হয়',
+     r3.ok && Math.abs(r3.parts[0].sqft / A - 10/16) < 0.003
+           && Math.abs(r3.parts[1].sqft / A - 3/16) < 0.003,
+     r3.ok ? r3.parts.map(x => (x.sqft / A).toFixed(4)).join(' / ') : r3.error);
+
+  /* একজনই সব — কাটার দরকার নেই */
+  const r1 = CadDivide.divide({ ftPerPx: 1 }, sq, [{name:'ক',value:'16'}],
+    { mode:'ana', angle:0 });
+  ok('একজন হলে পুরোটাই তার',
+     r1.ok && r1.parts.length === 1 && Math.abs(r1.parts[0].sqft - A) < 1);
+}
+
 console.log('\n──────────────────────────────');
 console.log('  পাস ' + pass + ' · ব্যর্থ ' + fail);
 console.log('──────────────────────────────\n');

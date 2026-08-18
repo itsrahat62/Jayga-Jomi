@@ -515,6 +515,10 @@ const DesignApp = {
     if (typeof DivideApp === 'undefined') return;
     AppController.openToolModal('land-divider');
     setTimeout(() => {
+      // কেবল এই পর্দার দাগগুলোই তালিকায় থাকুক — হাজার দাগ নেমে এলে
+      // নিজের দাগটাই আর খুঁজে পাওয়া যায় না
+      DivideApp.cadPick = this.ids.slice();
+      DivideApp.cadShowAll = false;
       DivideApp.setSource('cad');
       DivideApp.takeFromCad(f.id);
       DivideApp.status((f.dag ? 'দাগ ' + CadCore.bn(f.dag) : 'বাছাই করা দাগ')

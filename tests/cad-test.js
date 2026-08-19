@@ -731,6 +731,78 @@ console.log('\n=== ৩১. রাবার — কোণা মোছা ===');
      CadCore.feature(d2, C.id).pts.length);
 }
 
+
+console.log('\n=== ৩২. রেখায় রাবার ও নতুন কোণা বসানো ===');
+{
+  const CadView = require(path + 'cad-view.js');
+  CadView.draw = function () {}; CadView._status = function () {};
+  const d = CadCore.newDoc();
+  d.ftPerPx = 0.5;
+  CadView.state = { doc: d, selection: [], draft: [], show: {},
+                    scale: 1, off: { x: 0, y: 0 }, tool: 'erase' };
+
+  const A = CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:100,y:100},{x:300,y:100},{x:300,y:300},{x:100,y:300}], {dag:'১'}));
+  const B = CadCore.addFeature(d, CadCore.newFeature(d, 'bs',
+    [{x:300,y:100},{x:500,y:100},{x:500,y:300},{x:300,y:300}], {dag:'২'}));
+
+  /* ---- নতুন কোণা বসানো ---- */
+  CadView.state.tool = 'addpt';
+  CadView._undoStack.length = 0;
+  ok('রেখা থেকে দূরে চাপে কিছু বসে না', (function () {
+    const before = A.pts.length;
+    CadView._addPointClick({ x: 200, y: 200 });        // দাগের মাঝখানে
+    return A.pts.length === before;
+  })());
+
+  const beforeA = A.pts.length, beforeB = B.pts.length;
+  CadView._addPointClick({ x: 200, y: 100 });          // A এর উপরের বাহুতে
+  ok('রেখায় চাপ দিলে নতুন কোণা বসে', A.pts.length === beforeA + 1,
+     A.pts.length + '/' + beforeA);
+  ok('একা বাহু হলে পাশের দাগে বসে না', B.pts.length === beforeB);
+  ok('নতুন কোণাটি রেখার উপরেই', A.pts.some(q =>
+     Math.abs(q.y - 100) < 1e-6 && Math.abs(q.x - 200) < 1e-6));
+
+  /* ভাগ করা সীমানায় দুই দাগেই বসতে হবে, নইলে ফাঁক */
+  const a2 = A.pts.length, b2 = B.pts.length;
+  CadView._addPointClick({ x: 300, y: 200 });          // A ও B এর সাধারণ বাহু
+  ok('ভাগ করা সীমানায় দুই দাগেই বসে',
+     A.pts.length === a2 + 1 && B.pts.length === b2 + 1,
+     A.pts.length + '/' + B.pts.length);
+  ok('বসানোর পর সীমানা এখনো মেলে', (function () {
+    const key = q => q.x.toFixed(4) + ',' + q.y.toFixed(4);
+    const sa = new Set(A.pts.map(key));
+    return B.pts.filter(q => sa.has(key(q))).length >= 3;
+  })());
+  ok('Ctrl+Z তে নতুন কোণা ফিরে যায়', (function () {
+    CadView.undo();
+    return CadCore.feature(d, A.id).pts.length === a2;
+  })(), CadCore.feature(d, A.id).pts.length + '');
+
+  /* ---- রেখায় রাবার — গোটা দাগ ---- */
+  const d2 = CadCore.newDoc();
+  CadView.state = { doc: d2, selection: [], draft: [], show: {},
+                    scale: 1, off: { x: 0, y: 0 }, tool: 'erase' };
+  const C = CadCore.addFeature(d2, CadCore.newFeature(d2, 'bs',
+    [{x:0,y:0},{x:100,y:0},{x:100,y:100},{x:0,y:100}], {dag:'৫'}));
+  const D2 = CadCore.addFeature(d2, CadCore.newFeature(d2, 'bs',
+    [{x:200,y:0},{x:300,y:0},{x:300,y:100},{x:200,y:100}], {dag:'৬'}));
+  CadView.state.selection = [C.id, D2.id];
+  CadView._undoStack.length = 0;
+
+  ok('ফাঁকা জায়গায় রেখা-রাবার কিছু করে না',
+     CadView.eraseLineAt({ x: 150, y: 500 }) === false);
+  ok('রেখায় চাপে গোটা দাগ মোছে',
+     CadView.eraseLineAt({ x: 50, y: 0 }) === true);
+  ok('কেবল ঐ দাগটিই গেছে',
+     d2.features.length === 1 && d2.features[0].id === D2.id,
+     d2.features.length + 'টি বাকি');
+  ok('বাছাইয়ের তালিকা থেকেও বাদ',
+     CadView.state.selection.length === 1 && CadView.state.selection[0] === D2.id);
+  CadView.undo();
+  ok('Ctrl+Z তে দাগটি ফিরে আসে', d2.features.length === 2, d2.features.length + '');
+}
+
 console.log('\n──────────────────────────────');
 console.log(`  পাস ${pass} · ব্যর্থ ${fail}`);
 console.log('──────────────────────────────\n');

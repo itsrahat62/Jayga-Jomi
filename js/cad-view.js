@@ -189,7 +189,8 @@ const CadView = {
     scale:  'চেনা দূরত্বের দুই প্রান্তে ক্লিক করুন, তারপর মাপ লিখুন',
     gcp:    'নকশায় চেনা জায়গায় ক্লিক করুন — পরে স্যাটেলাইটে একই জায়গা দেখাবেন',
     split:  'দাগ ভাগ করতে দুই প্রান্তে ক্লিক করে রেখা টানুন',
-    erase:  'রাবার — কোণার উপর চাপ দিলেই মুছে যাবে · চেপে ধরে টানলে একটার পর একটা · পাশের দাগের কোণাও সাথে যাবে, ফাঁক হবে না',
+    addpt:  'দাগের রেখার উপর চাপ দিন — সেখানেই নতুন কোণা বসবে · ভাগ করা সীমানা হলে পাশের দাগেও বসবে',
+    erase:  'রাবার — কোণায় চাপ দিলে কোণা মুছবে · রেখায় চাপ দিলে গোটা দাগটি · চেপে ধরে টানলে একটার পর একটা কোণা',
     note:   'যেখানে লিখতে চান সেখানে ক্লিক করুন · আগের লেখায় ক্লিক করলে বদলাবে, টানলে সরবে, Delete দিলে মুছবে',
     pin:    'চিহ্ন বসাতে ক্লিক করুন (টিউবওয়েল, খুঁটি, গাছ…) · নাম লিখে Enter',
     circle: 'বৃত্তের মাঝে ক্লিক করুন · গায়ে ধরে টানলে মাপ বদলাবে, মাঝে ধরে টানলে সরবে'
@@ -380,9 +381,13 @@ const CadView = {
       if (this._erasing) {
         const n = this._erasing.count;
         this._erasing = null;
-        this._status(n
-          ? CadCore.bn(n) + 'টি কোণা মোছা হয়েছে — ভুল হলে ↺ (Ctrl+Z)'
-          : 'কোণার ঠিক উপরে চাপ দিন · চেপে ধরে টানলে একটার পর একটা মুছবে');
+        if (n) {
+          this._status(CadCore.bn(n) + 'টি কোণা মোছা হয়েছে — ভুল হলে ↺ (Ctrl+Z)');
+        } else if (!wasDrag && this.eraseLineAt(ip)) {
+          // কোণায় পড়েনি, কিন্তু রেখায় পড়েছে — গোটা দাগটিই যাবে
+        } else {
+          this._status('কোণায় চাপ দিলে কোণা মুছবে · রেখায় চাপ দিলে গোটা দাগটি');
+        }
         downPt = null; return;
       }
 
@@ -468,6 +473,7 @@ const CadView = {
         case 'scale':  this._scaleClick(ip); break;
         case 'gcp':    if (s.onGcp) s.onGcp(ip); this.draw(); break;
         case 'split':  this._splitClick(ip); break;
+        case 'addpt':  this._addPointClick(ip); break;
         case 'note':   this._noteClick(ip, 'text'); break;
         case 'pin':    this._noteClick(ip, 'pin'); break;
         case 'circle': this._noteClick(ip, 'circle'); break;
@@ -878,6 +884,29 @@ const CadView = {
     return n;
   },
 
+  /* ==================== বিন্দু যোগ ====================
+     ★ কেন আলাদা টুল
+       নতুন কোণা বসানো যেত “কোণা” টুলে রেখায় ক্লিক করে — কিন্তু ঐ টুলে
+       ক্লিক আর টান দুটোই কাজ করায় অনেকে ভুল করে কোণা সরিয়ে ফেলতেন,
+       আর “নতুন বিন্দু কোথায় যোগ করব” সেটাই খুঁজে পেতেন না। এখানে
+       ক্লিক মানে **শুধুই নতুন বিন্দু**।
+     ==================================================== */
+
+  _addPointClick(ip) {
+    const he = this._hitEdge(ip);
+    if (!he) {
+      this._status('দাগের **রেখার উপরে** চাপ দিন — সেখানেই নতুন কোণা বসবে। '
+        + 'রেখা থেকে দূরে চাপ দিলে কিছু হবে না।', true);
+      return;
+    }
+    this._pushUndo();
+    const n = this._insertVertex(he);
+    this._status(n > 1
+      ? 'নতুন কোণা বসেছে — ভাগ করা সীমানা বলে পাশের ' + CadCore.bn(n - 1)
+        + 'টি দাগেও একই জায়গায় বসেছে, ফাঁক হবে না'
+      : 'নতুন কোণা বসেছে — এবার “কোণা” টুলে ধরে টেনে জায়গামতো নিন');
+  },
+
   /* ==================== রাবার — কোণা মোছা ==================== */
 
   /**
@@ -891,6 +920,27 @@ const CadView = {
    *   একসাথে মোছা হয় — নইলে এক দাগে কোণা যেত, পাশেরটায় থেকে যেত, মাঝে
    *   ফাঁক তৈরি হতো।
    */
+  /**
+   * রাবার দিয়ে রেখায় চাপ — গোটা দাগটিই মুছে যায়
+   * ★ কেন গোটা দাগ
+   *   বন্ধ দাগ থেকে একটিমাত্র বাহু মুছে ফেলা যায় না — তাতে বলয়টা খুলে যায়,
+   *   ক্ষেত্রফলও বেরোয় না। ভুল করে বসা একটা দাগ/রেখা তুলে ফেলাই আসল দরকার,
+   *   তাই রেখায় চাপ দিলে সেই দাগটিই যায়।
+   */
+  eraseLineAt(ip) {
+    const s = this.state;
+    const he = this._hitEdge(ip);
+    if (!he) return false;
+    const f = he.f;
+    this._pushUndo();
+    CadCore.removeFeature(s.doc, f.id);
+    s.selection = s.selection.filter(id => id !== f.id);
+    this._changed(); this.draw();
+    this._status((f.dag ? 'দাগ ' + CadCore.bn(f.dag) : 'রেখাটি')
+      + ' মুছে ফেলা হয়েছে — ভুল হলে ↺ (Ctrl+Z)');
+    return true;
+  },
+
   eraseVertexAt(sp) {
     const s = this.state;
     const hv = this._hitVertex(sp);
@@ -1621,8 +1671,8 @@ const CadView = {
   _drawHandles(ctx) {
     const s = this.state;
     if (!s.show.vertices && !s.selection.length) return;
-    // রাবারেও সব কোণা দেখা দরকার — কোনটা মুছছেন সেটি দেখেই চাপ দেবেন
-    const showAll = s.tool === 'edit' || s.tool === 'erase';
+    // রাবার ও বিন্দু-যোগেও সব কোণা দেখা দরকার — কোথায় আছে দেখেই চাপ দেবেন
+    const showAll = s.tool === 'edit' || s.tool === 'erase' || s.tool === 'addpt';
     // নির্বাচিত কোণার জায়গা — আলাদা রঙে দেখাব
     const selPt = (s.vertexSel && s.vertexSel.length)
       ? s.vertexSel[0].f.pts[s.vertexSel[0].i] : null;

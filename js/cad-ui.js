@@ -27,7 +27,20 @@ const CadApp = {
     this.renderSteps();
     this.show(this.started ? 'work' : 'start');
     if (this.started) {
-      setTimeout(() => { this.sizeCanvas(); CadView.draw(); }, 60);
+      /* ★ ফিরে এলে সব যেন আগের মতোই চলে
+         অন্য টুলে গিয়ে ফিরে এলে ডান পাশের তালিকা, উপরের “ডিজাইনে খুলুন”
+         ও ফেরত/আবার বোতামগুলো আগের অবস্থায় আটকে থাকত — তাই এখানেই সব
+         আবার এঁকে দিই, আর ক্যানভাসের মাপও নতুন করে নিই। */
+      this.renderFeatures();
+      this.renderStats();
+      this.renderRasters();
+      if (CadView.state) CadView._syncHistoryBtns();
+      setTimeout(() => {
+        this.sizeCanvas();
+        this._initView();                     // ক্যানভাস বদলে থাকলে আবার বাঁধি
+        if (CadView.state) this.tool(CadView.state.tool || 'pan');
+        CadView.draw();
+      }, 60);
     }
   },
 
@@ -626,7 +639,47 @@ const CadApp = {
   },
 
   /** চেনা দূরত্ব দিয়ে স্কেল বসানো */
+  /**
+   * মাপার আগেই “কত চেইন” ঠিক করে রাখা
+   * ★ কেন
+   *   আগে দুই প্রান্তে ক্লিক করার **পরে** ঘর খুলত, তখন ব্যবহারকারী ভাবতেন
+   *   “কত লিখব?” — মাপকাঠির দিকে আবার তাকাতে হতো। এখন আগে বলে রাখুন
+   *   ০–১০ চেইন না ০–৫ চেইন মাপবেন; তারপর দুই দাগে ক্লিক করলেই স্কেল বসে যায়।
+   */
+  scalePreset: null,
+
+  setScalePreset(amt, unit) {
+    if (amt == null) { this.scalePreset = null; }
+    else this.scalePreset = { amt: Number(amt), unit: unit || 'chain' };
+    document.querySelectorAll('#cad-scale-presets .cad-mini').forEach(b => {
+      b.classList.toggle('hot', !!this.scalePreset
+        && Number(b.dataset.amt) === this.scalePreset.amt
+        && b.dataset.unit === this.scalePreset.unit);
+    });
+    const p = this.scalePreset;
+    this.tool('scale');
+    this.status(p
+      ? 'ঠিক আছে — এখন নকশার মাপকাঠিতে <b>০</b> দাগে আর <b>'
+        + CadCore.bn(String(p.amt)) + ' ' + CadCore.lengthUnit(p.unit).name
+        + '</b> দাগে ক্লিক করুন। স্কেল আপনাআপনি বসে যাবে।'
+      : 'দুই প্রান্তে ক্লিক করুন — তারপর মাপটি লিখতে বলা হবে।');
+  },
+
   askScale(px, pts) {
+    // আগেই বলে রাখা থাকলে ঘর না খুলে সরাসরি বসিয়ে দিই
+    if (this.scalePreset) {
+      const u = CadCore.lengthUnit(this.scalePreset.unit);
+      const ft = this.scalePreset.amt * u.ft;
+      if (ft > 0 && px > 0) {
+        this.doc.ftPerPx = ft / px;
+        CadView.draw();
+        this.renderFeatures(); this.renderStats(); this.renderSteps();
+        this.status('স্কেল বসানো হয়েছে — <b>' + CadCore.bn(String(this.scalePreset.amt))
+          + ' ' + u.name + '</b> মাপা হয়েছে। এখন সব দাগের ক্ষেত্রফল বেরোবে। '
+          + 'ভুল হলে আবার মেপে নিন।');
+        return;
+      }
+    }
     const box = document.getElementById('cad-scale-ask');
     if (!box) return;
     this._fillUnitOptions();

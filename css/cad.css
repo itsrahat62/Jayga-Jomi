@@ -1238,3 +1238,23 @@ html.dark-theme .hg-box { box-shadow: 0 18px 45px -12px rgba(0,0,0,0.8); }
 .dv-scope .cad-mini { flex: 1; justify-content: center; }
 
 #dv-canvas { cursor: crosshair; }
+
+
+/* রেলে ভাগের শিরোনাম — কোন টুল কি কাজের সেটি এক নজরে */
+.cad-rail-cap {
+  flex: 0 0 auto;
+  margin: 7px 0 2px;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--text-light);
+  text-align: center;
+  text-transform: uppercase;
+}
+.cad-rail-cap:first-child { margin-top: 0; }
+
+
+/* মাপার আগেই “কত চেইন” বেছে নেওয়া */
+.cad-scale-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 4px; }
+.cad-scale-presets .cad-mini { justify-content: center; }
+.cad-scale-presets .cad-mini:last-child { grid-column: 1 / -1; }

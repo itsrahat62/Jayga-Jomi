@@ -638,46 +638,68 @@
 
             <!-- বাঁয়ের টুল রেল -->
             <div class="cad-rail" id="cad-tools">
+
+              <div class="cad-rail-cap">দেখা</div>
               <button type="button" class="cad-tool active" data-tool="pan"
-                      title="সরান / জুম — ড্র্যাগ করে সরান, চাকা ঘুরিয়ে জুম"
+                      title="সরান / জুম — ছবিটা ধরে টেনে সরান, চাকা ঘুরিয়ে ছোট-বড় করুন। কিছুই বদলায় না।"
                       onclick="CadApp.tool('pan')">
                 <i class="bi bi-arrows-move"></i><em>সরান</em></button>
+              <button type="button" class="cad-tool"
+                      title="পুরো নকশা এক পর্দায় ধরান (F)"
+                      onclick="CadApp.fit()">
+                <i class="bi bi-arrows-fullscreen"></i><em>পুরোটা</em></button>
+
+              <div class="cad-rail-cap">দাগ আঁকা</div>
               <button type="button" class="cad-tool" data-tool="wand"
-                      title="জাদুকাঠি — দাগের ভেতরে এক ক্লিকেই বহুভুজ"
+                      title="জাদুকাঠি — দাগের ভেতরে এক ক্লিক করলেই তার সীমানা নিজে থেকে বেরিয়ে আসে"
                       onclick="CadApp.tool('wand')">
                 <i class="bi bi-magic"></i><em>জাদুকাঠি</em></button>
               <button type="button" class="cad-tool" data-tool="pen"
-                      title="কলম — দাগের কোণায় কোণায় ক্লিক করে নিজে আঁকুন"
+                      title="কলম — দাগের কোণায় কোণায় ক্লিক করে নিজে হাতে আঁকুন; শেষ করতে প্রথম কোণায় ক্লিক বা Enter"
                       onclick="CadApp.tool('pen')">
                 <i class="bi bi-pentagon"></i><em>কলম</em></button>
+
+              <div class="cad-rail-cap">ঠিক করা</div>
               <button type="button" class="cad-tool" data-tool="edit"
-                      title="কোণা সরান, নতুন কোণা বসান বা মুছুন"
+                      title="কোণা ধরে টেনে সরান — পাশের দাগের সীমানাও সাথে সরবে, ফাঁক হবে না"
                       onclick="CadApp.tool('edit')">
-                <i class="bi bi-node-plus"></i><em>কোণা</em></button>
+                <i class="bi bi-arrows-move"></i><em>কোণা টানুন</em></button>
+              <button type="button" class="cad-tool" data-tool="addpt"
+                      title="নতুন কোণা — দাগের রেখার উপর চাপ দিলেই সেখানে নতুন কোণা বসবে"
+                      onclick="CadApp.tool('addpt')">
+                <i class="bi bi-node-plus"></i><em>কোণা বসান</em></button>
               <button type="button" class="cad-tool" data-tool="erase"
-                      title="রাবার — কোণার উপর চাপ দিলেই মুছে যাবে · চেপে ধরে টানলে একটার পর একটা"
+                      title="রাবার — কোণায় চাপ দিলে কোণা মুছবে, রেখায় চাপ দিলে গোটা দাগটি। চেপে ধরে টানলে একটার পর একটা কোণা।"
                       onclick="CadApp.tool('erase')">
                 <i class="bi bi-eraser"></i><em>রাবার</em></button>
+              <button type="button" class="cad-tool" data-tool="split"
+                      title="দাগ ভাগ — দাগের এক প্রান্ত থেকে অন্য প্রান্তে ক্লিক করে রেখা টানলে দুই ভাগ হবে"
+                      onclick="CadApp.tool('split')">
+                <i class="bi bi-scissors"></i><em>দুই ভাগ</em></button>
+
+              <div class="cad-rail-cap">বাছাই</div>
               <button type="button" class="cad-tool" data-tool="select"
-                      title="নির্বাচন — ঘের টেনে একসাথে অনেক দাগ ধরুন"
+                      title="দাগ বাছুন — ক্লিক করে একটি, ঘের টেনে অনেকগুলো, Shift ধরে যোগ করুন"
                       onclick="CadApp.tool('select')">
                 <i class="bi bi-cursor"></i><em>বাছুন</em></button>
-              <div class="cad-rail-sep"></div>
+              <button type="button" class="cad-tool"
+                      title="বাছাই করা দাগ মুছে ফেলুন (Delete)"
+                      onclick="CadApp.del()">
+                <i class="bi bi-trash"></i><em>দাগ মুছুন</em></button>
+
+              <div class="cad-rail-cap">মাপ ও দিক</div>
               <button type="button" class="cad-tool" data-tool="scale"
-                      title="স্কেল বসান — চেনা দূরত্বের দুই প্রান্তে ক্লিক করুন"
+                      title="স্কেল বসান — নকশার স্কেল-দণ্ডের দুই দাগে ক্লিক করুন। এটি ছাড়া কোনো ক্ষেত্রফল বেরোবে না।"
                       onclick="CadApp.tool('scale')">
                 <i class="bi bi-rulers"></i><em>স্কেল</em></button>
-              <button type="button" class="cad-tool" data-tool="split"
-                      title="দাগ ভাগ করুন — রেখা টেনে দুই ভাগ"
-                      onclick="CadApp.tool('split')">
-                <i class="bi bi-scissors"></i><em>ভাগ</em></button>
               <button type="button" class="cad-tool" data-tool="gcp"
-                      title="ভূ-স্থানাঙ্ক — স্যাটেলাইটের সাথে মেলান"
+                      title="স্যাটেলাইটের সাথে মেলান — নকশার চেনা জায়গা আর গুগল আর্থের একই জায়গা মিলিয়ে দিন"
                       onclick="CadApp.geoOpen()">
-                <i class="bi bi-geo-alt"></i><em>গুগল</em></button>
-              <div class="cad-rail-sep"></div>
+                <i class="bi bi-geo-alt"></i><em>স্যাটেলাইট</em></button>
+
+              <div class="cad-rail-cap">চিহ্ন</div>
               <button type="button" class="cad-tool" data-tool="note"
-                      title="লেখা — নকশায় নাম বা মন্তব্য বসান (রাস্তা, পুকুরপাড়…)"
+                      title="লেখা — নকশায় নাম বা মন্তব্য বসান (রাস্তা, পুকুরপাড়…)। ক্ষেত্রফলের হিসাবে ঢোকে না।"
                       onclick="CadApp.tool('note')">
                 <i class="bi bi-fonts"></i><em>লেখা</em></button>
               <button type="button" class="cad-tool" data-tool="pin"
@@ -685,19 +707,17 @@
                       onclick="CadApp.tool('pin')">
                 <i class="bi bi-geo-alt-fill"></i><em>চিহ্ন</em></button>
               <button type="button" class="cad-tool" data-tool="circle"
-                      title="বৃত্ত — কুয়া বা গোল জায়গা; গায়ে ধরে টানলে মাপ বদলায়"
+                      title="বৃত্ত — কুয়া বা গোল জায়গা; গায়ে ধরে টানলে মাপ বদলায়, মাঝে ধরে টানলে সরে"
                       onclick="CadApp.tool('circle')">
                 <i class="bi bi-circle"></i><em>বৃত্ত</em></button>
-              <div class="cad-rail-sep"></div>
-              <button type="button" class="cad-tool" title="ফেরত নিন (Ctrl+Z)"
+
+              <div class="cad-rail-cap">ভুল হলে</div>
+              <button type="button" class="cad-tool" title="আগের অবস্থায় ফেরত (Ctrl+Z)"
                       onclick="CadApp.undo()">
                 <i class="bi bi-arrow-counterclockwise"></i><em>ফেরত</em></button>
-              <button type="button" class="cad-tool" title="নির্বাচিত দাগ মুছুন (Delete)"
-                      onclick="CadApp.del()">
-                <i class="bi bi-trash"></i><em>মুছুন</em></button>
-              <button type="button" class="cad-tool" title="পুরো নকশা এক পর্দায় দেখুন (F)"
-                      onclick="CadApp.fit()">
-                <i class="bi bi-arrows-fullscreen"></i><em>পুরোটা</em></button>
+              <button type="button" class="cad-tool" title="আবার করুন (Ctrl+Y)"
+                      onclick="CadApp.redo()">
+                <i class="bi bi-arrow-clockwise"></i><em>আবার</em></button>
             </div>
 
             <!-- মাঝের মঞ্চ -->
@@ -843,9 +863,24 @@
                   <p class="cad-hint-mini"><b>নকশার স্কেল-দণ্ড মেপে নিন</b> — নিচের বোতাম চেপে
                      নকশার মাপকাঠির ০ ও ১০ চেইন দাগে ক্লিক করুন, তারপর “১০ চেইন” লিখুন।
                      এটাই সবচেয়ে নির্ভুল, DPI জানার দরকার নেই।</p>
-                  <div style="display:flex;gap:5px;margin-bottom:8px">
-                    <button type="button" class="cad-mini full" onclick="CadApp.tool('scale')">
-                      <i class="bi bi-rulers"></i> স্কেল-দণ্ড / চেনা দূরত্ব মাপুন</button>
+                  <p class="cad-hint-mini"><b>প্রথমে</b> বলে নিন মাপকাঠির কতটুকু মাপবেন —
+                     তারপর ওই দুই দাগে ক্লিক করলেই স্কেল বসে যাবে, আর কিছু লিখতে হবে না।</p>
+                  <div class="cad-scale-presets" id="cad-scale-presets">
+                    <button type="button" class="cad-mini" data-amt="10" data-unit="chain"
+                            onclick="CadApp.setScalePreset(10,'chain')">০–১০ চেইন</button>
+                    <button type="button" class="cad-mini" data-amt="5" data-unit="chain"
+                            onclick="CadApp.setScalePreset(5,'chain')">০–৫ চেইন</button>
+                    <button type="button" class="cad-mini" data-amt="1" data-unit="chain"
+                            onclick="CadApp.setScalePreset(1,'chain')">০–১ চেইন</button>
+                    <button type="button" class="cad-mini" data-amt="100" data-unit="link"
+                            onclick="CadApp.setScalePreset(100,'link')">০–১০০ লিংক</button>
+                    <button type="button" class="cad-mini" data-amt="" data-unit=""
+                            onclick="CadApp.setScalePreset(null)">অন্য মাপ</button>
+                  </div>
+                  <div style="display:flex;gap:5px;margin:8px 0">
+                    <button type="button" class="cad-tbtn hot full" style="justify-content:center"
+                            onclick="CadApp.tool('scale')">
+                      <i class="bi bi-rulers"></i> এখন দুই দাগে ক্লিক করুন</button>
                   </div>
                   <div class="cad-form">
                     <label class="wide">নকশায় ছাপা স্কেল (যাচাইয়ের জন্য)
